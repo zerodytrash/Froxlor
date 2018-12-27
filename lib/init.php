@@ -18,55 +18,10 @@
  */
 require dirname(__DIR__) . '/vendor/autoload.php';
 
+session_start();
+
 use Froxlor\Database\Database;
 use Froxlor\Settings;
-
-header("Content-Type: text/html; charset=UTF-8");
-
-// prevent Froxlor pages from being cached
-header("Cache-Control: no-store, no-cache, must-revalidate");
-header("Pragma: no-cache");
-header('Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', time()));
-header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time()));
-
-// Prevent inline - JS to be executed (i.e. XSS) in browsers which support this,
-// Inline-JS is no longer allowed and used
-// See: http://people.mozilla.org/~bsterne/content-security-policy/index.html
-// New stuff see: https://www.owasp.org/index.php/List_of_useful_HTTP_headers and https://www.owasp.org/index.php/Content_Security_Policy
-$csp_content = "default-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self';";
-header("Content-Security-Policy: " . $csp_content);
-header("X-Content-Security-Policy: " . $csp_content);
-header("X-WebKit-CSP: " . $csp_content);
-
-header("X-XSS-Protection: 1; mode=block");
-
-// Don't allow to load Froxlor in an iframe to prevent i.e. clickjacking
-header("X-Frame-Options: DENY");
-
-// Internet Explorer shall not guess the Content-Type, see:
-// http://blogs.msdn.com/ie/archive/2008/07/02/ie8-security-part-v-comprehensive-protection.aspx
-header("X-Content-Type-Options: nosniff");
-
-// ensure that default timezone is set
-if (function_exists("date_default_timezone_set") && function_exists("date_default_timezone_get")) {
-	@date_default_timezone_set(@date_default_timezone_get());
-}
-
-/**
- * Register Globals Security Fix
- * - unsetting every variable registered in $_REQUEST and as variable itself
- */
-foreach ($_REQUEST as $key => $value) {
-	if (isset($$key)) {
-		unset($$key);
-	}
-}
-
-unset($_);
-unset($value);
-unset($key);
-
-$filename = htmlentities(basename($_SERVER['PHP_SELF']));
 
 // define default theme for configurehint, etc.
 $_deftheme = 'Sparkle';
@@ -88,16 +43,13 @@ if (! is_readable(\Froxlor\Froxlor::getInstallDir() . '/lib/userdata.inc.php')) 
 	// replace values
 	$owner_hint = str_replace("<USER>", $posixusername['name'], $owner_hint);
 	$owner_hint = str_replace("<GROUP>", $posixgroup['name'], $owner_hint);
-	$owner_hint = str_replace("<\Froxlor\Froxlor::getInstallDir()>", \Froxlor\Froxlor::getInstallDir(), $owner_hint);
+	$owner_hint = str_replace("<FROXLOR_INSTALL_DIR>", \Froxlor\Froxlor::getInstallDir(), $owner_hint);
 	$owner_hint = str_replace("<CURRENT_YEAR>", date('Y', time()), $owner_hint);
 	// show
 	die($owner_hint);
 }
 
-/**
- * Includes the Usersettings eg.
- * MySQL-Username/Passwort etc.
- */
+// includes MySQL-Username/Passwort etc.
 require \Froxlor\Froxlor::getInstallDir() . '/lib/userdata.inc.php';
 
 if (! isset($sql) || ! is_array($sql)) {
@@ -106,69 +58,146 @@ if (! isset($sql) || ! is_array($sql)) {
 	die($config_hint);
 }
 
-/**
- * Includes the Functions
- */
+// register error-handler
 @set_error_handler(array(
 	'\\Froxlor\\PhpHelper',
 	'phpErrHandler'
 ));
 
-/**
- * Includes the MySQL-Tabledefinitions etc.
- */
+// includes the MySQL-Tabledefinitions etc.
 require \Froxlor\Froxlor::getInstallDir() . '/lib/tables.inc.php';
 
-/**
- * Create a new idna converter
- */
-$idna_convert = new \Froxlor\Idna\IdnaWrapper();
+// send headers
+\Froxlor\Frontend\UI::sendHeaders();
 
-/**
- * If Froxlor was called via HTTPS -> enforce it for the next time by settings HSTS header according to settings
- */
-if (isset($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) != 'off')) {
-	$maxage = Settings::Get('system.hsts_maxage');
-	if (empty($maxage)) {
-		$maxage = 0;
+// init template engine
+\Froxlor\Frontend\UI::initTwig();
+
+define('AREA', 'login');
+
+// Language Managament
+$langs = array();
+$languages = array();
+$iso = array();
+
+// query the whole table
+$result_stmt = Database::query("SELECT * FROM `" . TABLE_PANEL_LANGUAGE . "`");
+
+// presort languages
+while ($row = $result_stmt->fetch(PDO::FETCH_ASSOC)) {
+	$langs[$row['language']][] = $row;
+	// check for row[iso] cause older froxlor
+	// versions didn't have that and it will
+	// lead to a lot of undfined variables
+	// before the admin can even update
+	if (isset($row['iso'])) {
+		$iso[$row['iso']] = $row['language'];
 	}
-	$hsts_header = "Strict-Transport-Security: max-age=" . $maxage;
-	if (Settings::Get('system.hsts_incsub') == '1') {
-		$hsts_header .= "; includeSubDomains";
-	}
-	if (Settings::Get('system.hsts_preload') == '1') {
-		$hsts_header .= "; preload";
-	}
-	header($hsts_header);
 }
 
-/**
- * SESSION MANAGEMENT
- */
-$remote_addr = $_SERVER['REMOTE_ADDR'];
+// buildup $languages for the login screen
+foreach ($langs as $key => $value) {
+	$languages[$key] = $key;
+}
 
-if (empty($_SERVER['HTTP_USER_AGENT'])) {
-	$http_user_agent = 'unknown';
+// set default language before anything else to
+// ensure that we can display messages
+$language = Settings::Get('panel.standardlanguage');
+
+if (isset($userinfo['language']) && isset($languages[$userinfo['language']])) {
+	// default: use language from session, #277
+	$language = $userinfo['language'];
 } else {
-	$http_user_agent = $_SERVER['HTTP_USER_AGENT'];
-}
-unset($userinfo);
-unset($userid);
-unset($customerid);
-unset($adminid);
-unset($s);
+	// this will always evaluat true, since it is the above statement inverted. @todo remove
+	if (! isset($userinfo['def_language']) || ! isset($languages[$userinfo['def_language']])) {
+		if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+			$accept_langs = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+			for ($i = 0; $i < count($accept_langs); $i ++) {
+				// this only works for most common languages. some (uncommon) languages have a 3 letter iso-code.
+				// to be able to use these also, we would have to depend on the intl extension for php (using Locale::lookup or similar)
+				// as long as froxlor does not support any of these languages, we can leave it like that.
+				if (isset($iso[substr($accept_langs[$i], 0, 2)])) {
+					$language = $iso[substr($accept_langs[$i], 0, 2)];
+					break;
+				}
+			}
+			unset($iso);
 
-if (isset($_POST['s'])) {
-	$s = $_POST['s'];
-	$nosession = 0;
-} elseif (isset($_GET['s'])) {
-	$s = $_GET['s'];
-	$nosession = 0;
+			// if HTTP_ACCEPT_LANGUAGES has no valid langs, use default (very unlikely)
+			if (! strlen($language) > 0) {
+				$language = Settings::Get('panel.standardlanguage');
+			}
+		}
+	} else {
+		$language = $userinfo['def_language'];
+	}
+}
+
+// include every english language file we can get
+foreach ($langs['English'] as $key => $value) {
+	include_once \Froxlor\FileDir::makeSecurePath(\Froxlor\Froxlor::getInstallDir() . '/' . $value['file']);
+}
+
+// now include the selected language if its not english
+if ($language != 'English') {
+	foreach ($langs[$language] as $key => $value) {
+		include_once \Froxlor\FileDir::makeSecurePath(\Froxlor\Froxlor::getInstallDir() . '/' . $value['file']);
+	}
+}
+
+// last but not least include language references file
+include_once \Froxlor\FileDir::makeSecurePath(\Froxlor\Froxlor::getInstallDir() . '/lng/lng_references.php');
+
+// set language for Frontend
+\Froxlor\Frontend\UI::setLng($lng);
+
+// check for custom header-graphic
+$hl_path = '../templates/Sparkle2/assets/img';
+$header_logo = $hl_path . '/logo.png';
+
+if (file_exists($hl_path . '/logo_custom.png')) {
+	$header_logo = $hl_path . '/logo_custom.png';
+}
+\Froxlor\Frontend\UI::Twig()->addGlobal('header_logo', $header_logo);
+
+// get module and view
+$module = isset($_GET['module']) ? $_GET['module'] : 'login';
+$view = isset($_GET['view']) ? $_GET['view'] : 'overview';
+
+var_dump($module);
+var_dump($view);
+var_dump(\Froxlor\CurrentUser::hasSession());
+if (\Froxlor\CurrentUser::hasSession() == false && $module != 'login') {
+	header("Location: index.php?module=login");
+	exit();
+} elseif (\Froxlor\CurrentUser::hasSession() && ($module == 'login' && $view != 'su')) {
+	$module = "Index";
+	if (\Froxlor\CurrentUser::getField('adminsession') == 1) {
+		$module = 'admin' . $module;
+	} else {
+		$module = 'customer' . $module;
+	}
+	header("Location: index.php?module=" . $module);
+	exit();
+}
+
+$module = ucfirst($module);
+$mod_fullpath = '\\Froxlor\\Frontend\\Modules\\' . $module;
+
+if (! class_exists($mod_fullpath)) {
+	\Froxlor\UI\Response::dynamic_error(sprintf(_('Module %s does not exist'), $module));
 } else {
-	$s = '';
-	$nosession = 1;
-}
 
+	$mod = new $mod_fullpath();
+	if (method_exists($mod_fullpath, $view)) {
+		$mod->lng = $lng;
+		$mod->mail = new \Froxlor\System\Mailer(true);
+		$mod->{$view}();
+	} else {
+		\Froxlor\UI\Response::dynamic_error(sprintf(_('Module function %s does not exist'), $view));
+	}
+}
+/*
 $timediff = time() - Settings::Get('session.sessiontimeout');
 $del_stmt = Database::prepare("
 	DELETE FROM `" . TABLE_PANEL_SESSIONS . "` WHERE `lastactivity` < :timediff
@@ -185,6 +214,13 @@ if (isset($s) && $s != "" && $nosession != 1) {
 	ini_set("session.use_cookies", false);
 	session_id($s);
 	session_start();
+
+	if (\Froxlor\CurrentUser::getField('adminsession') == 1) {
+		define('AREA', 'admin');
+	} else {
+		define('AREA', 'customer');
+	}
+
 	$query = "SELECT `s`.*, `u`.* FROM `" . TABLE_PANEL_SESSIONS . "` `s` LEFT JOIN `";
 
 	if (AREA == 'admin') {
@@ -230,96 +266,13 @@ if (isset($s) && $s != "" && $nosession != 1) {
 	$nosession = 1;
 }
 
-/**
- * Language Managament
- */
-$langs = array();
-$languages = array();
-$iso = array();
-
-// query the whole table
-$result_stmt = Database::query("SELECT * FROM `" . TABLE_PANEL_LANGUAGE . "`");
-
-// presort languages
-while ($row = $result_stmt->fetch(PDO::FETCH_ASSOC)) {
-	$langs[$row['language']][] = $row;
-	// check for row[iso] cause older froxlor
-	// versions didn't have that and it will
-	// lead to a lot of undfined variables
-	// before the admin can even update
-	if (isset($row['iso'])) {
-		$iso[$row['iso']] = $row['language'];
-	}
-}
-
-// buildup $languages for the login screen
-foreach ($langs as $key => $value) {
-	$languages[$key] = $key;
-}
-
-// set default language before anything else to
-// ensure that we can display messages
-$language = Settings::Get('panel.standardlanguage');
-
-if (isset($userinfo['language']) && isset($languages[$userinfo['language']])) {
-	// default: use language from session, #277
-	$language = $userinfo['language'];
-} else {
-	if (! isset($userinfo['def_language']) || ! isset($languages[$userinfo['def_language']])) // this will always evaluat true, since it is the above statement inverted. @todo remove
-	{
-		if (isset($_GET['language']) && isset($languages[$_GET['language']])) {
-			$language = $_GET['language'];
-		} else {
-			if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-				$accept_langs = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
-				for ($i = 0; $i < count($accept_langs); $i ++) {
-					// this only works for most common languages. some (uncommon) languages have a 3 letter iso-code.
-					// to be able to use these also, we would have to depend on the intl extension for php (using Locale::lookup or similar)
-					// as long as froxlor does not support any of these languages, we can leave it like that.
-					if (isset($iso[substr($accept_langs[$i], 0, 2)])) {
-						$language = $iso[substr($accept_langs[$i], 0, 2)];
-						break;
-					}
-				}
-				unset($iso);
-
-				// if HTTP_ACCEPT_LANGUAGES has no valid langs, use default (very unlikely)
-				if (! strlen($language) > 0) {
-					$language = Settings::Get('panel.standardlanguage');
-				}
-			}
-		}
-	} else {
-		$language = $userinfo['def_language'];
-	}
-}
-
-// include every english language file we can get
-foreach ($langs['English'] as $key => $value) {
-	include_once \Froxlor\FileDir::makeSecurePath($value['file']);
-}
-
-// now include the selected language if its not english
-if ($language != 'English') {
-	foreach ($langs[$language] as $key => $value) {
-		include_once \Froxlor\FileDir::makeSecurePath($value['file']);
-	}
-}
-
-// last but not least include language references file
-include_once \Froxlor\FileDir::makeSecurePath('lng/lng_references.php');
-
 // Initialize our new link - class
 $linker = new \Froxlor\UI\Linker('index.php', $s);
 
-/**
- * global Theme-variable
- */
+// global Theme-variable
 $theme = (Settings::Get('panel.default_theme') !== null) ? Settings::Get('panel.default_theme') : $_deftheme;
 
-/**
- * overwrite with customer/admin theme if defined
- */
+// overwrite with customer/admin theme if defined
 if (isset($userinfo['theme']) && $userinfo['theme'] != $theme) {
 	$theme = $userinfo['theme'];
 }
@@ -344,17 +297,7 @@ if (! array_key_exists('variants', $_themeoptions) || ! array_key_exists($themev
 	$themevariant = "default";
 }
 
-// check for custom header-graphic
-$hl_path = 'templates/' . $theme . '/assets/img';
-$header_logo = $hl_path . '/logo.png';
-
-if (file_exists($hl_path . '/logo_custom.png')) {
-	$header_logo = $hl_path . '/logo_custom.png';
-}
-
-/**
- * Redirects to index.php (login page) if no session exists
- */
+// Redirects to index.php (login page) if no session exists
 if ($nosession == 1 && AREA != 'login') {
 	unset($userinfo);
 	$params = array(
@@ -365,31 +308,20 @@ if ($nosession == 1 && AREA != 'login') {
 	exit();
 }
 
-/**
- * Initialize Template Engine
- */
-$templatecache = array();
-
-/**
- * Logic moved out of lng-file
- */
+// Logic moved out of lng-file
 if (isset($userinfo['loginname']) && $userinfo['loginname'] != '') {
 	$lng['menue']['main']['username'] .= $userinfo['loginname'];
 	// Initialize logging
 	$log = \Froxlor\FroxlorLogger::getInstanceOf($userinfo);
 }
 
-/**
- * Fills variables for navigation, header and footer
- */
+// Fills variables for navigation, header and footer
 $navigation = "";
 if (AREA == 'admin' || AREA == 'customer') {
 	if (\Froxlor\Froxlor::hasUpdates() || \Froxlor\Froxlor::hasDbUpdates()) {
-		/*
-		 * if froxlor-files have been updated
-		 * but not yet configured by the admin
-		 * we only show logout and the update-page
-		 */
+		// if froxlor-files have been updated
+		// but not yet configured by the admin
+		// we only show logout and the update-page
 		$navigation_data = array(
 			'admin' => array(
 				'index' => array(
@@ -443,39 +375,8 @@ if (array_key_exists('css', $_themeoptions['variants'][$themevariant]) && is_arr
 		}
 	}
 }
-eval("\$header = \"" . \Froxlor\UI\Template::getTemplate('header', '1') . "\";");
 
-$current_year = date('Y', time());
-eval("\$footer = \"" . \Froxlor\UI\Template::getTemplate('footer', '1') . "\";");
 
-unset($js);
-unset($css);
-
-if (isset($_POST['action'])) {
-	$action = $_POST['action'];
-} elseif (isset($_GET['action'])) {
-	$action = $_GET['action'];
-} else {
-	$action = '';
-	// clear request data
-	if (isset($_SESSION)) {
-		unset($_SESSION['requestData']);
-	}
-}
-
-if (isset($_POST['page'])) {
-	$page = $_POST['page'];
-} elseif (isset($_GET['page'])) {
-	$page = $_GET['page'];
-} else {
-	$page = '';
-}
-
-if ($page == '') {
-	$page = 'overview';
-}
-
-/**
- * Initialize the mailingsystem
- */
+// Initialize the mailingsystem
 $mail = new \Froxlor\System\Mailer(true);
+*/

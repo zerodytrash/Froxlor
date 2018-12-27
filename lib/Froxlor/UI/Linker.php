@@ -33,7 +33,7 @@ class Linker
 
 	private $args = array();
 
-	public function __construct($file = 'index.php', $sessionid = '', $hostname = '', $protocol = '', $port = '', $username = '', $password = '')
+	public function __construct($file = 'index.php', $hostname = '', $protocol = '', $port = '', $username = '', $password = '')
 	{
 		// Set the basic parts of our URL
 		$this->protocol = $protocol;
@@ -42,8 +42,6 @@ class Linker
 		$this->hostname = $hostname;
 		$this->port = $port;
 		$this->filename = $file;
-		// @TODO: Remove this
-		$this->args['s'] = $sessionid;
 	}
 
 	public function __set($key, $value)
@@ -90,11 +88,7 @@ class Linker
 	public function delAll()
 	{
 		// Just resetting the array
-		// Until the sessionid can be removed: save it
-		// @TODO: Remove this
-		$this->args = array(
-			's' => $this->args['s']
-		);
+		$this->args = array();
 	}
 
 	public function getLink()
@@ -136,16 +130,8 @@ class Linker
 			$this->args = array_merge($this->args, $arguments);
 		}
 
-		// temporary until frontcontroller exists
-		// We got a section in the URL -> morph AREA and section into filename
-		// @TODO: Remove this
-		if (isset($this->args['section']) && strlen($this->args['section']) > 0) {
-			$link .= AREA . '_' . $this->args['section'] . '.php';
-			unset($this->args['section']);
-		} else {
-			// filename has a prefixed slash
-			$link .= $this->filename;
-		}
+		// filename has a prefixed slash
+		$link .= $this->filename;
 
 		// Let's see if we are done (no arguments in query)
 		if (count($this->args) == 0) {

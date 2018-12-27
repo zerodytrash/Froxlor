@@ -19,14 +19,8 @@ class Response
 	 */
 	public static function redirectTo($destination, $get_variables = null, $isRelative = true)
 	{
-		global $s;
-
 		if (is_array($get_variables)) {
-			if (isset($get_variables['s'])) {
-				$linker = new Linker($destination, $get_variables['s']);
-			} else {
-				$linker = new Linker($destination, $s);
-			}
+			$linker = new Linker($destination);
 
 			foreach ($get_variables as $key => $value) {
 				$linker->add($key, $value);
@@ -55,11 +49,7 @@ class Response
 			header('Location: ' . $linker->getLink());
 			exit();
 		} elseif ($get_variables == null) {
-			if ($isRelative) {
-				$linker = new Linker($destination, $s);
-			} else {
-				$linker = new Linker($destination);
-			}
+			$linker = new Linker($destination);
 			header('Location: ' . $linker->getLink());
 			exit();
 		}
@@ -163,7 +153,7 @@ class Response
 		}
 
 		if (is_array($params) && isset($params['filename'])) {
-			$redirect_url = $params['filename'] . '?s=' . $s;
+			$redirect_url = $params['filename'];
 			unset($params['filename']);
 
 			foreach ($params as $varname => $value) {
