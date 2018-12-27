@@ -19,15 +19,10 @@ use Froxlor\Settings;
 use Froxlor\Install\PreConfig;
 use PHPMailer\PHPMailer;
 
-if (PreConfig::versionInUpdate($current_db_version, '201901010')) {
+if (PreConfig::versionInUpdate($current_db_version, '201812190')) {
 	$item = array(
-		'description' => 'OMG so many changes...please note:',
-		'question' => array(
-			0 => array(
-				'title' => 'Activate API interface?',
-				'form' => \Froxlor\UI\HTML::makeyesno('system_activate_api', '1', '0', '0')
-			)
-		)
+		'description' => '<div class="alert alert-warning" role="alert">The ticketsystem has been removed completely. Please backup any contents from the froxlor database if you need them.</div>',
+		'question' => array()
 	);
 	array_push($preconfig_items, $item);
 }

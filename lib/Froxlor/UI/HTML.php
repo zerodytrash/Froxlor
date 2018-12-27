@@ -229,7 +229,7 @@ class HTML
 			$yesselected = $yesselected & $_SESSION['requestData'][$name];
 		}
 
-		return '<select class="dropdown_noborder" id="' . $name . '" name="' . $name . '"' . $d . '>
+		return '<select class="form-control" id="' . $name . '" name="' . $name . '"' . $d . '>
 	<option value="' . $yesvalue . '"' . ($yesselected ? ' selected="selected"' : '') . '>' . $lng['panel']['yes'] . '</option><option value="' . $novalue . '"' . ($yesselected ? '' : ' selected="selected"') . '>' . $lng['panel']['no'] . '</option></select>';
 	}
 
