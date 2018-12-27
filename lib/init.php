@@ -164,9 +164,6 @@ if (file_exists($hl_path . '/logo_custom.png')) {
 $module = isset($_GET['module']) ? $_GET['module'] : 'login';
 $view = isset($_GET['view']) ? $_GET['view'] : 'overview';
 
-var_dump($module);
-var_dump($view);
-var_dump(\Froxlor\CurrentUser::hasSession());
 if (\Froxlor\CurrentUser::hasSession() == false && $module != 'login') {
 	header("Location: index.php?module=login");
 	exit();
@@ -187,7 +184,7 @@ $mod_fullpath = '\\Froxlor\\Frontend\\Modules\\' . $module;
 if (! class_exists($mod_fullpath)) {
 	\Froxlor\UI\Response::dynamic_error(sprintf(_('Module %s does not exist'), $module));
 } else {
-
+	\Froxlor\Frontend\UI::Twig()->addGlobal('module', $module);
 	$mod = new $mod_fullpath();
 	if (method_exists($mod_fullpath, $view)) {
 		$mod->lng = $lng;

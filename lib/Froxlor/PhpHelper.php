@@ -90,22 +90,16 @@ class PhpHelper
 		}
 
 		if (! isset($_SERVER['SHELL']) || (isset($_SERVER['SHELL']) && $_SERVER['SHELL'] == '')) {
-			global $theme;
-
-			// fallback
-			if (empty($theme)) {
-				$theme = "Sparkle";
-			}
 			// prevent possible file-path-disclosure
 			$errfile = str_replace(\Froxlor\Froxlor::getInstallDir(), "", $errfile);
-			// if we're not on the shell, output a nicer error-message
-			$err_hint = file_get_contents(\Froxlor\Froxlor::getInstallDir() . '/templates/' . $theme . '/misc/phperrornice.tpl');
-			// replace values
-			$err_hint = str_replace("<TEXT>", '#' . $errno . ' ' . $errstr, $err_hint);
-			$err_hint = str_replace("<DEBUG>", $errfile . ':' . $errline, $err_hint);
 
-			// show
-			echo $err_hint;
+			$err_display = '<div class="alert alert-danger" role="alert">';
+			$err_display .= '<strong>#' . $errno . ' ' . $errstr . '</strong><br>';
+			$err_display .= $errfile . ':' . $errline;
+			$err_display .= '</div>';
+			// check for more existing errors
+			$errors = isset(\Froxlor\Frontend\UI::Twig()->getGlobals()['global_errors']) ? \Froxlor\Frontend\UI::Twig()->getGlobals()['global_errors'] : "";
+			\Froxlor\Frontend\UI::Twig()->addGlobal('global_errors', $errors.$err_display);
 			// return true to ignore php standard error-handler
 			return true;
 		}

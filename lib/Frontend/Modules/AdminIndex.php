@@ -65,9 +65,9 @@ class AdminIndex extends FeModule
 			SUM(`ftps_used`) AS `ftps_used`,
 			SUM(`subdomains_used`) AS `subdomains_used`,
 			SUM(`traffic_used`) AS `traffic_used`
-			FROM `" . TABLE_PANEL_CUSTOMERS . "`" . ($userinfo['customers_see_all'] ? '' : " WHERE `adminid` = :adminid "));
+			FROM `" . TABLE_PANEL_CUSTOMERS . "`" . (\Froxlor\CurrentUser::getField('customers_see_all') ? '' : " WHERE `adminid` = :adminid "));
 		$overview = Database::pexecute_first($overview_stmt, array(
-			'adminid' => $userinfo['adminid']
+			'adminid' => \Froxlor\CurrentUser::getField('adminid')
 		));
 
 		$dec_places = Settings::Get('panel.decimal_places');
@@ -76,9 +76,9 @@ class AdminIndex extends FeModule
 
 		$number_domains_stmt = Database::prepare("
 			SELECT COUNT(*) AS `number_domains` FROM `" . TABLE_PANEL_DOMAINS . "`
-			WHERE `parentdomainid`='0'" . ($userinfo['customers_see_all'] ? '' : " AND `adminid` = :adminid"));
+			WHERE `parentdomainid`='0'" . (\Froxlor\CurrentUser::getField('customers_see_all') ? '' : " AND `adminid` = :adminid"));
 		$number_domains = Database::pexecute_first($number_domains_stmt, array(
-			'adminid' => $userinfo['adminid']
+			'adminid' => \Froxlor\CurrentUser::getField('adminid')
 		));
 
 		$overview['number_domains'] = $number_domains['number_domains'];
@@ -89,7 +89,7 @@ class AdminIndex extends FeModule
 
 		if ((isset($_GET['lookfornewversion']) && $_GET['lookfornewversion'] == 'yes') || (isset($lookfornewversion) && $lookfornewversion == 'yes')) {
 			try {
-				$json_result = Froxlor::getLocal($userinfo)->checkUpdate();
+				$json_result = Froxlor::getLocal(\Froxlor\CurrentUser::getData())->checkUpdate();
 			} catch (\Exception $e) {
 				\Froxlor\UI\Response::dynamic_error($e->getMessage());
 			}
@@ -102,13 +102,15 @@ class AdminIndex extends FeModule
 			$isnewerversion = $result['isnewerversion'];
 		} else {
 			$lookfornewversion_lable = $this->lng['admin']['lookfornewversion']['clickhere'];
-			$lookfornewversion_link = htmlspecialchars($filename . '?s=' . urlencode($s) . '&page=' . urlencode($page) . '&lookfornewversion=yes');
+			$lookfornewversion_link = "index.php?module=AdminIndex&lookfornewversion=yes";
 			$lookfornewversion_message = '';
 			$lookfornewversion_addinfo = '';
 			$isnewerversion = 0;
 		}
 
 		$dec_places = Settings::Get('panel.decimal_places');
+		/*
+		 * @fixme
 		$userinfo['diskspace'] = round($userinfo['diskspace'] / 1024, $dec_places);
 		$userinfo['diskspace_used'] = round($userinfo['diskspace_used'] / 1024, $dec_places);
 		$userinfo['traffic'] = round($userinfo['traffic'] / (1024 * 1024), $dec_places);
@@ -116,6 +118,7 @@ class AdminIndex extends FeModule
 		$userinfo = \Froxlor\PhpHelper::strReplaceArray('-1', $this->lng['customer']['unlimited'], $userinfo, 'customers domains diskspace traffic mysqls emails email_accounts email_forwarders email_quota ftps subdomains');
 
 		$userinfo['custom_notes'] = ($userinfo['custom_notes'] != '') ? nl2br($userinfo['custom_notes']) : '';
+		*/
 
 		$cron_last_runs = \Froxlor\System\Cronjob::getCronjobsLastRun();
 		$outstanding_tasks = \Froxlor\System\Cronjob::getOutstandingTasks();
@@ -171,7 +174,10 @@ class AdminIndex extends FeModule
 			$uptime = '';
 		}
 
-		eval("echo \"" . \Froxlor\UI\Template::getTemplate("index/index") . "\";");
+		//eval("echo \"" . \Froxlor\UI\Template::getTemplate("index/index") . "\";");
+		\Froxlor\Frontend\UI::TwigBuffer('admin/index/index.html.twig', array(
+			'page_title' => "Dashboard"
+		));
 	}
 
 	/**

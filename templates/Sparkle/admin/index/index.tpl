@@ -152,35 +152,7 @@ $header
 			</div>
 
 			<div class="grid-u-1-2">
-				<if \Froxlor\Settings::Get('admin.show_news_feed') == '1'>
-				<table class="dboarditem full" id="newsfeed">
-					<thead>
-						<tr>
-							<th>News</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>
-								<ul class="newsfeed" id="newsfeeditems"></ul>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-				<else>
-				<table class="dboarditem full">
-					<tbody>
-						<tr><td>
-							<img src="templates/{$theme}/assets/img/icons/warning_big.png" alt="" />&nbsp;
-							{$lng['panel']['newsfeed_disabled']}&nbsp;
-							<a href="{$linker->getLink(array('section' => 'settings', 'part' => 'panel'))}">
-								<img src="templates/{$theme}/assets/img/icons/edit_20.png" alt="" />
-							</a>
-						</td></tr>
-					</tbody>
-				</table>
-				</if>
-
+				
 				<if $userinfo['custom_notes'] != '' && $userinfo['custom_notes_show'] == '1'>
 				<table class="dboarditem full">
 					<tbody>

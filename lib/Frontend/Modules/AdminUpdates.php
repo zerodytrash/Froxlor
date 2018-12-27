@@ -114,9 +114,9 @@ class AdminUpdates extends FeModule
 				));
 			}
 		} else {
-			$success_message = $this->lng['update']['noupdatesavail'];
-			$redirect_url = 'index.php?module=AdminIndex';
-			eval("echo \"" . \Froxlor\UI\Template::getTemplate('update/noupdatesavail') . "\";");
+			\Froxlor\UI\Response::standard_success($this->lng['update']['noupdatesavail'], '', array(
+				'module' => 'AdminIndex'
+			));
 		}
 	}
 }
