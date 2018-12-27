@@ -98,15 +98,14 @@ class AdminUpdates extends FeModule
 				}
 				$update_information = $ui_text;
 
-				include_once \Froxlor\Froxlor::getInstallDir() . '/install/updates/preconfig.php';
-				$preconfig = getPreConfig($current_version, $current_db_version);
-				if ($preconfig != '') {
-					$update_information .= '<br />' . $preconfig . $message;
-				}
+				$preconfig = \Froxlor\Install\PreConfig::getPreConfig($current_version, $current_db_version);
 
-				$update_information .= $this->lng['update']['update_information']['part_b'];
-
-				eval("echo \"" . \Froxlor\UI\Template::getTemplate('update/index') . "\";");
+				\Froxlor\Frontend\UI::TwigBuffer('admin/update/index.html.twig', array(
+					'page_title' => $this->lng['update']['update'],
+					'message' => $message,
+					'update_information' => $update_information,
+					'preconfig' => $preconfig
+				));
 			}
 		} else {
 			$success_message = $this->lng['update']['noupdatesavail'];

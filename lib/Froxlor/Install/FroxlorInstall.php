@@ -1,4 +1,5 @@
 <?php
+namespace Froxlor\Install;
 
 /**
  * This file is part of the Froxlor project.
@@ -8,14 +9,14 @@
  * file that was distributed with this source code. You can also view the
  * COPYING file online at http://files.froxlor.org/misc/COPYING.txt
  *
- * @copyright  (c) the authors
- * @author     Michael Kaufmann <mkaufmann@nutime.de>
- * @author     Froxlor team <team@froxlor.org> (2010-)
- * @license    GPLv2 http://files.froxlor.org/misc/COPYING.txt
- * @package    Classes
- *
- * @since      0.9.29.1
- *
+ * @copyright (c) the authors
+ * @author Michael Kaufmann <mkaufmann@nutime.de>
+ * @author Froxlor team <team@froxlor.org> (2010-)
+ * @license GPLv2 http://files.froxlor.org/misc/COPYING.txt
+ * @package Classes
+ *         
+ * @since 0.9.29.1
+ *       
  */
 
 /**
@@ -90,7 +91,7 @@ class FroxlorInstall
 	 */
 	public function __construct()
 	{
-		$this->_basepath = dirname(dirname(dirname(__FILE__)));
+		$this->_basepath = \Froxlor\Froxlor::getInstallDir();
 		$this->_data = array();
 	}
 
@@ -214,11 +215,11 @@ class FroxlorInstall
 		$dsn = "mysql:host=" . $this->_data['mysql_host'] . ";";
 		$fatal_fail = false;
 		try {
-			$db_root = new PDO($dsn, $this->_data['mysql_root_user'], $this->_data['mysql_root_pass'], $options);
-		} catch (PDOException $e) {
+			$db_root = new \PDO($dsn, $this->_data['mysql_root_user'], $this->_data['mysql_root_pass'], $options);
+		} catch (\PDOException $e) {
 			// possibly without passwd?
 			try {
-				$db_root = new PDO($dsn, $this->_data['mysql_root_user'], '', $options);
+				$db_root = new \PDO($dsn, $this->_data['mysql_root_user'], '', $options);
 				// set the given password
 				$passwd_stmt = $db_root->prepare("
 						SET PASSWORD = PASSWORD(:passwd)
@@ -226,7 +227,7 @@ class FroxlorInstall
 				$passwd_stmt->execute(array(
 					'passwd' => $this->_data['mysql_root_pass']
 				));
-			} catch (PDOException $e) {
+			} catch (\PDOException $e) {
 				// nope
 				$content .= $this->_status_message('red', $e->getMessage());
 				$fatal_fail = true;
@@ -234,7 +235,7 @@ class FroxlorInstall
 		}
 
 		if (! $fatal_fail) {
-			$version_server = $db_root->getAttribute(PDO::ATTR_SERVER_VERSION);
+			$version_server = $db_root->getAttribute(\PDO::ATTR_SERVER_VERSION);
 			$sql_mode = 'NO_ENGINE_SUBSTITUTION';
 			if (version_compare($version_server, '8.0.11', '<')) {
 				$sql_mode .= ',NO_AUTO_CREATE_USER';
@@ -257,14 +258,14 @@ class FroxlorInstall
 				$dsn = "mysql:host=" . $this->_data['mysql_host'] . ";dbname=" . $this->_data['mysql_database'] . ";";
 				$another_fail = false;
 				try {
-					$db = new PDO($dsn, $this->_data['mysql_unpriv_user'], $this->_data['mysql_unpriv_pass'], $options);
-					$version_server = $db->getAttribute(PDO::ATTR_SERVER_VERSION);
+					$db = new \PDO($dsn, $this->_data['mysql_unpriv_user'], $this->_data['mysql_unpriv_pass'], $options);
+					$version_server = $db->getAttribute(\PDO::ATTR_SERVER_VERSION);
 					$sql_mode = 'NO_ENGINE_SUBSTITUTION';
 					if (version_compare($version_server, '8.0.11', '<')) {
 						$sql_mode .= ',NO_AUTO_CREATE_USER';
 					}
 					$db->exec('SET sql_mode = "' . $sql_mode . '"');
-				} catch (PDOException $e) {
+				} catch (\PDOException $e) {
 					// dafuq? this should have happened in _importDatabaseData()
 					$content .= $this->_status_message('red', $e->getMessage());
 					$another_fail = true;
@@ -434,7 +435,7 @@ class FroxlorInstall
 	/**
 	 * execute prepared statement to update settings
 	 *
-	 * @param PDOStatement $stmt
+	 * @param \PDOStatement $stmt
 	 * @param string $group
 	 * @param string $varname
 	 * @param string $value
@@ -530,7 +531,7 @@ class FroxlorInstall
 		$dsn = "mysql:host=" . $this->_data['mysql_host'] . ";dbname=" . $this->_data['mysql_database'] . ";";
 		$fatal_fail = false;
 		try {
-			$db = new PDO($dsn, $this->_data['mysql_unpriv_user'], $this->_data['mysql_unpriv_pass'], $options);
+			$db = new \PDO($dsn, $this->_data['mysql_unpriv_user'], $this->_data['mysql_unpriv_pass'], $options);
 			$attributes = array(
 				'ATTR_ERRMODE' => 'ERRMODE_EXCEPTION'
 			);
@@ -538,13 +539,13 @@ class FroxlorInstall
 			foreach ($attributes as $k => $v) {
 				$db->setAttribute(constant("PDO::" . $k), constant("PDO::" . $v));
 			}
-			$version_server = $db->getAttribute(PDO::ATTR_SERVER_VERSION);
+			$version_server = $db->getAttribute(\PDO::ATTR_SERVER_VERSION);
 			$sql_mode = 'NO_ENGINE_SUBSTITUTION';
 			if (version_compare($version_server, '8.0.11', '<')) {
 				$sql_mode .= ',NO_AUTO_CREATE_USER';
 			}
 			$db->exec('SET sql_mode = "' . $sql_mode . '"');
-		} catch (PDOException $e) {
+		} catch (\PDOException $e) {
 			$content .= $this->_status_message('red', $e->getMessage());
 			$fatal_fail = true;
 		}
@@ -957,7 +958,7 @@ class FroxlorInstall
 		// check for php_pdo and pdo_mysql
 		$content .= $this->_status_message('begin', $this->_lng['requirements']['phppdo']);
 
-		if (! extension_loaded('pdo') || in_array("mysql", PDO::getAvailableDrivers()) == false) {
+		if (! extension_loaded('pdo') || in_array("mysql", \PDO::getAvailableDrivers()) == false) {
 			$content .= $this->_status_message('red', $this->_lng['requirements']['notinstalled']);
 			$_die = true;
 		} else {

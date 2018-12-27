@@ -1,6 +1,7 @@
 <?php
 use Froxlor\Database\Database;
 use Froxlor\Settings;
+use Froxlor\Install\Updates;
 
 /**
  * This file is part of the Froxlor project.
@@ -24,9 +25,9 @@ if (! defined('_CRON_UPDATE')) {
 }
 
 if (\Froxlor\Froxlor::isFroxlorVersion('0.9.40.1')) {
-	showUpdateStep("Updating from 0.9.40.1 to 0.10.0", false);
+	Updates::showUpdateStep("Updating from 0.9.40.1 to 0.10.0", false);
 
-	showUpdateStep("Adding new api keys table");
+	Updates::showUpdateStep("Adding new api keys table");
 	Database::query("DROP TABLE IF EXISTS `api_keys`;");
 	$sql = "CREATE TABLE `api_keys` (
 	  `id` int(11) NOT NULL auto_increment,
@@ -41,17 +42,17 @@ if (\Froxlor\Froxlor::isFroxlorVersion('0.9.40.1')) {
 	  KEY customerid (customerid)
 	) ENGINE=MyISAM CHARSET=utf8 COLLATE=utf8_general_ci;";
 	Database::query($sql);
-	lastStepStatus(0);
+	Updates::lastStepStatus(0);
 
-	showUpdateStep("Adding new api settings");
+	Updates::showUpdateStep("Adding new api settings");
 	Settings::AddNew('api.enabled', 0);
-	lastStepStatus(0);
+	Updates::lastStepStatus(0);
 
-	showUpdateStep("Adding new default-ssl-ip setting");
+	Updates::showUpdateStep("Adding new default-ssl-ip setting");
 	Settings::AddNew('system.defaultsslip', '');
-	lastStepStatus(0);
+	Updates::lastStepStatus(0);
 
-	showUpdateStep("Altering admin ip's field to allow multiple ip addresses");
+	Updates::showUpdateStep("Altering admin ip's field to allow multiple ip addresses");
 	// get all admins for updating the new field
 	$sel_stmt = Database::prepare("SELECT adminid, ip FROM `panel_admins`");
 	Database::pexecute($sel_stmt);
@@ -66,71 +67,71 @@ if (\Froxlor\Froxlor::isFroxlorVersion('0.9.40.1')) {
 			));
 		}
 	}
-	lastStepStatus(0);
+	Updates::lastStepStatus(0);
 
 	\Froxlor\Froxlor::updateToVersion('0.10.0');
 }
 
 if (\Froxlor\Froxlor::isDatabaseVersion('201809280')) {
 
-	showUpdateStep("Adding dhparams-file setting");
+	Updates::showUpdateStep("Adding dhparams-file setting");
 	Settings::AddNew("system.dhparams_file", '');
-	lastStepStatus(0);
+	Updates::lastStepStatus(0);
 
 	\Froxlor\Froxlor::updateToDbVersion('201811180');
 }
 
 if (\Froxlor\Froxlor::isDatabaseVersion('201811180')) {
 
-	showUpdateStep("Adding new settings for 2FA");
+	Updates::showUpdateStep("Adding new settings for 2FA");
 	Settings::AddNew('2fa.enabled', '1', true);
-	lastStepStatus(0);
+	Updates::lastStepStatus(0);
 
-	showUpdateStep("Adding new fields to admin-table for 2FA");
+	Updates::showUpdateStep("Adding new fields to admin-table for 2FA");
 	Database::query("ALTER TABLE `" . TABLE_PANEL_ADMINS . "` ADD `type_2fa` tinyint(1) NOT NULL default '0';");
 	Database::query("ALTER TABLE `" . TABLE_PANEL_ADMINS . "` ADD `data_2fa` varchar(500) NOT NULL default '' AFTER `type_2fa`;");
-	lastStepStatus(0);
+	Updates::lastStepStatus(0);
 
-	showUpdateStep("Adding new fields to customer-table for 2FA");
+	Updates::showUpdateStep("Adding new fields to customer-table for 2FA");
 	Database::query("ALTER TABLE `" . TABLE_PANEL_CUSTOMERS . "` ADD `type_2fa` tinyint(1) NOT NULL default '0';");
 	Database::query("ALTER TABLE `" . TABLE_PANEL_CUSTOMERS . "` ADD `data_2fa` varchar(500) NOT NULL default '' AFTER `type_2fa`;");
-	lastStepStatus(0);
+	Updates::lastStepStatus(0);
 
 	\Froxlor\Froxlor::updateToDbVersion('201811300');
 }
 
 if (\Froxlor\Froxlor::isDatabaseVersion('201811300')) {
 
-	showUpdateStep("Adding new logview-flag to customers");
+	Updates::showUpdateStep("Adding new logview-flag to customers");
 	Database::query("ALTER TABLE `" . TABLE_PANEL_CUSTOMERS . "` ADD `logviewenabled` tinyint(1) NOT NULL default '0';");
-	lastStepStatus(0);
+	Updates::lastStepStatus(0);
 
 	\Froxlor\Froxlor::updateToDbVersion('201812010');
 }
 
 if (\Froxlor\Froxlor::isDatabaseVersion('201812010')) {
 
-	showUpdateStep("Adding new is_configured-flag");
+	Updates::showUpdateStep("Adding new is_configured-flag");
 	// updated systems are already configured (most likely :P)
 	Settings::AddNew('panel.is_configured', '1', true);
-	lastStepStatus(0);
+	Updates::lastStepStatus(0);
 
 	\Froxlor\Froxlor::updateToDbVersion('201812100');
 }
 
 if (\Froxlor\Froxlor::isDatabaseVersion('201812100')) {
 
-	showUpdateStep("Adding fields writeaccesslog and writeerrorlog for domains");
+	Updates::showUpdateStep("Adding fields writeaccesslog and writeerrorlog for domains");
 	Database::query("ALTER TABLE `" . TABLE_PANEL_DOMAINS . "` ADD `writeaccesslog` tinyint(1) NOT NULL default '1';");
 	Database::query("ALTER TABLE `" . TABLE_PANEL_DOMAINS . "` ADD `writeerrorlog` tinyint(1) NOT NULL default '1';");
-	lastStepStatus(0);
+	Updates::lastStepStatus(0);
 
 	\Froxlor\Froxlor::updateToDbVersion('201812180');
 }
 
 if (\Froxlor\Froxlor::isDatabaseVersion('201812180')) {
 
-	showUpdateStep("Updating cronjob table");
+	Updates::showUpdateStep("Updating cronjob table");
 	Database::query("ALTER TABLE `" . TABLE_PANEL_CRONRUNS . "` ADD `cronclass` varchar(500) NOT NULL AFTER `cronfile`");
 	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_CRONRUNS . "` SET `cronclass`  = :cc WHERE `cronfile` = :cf");
 	Database::pexecute($upd_stmt, array(
@@ -158,9 +159,9 @@ if (\Froxlor\Froxlor::isDatabaseVersion('201812180')) {
 		'cf' => 'backup'
 	));
 	Database::query("DELETE FROM `" . TABLE_PANEL_CRONRUNS . "` WHERE `module` = 'froxlor/ticket'");
-	lastStepStatus(0);
+	Updates::lastStepStatus(0);
 
-	showUpdateStep("Removing ticketsystem");
+	Updates::showUpdateStep("Removing ticketsystem");
 	Database::query("ALTER TABLE `" . TABLE_PANEL_ADMINS . "` DROP `tickets`");
 	Database::query("ALTER TABLE `" . TABLE_PANEL_ADMINS . "` DROP `tickets_used`");
 	Database::query("ALTER TABLE `" . TABLE_PANEL_ADMINS . "` DROP `tickets_see_all`");
@@ -172,9 +173,9 @@ if (\Froxlor\Froxlor::isDatabaseVersion('201812180')) {
 	define('TABLE_PANEL_TICKET_CATS', 'panel_ticket_categories');
 	Database::query("DROP TABLE IF EXISTS `" . TABLE_PANEL_TICKETS . "`;");
 	Database::query("DROP TABLE IF EXISTS `" . TABLE_PANEL_TICKET_CATS . "`;");
-	lastStepStatus(0);
+	Updates::lastStepStatus(0);
 
-	showUpdateStep("Updating nameserver settings");
+	Updates::showUpdateStep("Updating nameserver settings");
 	$dns_target = 'Bind';
 	if (Settings::Get('system.dns_server') != 'bind') {
 		$dns_target = 'PowerDNS';
@@ -183,7 +184,7 @@ if (\Froxlor\Froxlor::isDatabaseVersion('201812180')) {
 	Database::pexecute($upd_stmt, array(
 		'v' => $dns_target
 	));
-	lastStepStatus(0);
+	Updates::lastStepStatus(0);
 
 	\Froxlor\Froxlor::updateToDbVersion('201812190');
 }

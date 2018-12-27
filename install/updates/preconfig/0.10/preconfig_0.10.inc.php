@@ -9,13 +9,25 @@
  * COPYING file online at http://files.froxlor.org/misc/COPYING.txt
  *
  * @copyright  (c) the authors
- * @author     Michael Kaufmann <mkaufmann@nutime.de>
  * @author     Froxlor team <team@froxlor.org> (2010-)
  * @license    GPLv2 http://files.froxlor.org/misc/COPYING.txt
- * @package    Install
+ * @package    Language
  *
  */
-require dirname(__DIR__) . '/vendor/autoload.php';
+use Froxlor\Database\Database;
+use Froxlor\Settings;
+use Froxlor\Install\PreConfig;
+use PHPMailer\PHPMailer;
 
-$frxinstall = new \Froxlor\Install\FroxlorInstall();
-$frxinstall->run();
+if (PreConfig::versionInUpdate($current_db_version, '201901010')) {
+	$item = array(
+		'description' => 'OMG so many changes...please note:',
+		'question' => array(
+			0 => array(
+				'title' => 'Activate API interface?',
+				'form' => \Froxlor\UI\HTML::makeyesno('system_activate_api', '1', '0', '0')
+			)
+		)
+	);
+	array_push($preconfig_items, $item);
+}
