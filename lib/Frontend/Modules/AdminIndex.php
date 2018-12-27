@@ -54,10 +54,6 @@ class AdminIndex extends FeModule
 
 	public function overview()
 	{
-		if ($this->getAction() == 'logout') {
-			$this->logout();
-		}
-
 		\Froxlor\FroxlorLogger::getInstanceOf()->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "viewed AdminIndex");
 		$overview_stmt = Database::prepare("SELECT COUNT(*) AS `number_customers`,
 			SUM(`diskspace_used`) AS `diskspace_used`,

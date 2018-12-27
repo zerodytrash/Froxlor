@@ -61,12 +61,18 @@ class AdminUpdates extends FeModule
 
 			if (isset($_POST['send']) && $_POST['send'] == 'send') {
 				if ((isset($_POST['update_preconfig']) && isset($_POST['update_changesagreed']) && intval($_POST['update_changesagreed']) != 0) || ! isset($_POST['update_preconfig'])) {
-					eval("echo \"" . \Froxlor\UI\Template::getTemplate('update/update_start') . "\";");
 
+					ob_start();
 					include_once \Froxlor\Froxlor::getInstallDir() . 'install/updatesql.php';
-
+					$update_process = ob_get_contents();
+					ob_end_clean();
 					$redirect_url = 'index.php?module=AdminIndex';
-					eval("echo \"" . \Froxlor\UI\Template::getTemplate('update/update_end') . "\";");
+
+					\Froxlor\Frontend\UI::TwigBuffer('admin/update/update.html.twig', array(
+						'page_title' => $this->lng['update']['update'],
+						'update_process' => $update_process,
+						'redirect_url' => $redirect_url
+					));
 
 					\Froxlor\User::updateCounters();
 					\Froxlor\System\Cronjob::inserttask('1');
@@ -74,7 +80,7 @@ class AdminUpdates extends FeModule
 
 					$successful_update = true;
 				} else {
-					$message = '<br /><strong class="red">You have to agree that you have read the update notifications.</strong>';
+					$message = 'You have to agree that you have read the update notifications.';
 				}
 			}
 

@@ -20,7 +20,7 @@ use Froxlor\FroxlorLogger;
 use Froxlor\Install\Updates;
 
 if (! defined('_CRON_UPDATE')) {
-	if (! defined('AREA') || (defined('AREA') && AREA != 'admin') || ! isset($userinfo['loginname']) || (isset($userinfo['loginname']) && $userinfo['loginname'] == '')) {
+	if (empty(\Froxlor\CurrentUser::getField('loginname')) || (! empty(\Froxlor\CurrentUser::getField('loginname')) && \Froxlor\CurrentUser::getField('adminsession') != '1')) {
 		header('Location: ../index.php');
 		exit();
 	}
