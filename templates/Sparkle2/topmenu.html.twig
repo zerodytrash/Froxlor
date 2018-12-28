@@ -9,7 +9,7 @@
 	class="nav-link dropdown-toggle{% if module[:8]|lower == 'userdata' %} active{% endif %}"
 	href="#" id="navbarDropdown{{ module }}" data-toggle="dropdown"
 	aria-haspopup="true" aria-expanded="false"><i
-		class="fas fa-7{% if box.icon is defined %}{{ box.item }}{% else %}user{% endif %}"></i>
+		class="fas fa-{% if box.icon is defined %}{{ box.icon }}{% else %}asterisk{% endif %}"></i>
 		{{ box.label  }}</a>
 	<div class="dropdown-menu" aria-labelledby="navbarDropdown{{ module }}">
 		{% for element in box.elements %}

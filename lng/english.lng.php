@@ -2056,3 +2056,4 @@ $lng['panel']['settings_before_configuration'] = 'Please be sure you adjusted th
 $lng['panel']['alternative_cmdline_config'] = 'Alternatively, just run the following command as root-user in you shell to configure the services automatically';
 $lng['admin']['kernel'] = 'Kernel';
 $lng['admin']['uptime'] = 'Uptime';
+$lng['admin']['mydata'] = 'My data';

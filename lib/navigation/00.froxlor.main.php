@@ -20,7 +20,7 @@ return array(
 	'customer' => array(
 		'index' => array(
 			'url' => 'customer_index.php',
-			'label' => $lng['admin']['overview'],
+			'label' => $lng['admin']['mydata'],
 			'elements' => array(
 				array(
 					'label' => $lng['menue']['main']['username'] . \Froxlor\CurrentUser::getField('loginname')
@@ -171,8 +171,8 @@ return array(
 	'admin' => array(
 		'index' => array(
 			'url' => 'index.php?module=AdminIndex',
-			'icon' => 'tachometer-alt',
-			'label' => $lng['admin']['overview'],
+			'icon' => 'user',
+			'label' => $lng['admin']['mydata'],
 			'elements' => array(
 				array(
 					'label' => $lng['menue']['main']['username'] . \Froxlor\CurrentUser::getField('loginname')
