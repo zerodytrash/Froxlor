@@ -170,187 +170,221 @@ return array(
 	),
 	'admin' => array(
 		'index' => array(
-			'url' => 'index.php?module=AdminIndex',
 			'icon' => 'user',
 			'label' => $lng['admin']['mydata'],
 			'elements' => array(
 				array(
-					'label' => $lng['menue']['main']['username'] . \Froxlor\CurrentUser::getField('loginname')
+					'label' => $lng['menue']['main']['username'] . \Froxlor\CurrentUser::getField('loginname'),
+					'icon' => 'user-circle'
 				),
 				array(
 					'url' => 'admin_index.php?page=change_password',
-					'label' => $lng['menue']['main']['changepassword']
+					'label' => $lng['menue']['main']['changepassword'],
+					'icon' => 'user-lock'
 				),
 				array(
 					'url' => 'admin_index.php?page=change_language',
-					'label' => $lng['menue']['main']['changelanguage']
+					'label' => $lng['menue']['main']['changelanguage'],
+					'icon' => 'flag'
 				),
 				array(
 					'url' => 'admin_index.php?page=change_theme',
 					'label' => $lng['menue']['main']['changetheme'],
-					'show_element' => (\Froxlor\Settings::Get('panel.allow_theme_change_admin') == true)
+					'show_element' => (\Froxlor\Settings::Get('panel.allow_theme_change_admin') == true),
+					'icon' => 'images'
 				),
 				array(
 					'url' => 'admin_index.php?page=apikeys',
 					'label' => $lng['menue']['main']['apikeys'],
-					'show_element' => (\Froxlor\Settings::Get('api.enabled') == true)
+					'show_element' => (\Froxlor\Settings::Get('api.enabled') == true),
+					'icon' => 'key'
 				),
 				array(
 					'url' => 'admin_index.php?page=apihelp',
 					'label' => $lng['menue']['main']['apihelp'],
-					'show_element' => (\Froxlor\Settings::Get('api.enabled') == true)
+					'show_element' => (\Froxlor\Settings::Get('api.enabled') == true),
+					'icon' => 'question-circle'
 				)
 			)
 		),
 		'resources' => array(
 			'label' => $lng['admin']['resources'],
 			'required_resources' => 'customers',
+			'icon' => 'boxes',
 			'elements' => array(
 				array(
 					'url' => 'admin_customers.php?page=customers',
 					'label' => $lng['admin']['customers'],
-					'required_resources' => 'customers'
+					'required_resources' => 'customers',
+					'icon' => 'users'
 				),
 				array(
 					'url' => 'admin_admins.php?page=admins',
 					'label' => $lng['admin']['admins'],
-					'required_resources' => 'change_serversettings'
+					'required_resources' => 'change_serversettings',
+					'icon' => 'user-shield'
 				),
 				array(
 					'url' => 'admin_domains.php?page=domains',
 					'label' => $lng['admin']['domains'],
-					'required_resources' => 'domains'
+					'required_resources' => 'domains',
+					'icon' => 'globe'
 				),
 				array(
 					'url' => 'admin_domains.php?page=sslcertificates',
 					'label' => $lng['domains']['ssl_certificates'],
-					'required_resources' => 'domains'
+					'required_resources' => 'domains',
+					'icon' => 'certificate'
 				),
 				array(
 					'url' => 'admin_ipsandports.php?page=ipsandports',
 					'label' => $lng['admin']['ipsandports']['ipsandports'],
-					'required_resources' => 'change_serversettings'
+					'required_resources' => 'change_serversettings',
+					'icon' => 'network-wired'
 				),
 				array(
 					'url' => 'admin_plans.php?page=overview',
 					'label' => $lng['admin']['plans']['plans'],
-					'required_resources' => 'customers'
+					'required_resources' => 'customers',
+					'icon' => 'sticky-note'
 				),
 				array(
 					'url' => 'admin_settings.php?page=updatecounters',
 					'label' => $lng['admin']['updatecounters'],
-					'required_resources' => 'change_serversettings'
+					'required_resources' => 'change_serversettings',
+					'icon' => 'sync'
 				)
 			)
 		),
 		'traffic' => array(
 			'label' => $lng['admin']['traffic'],
 			'required_resources' => 'customers',
+			'icon' => 'chart-bar',
 			'elements' => array(
 				array(
 					'url' => 'admin_traffic.php?page=customers',
 					'label' => $lng['admin']['customertraffic'],
-					'required_resources' => 'customers'
+					'required_resources' => 'customers',
+					'icon' => 'chart-bar'
 				)
 			)
 		),
 		'server' => array(
 			'label' => $lng['admin']['server'],
 			'required_resources' => 'change_serversettings',
+			'icon' => 'toolbox',
 			'elements' => array(
 				array(
 					'url' => 'admin_configfiles.php?page=configfiles',
 					'label' => $lng['admin']['configfiles']['serverconfiguration'],
-					'required_resources' => 'change_serversettings'
+					'required_resources' => 'change_serversettings',
+					'icon' => 'cogs'
 				),
 				array(
 					'url' => 'admin_settings.php?page=overview',
 					'label' => $lng['admin']['serversettings'],
-					'required_resources' => 'change_serversettings'
+					'required_resources' => 'change_serversettings',
+					'icon' => 'wrench'
 				),
 				array(
 					'url' => 'admin_cronjobs.php?page=overview',
 					'label' => $lng['admin']['cron']['cronsettings'],
-					'required_resources' => 'change_serversettings'
+					'required_resources' => 'change_serversettings',
+					'icon' => 'redo'
 				),
 				array(
 					'url' => 'admin_logger.php?page=log',
 					'label' => $lng['menue']['logger']['logger'],
 					'required_resources' => 'change_serversettings',
-					'show_element' => (\Froxlor\Settings::Get('logger.enabled') == true)
+					'show_element' => (\Froxlor\Settings::Get('logger.enabled') == true),
+					'icon' => 'eye'
 				),
 				array(
 					'url' => 'admin_settings.php?page=rebuildconfigs',
 					'label' => $lng['admin']['rebuildconf'],
-					'required_resources' => 'change_serversettings'
+					'required_resources' => 'change_serversettings',
+					'icon' => 'play'
 				),
 				array(
 					'url' => 'admin_autoupdate.php?page=overview',
 					'label' => $lng['admin']['autoupdate'],
 					'required_resources' => 'change_serversettings',
-					'show_element' => extension_loaded('zip')
+					'show_element' => extension_loaded('zip'),
+					'icon' => 'arrow-circle-down'
 				),
 				array(
 					'url' => 'admin_settings.php?page=wipecleartextmailpws',
 					'label' => $lng['admin']['wipecleartextmailpwd'],
 					'required_resources' => 'change_serversettings',
-					'show_element' => (\Froxlor\Settings::Get('system.mailpwcleartext') == true)
+					'show_element' => (\Froxlor\Settings::Get('system.mailpwcleartext') == true),
+					'icon' => 'broom'
 				)
 			)
 		),
 		'server_php' => array(
 			'label' => $lng['admin']['server_php'],
 			'required_resources' => 'change_serversettings',
+			'icon' => 'server',
 			'elements' => array(
 				array(
 					'url' => 'admin_phpsettings.php?page=overview',
 					'label' => $lng['menue']['phpsettings']['maintitle'],
-					'show_element' => (\Froxlor\Settings::Get('system.mod_fcgid') == true || \Froxlor\Settings::Get('phpfpm.enabled') == true)
+					'show_element' => (\Froxlor\Settings::Get('system.mod_fcgid') == true || \Froxlor\Settings::Get('phpfpm.enabled') == true),
+					'icon' => 'cogs'
 				),
 				array(
 					'url' => 'admin_phpsettings.php?page=fpmdaemons',
 					'label' => $lng['menue']['phpsettings']['fpmdaemons'],
 					'required_resources' => 'change_serversettings',
-					'show_element' => \Froxlor\Settings::Get('phpfpm.enabled') == true
+					'show_element' => \Froxlor\Settings::Get('phpfpm.enabled') == true,
+					'icon' => 'cogs'
 				),
 				array(
 					'url' => 'admin_settings.php?page=phpinfo',
 					'label' => $lng['admin']['phpinfo'],
-					'required_resources' => 'change_serversettings'
+					'required_resources' => 'change_serversettings',
+					'icon' => 'info-circle'
 				),
 				array(
 					'url' => 'admin_apcuinfo.php?page=showinfo',
 					'label' => $lng['admin']['apcuinfo'],
 					'required_resources' => 'change_serversettings',
-					'show_element' => (function_exists('apcu_cache_info') === true)
+					'show_element' => (function_exists('apcu_cache_info') === true),
+					'icon' => 'info-circle'
 				),
 				array(
 					'url' => 'admin_opcacheinfo.php?page=showinfo',
 					'label' => $lng['admin']['opcacheinfo'],
 					'required_resources' => 'change_serversettings',
-					'show_element' => (function_exists('opcache_get_configuration') === true)
+					'show_element' => (function_exists('opcache_get_configuration') === true),
+					'icon' => 'info-circle'
 				)
 			)
 		),
 		'misc' => array(
 			'label' => $lng['admin']['misc'],
+			'icon' => 'asterisk',
 			'elements' => array(
 				array(
 					'url' => 'admin_settings.php?page=integritycheck',
 					'label' => $lng['admin']['integritycheck'],
-					'required_resources' => 'change_serversettings'
+					'required_resources' => 'change_serversettings',
+					'icon' => 'check-circle'
 				),
 				array(
 					'url' => 'admin_templates.php?page=email',
-					'label' => $lng['admin']['templates']['email']
+					'label' => $lng['admin']['templates']['email'],
+					'icon' => 'user-edit'
 				),
 				array(
 					'url' => 'admin_message.php?page=message',
-					'label' => $lng['admin']['message']
+					'label' => $lng['admin']['message'],
+					'icon' => 'envelope'
 				),
 				array(
 					'url' => 'admin_settings.php?page=testmail',
-					'label' => $lng['admin']['testmail']
+					'label' => $lng['admin']['testmail'],
+					'icon' => 'clipboard-check'
 				)
 			)
 		)

@@ -55,24 +55,24 @@ class AdminIndex extends FeModule
 	public function overview()
 	{
 		\Froxlor\FroxlorLogger::getInstanceOf()->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "viewed AdminIndex");
-		$overview_stmt = Database::prepare("SELECT COUNT(*) AS `number_customers`,
-			SUM(`diskspace_used`) AS `diskspace_used`,
-			SUM(`mysqls_used`) AS `mysqls_used`,
-			SUM(`emails_used`) AS `emails_used`,
-			SUM(`email_accounts_used`) AS `email_accounts_used`,
-			SUM(`email_forwarders_used`) AS `email_forwarders_used`,
-			SUM(`email_quota_used`) AS `email_quota_used`,
-			SUM(`ftps_used`) AS `ftps_used`,
-			SUM(`subdomains_used`) AS `subdomains_used`,
-			SUM(`traffic_used`) AS `traffic_used`
+		$overview_stmt = Database::prepare("SELECT COUNT(*) AS `customers`,
+			SUM(`diskspace_used`) AS `diskspace`,
+			SUM(`mysqls_used`) AS `mysqls`,
+			SUM(`emails_used`) AS `emails`,
+			SUM(`email_accounts_used`) AS `email_accounts`,
+			SUM(`email_forwarders_used`) AS `email_forwarders`,
+			SUM(`email_quota_used`) AS `email_quota`,
+			SUM(`ftps_used`) AS `ftps`,
+			SUM(`subdomains_used`) AS `subdomains`,
+			SUM(`traffic_used`) AS `traffic`
 			FROM `" . TABLE_PANEL_CUSTOMERS . "`" . (\Froxlor\CurrentUser::getField('customers_see_all') ? '' : " WHERE `adminid` = :adminid "));
 		$overview = Database::pexecute_first($overview_stmt, array(
 			'adminid' => \Froxlor\CurrentUser::getField('adminid')
 		));
 
 		$dec_places = Settings::Get('panel.decimal_places');
-		$overview['traffic_used'] = round($overview['traffic_used'] / (1024 * 1024), $dec_places);
-		$overview['diskspace_used'] = round($overview['diskspace_used'] / 1024, $dec_places);
+		$overview['traffic'] = round($overview['traffic'] / (1024 * 1024), $dec_places);
+		$overview['diskspace'] = round($overview['diskspace'] / 1024, $dec_places);
 
 		$number_domains_stmt = Database::prepare("
 			SELECT COUNT(*) AS `number_domains` FROM `" . TABLE_PANEL_DOMAINS . "`
@@ -81,7 +81,7 @@ class AdminIndex extends FeModule
 			'adminid' => \Froxlor\CurrentUser::getField('adminid')
 		));
 
-		$overview['number_domains'] = $number_domains['number_domains'];
+		$overview['domains'] = $number_domains['number_domains'];
 
 		/*
 		 * @fixme
@@ -172,6 +172,7 @@ class AdminIndex extends FeModule
 
 		\Froxlor\Frontend\UI::TwigBuffer('admin/index/index.html.twig', array(
 			'page_title' => "Dashboard",
+			'usage_data' => $overview,
 			'sysinfo' => $sysinfo
 		));
 	}

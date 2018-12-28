@@ -24,10 +24,6 @@
 
 <!-- Bootstrap and necessary plugins -->
 <script src="../vendor/components/jquery/jquery.min.js"></script>
-<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"
-	integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
-	crossorigin="anonymous"></script>
 <script src="../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
 {% block custom_js %}
 {% endblock %}
@@ -45,12 +41,12 @@
 		{% block body %}
 		{% endblock %}
 
-		<footer class="pt-5">
+		<footer class="pt-5 pb-5 text-center">
 			<span><img
 				src="../templates/Sparkle2/assets/img/logo_grey.png" alt="Froxlor" />
 				{% if (get_setting('admin.show_version_login') ==
-					'1' and filename== 'index.php') or (filename !='index.php'
-					and get_setting('admin.show_version_footer') =='1') %}
+					'1' and module == 'Login') or (module != 'Login'
+					and get_setting('admin.show_version_footer') == '1') %}
 				{{ call_static('\\Froxlor\\Froxlor', 'getFullVersion') }} {% endif %}
 				&copy; 2009-{{ "now"|date("Y") }} by <a
 				href="http://www.froxlor.org/" rel="external">the Froxlor Team</a><br />

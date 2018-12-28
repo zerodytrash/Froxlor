@@ -1,21 +1,27 @@
-<!-- @todo show_element and required_resource -->
 <li class="nav-item"><a
-	class="nav-link {% if module[:5]|lower == 'index' %}active" href="#"
+	class="nav-link {% if module[-5:]|lower == 'index' %}active" href="#"
 	{% else %}" href="index.php?module={% if call_static('\\Froxlor\\CurrentUser', 'getField', ['adminsession']) == 1 %}Admin{% else %}Customer{% endif %}Index"
-	{% endif %}> <i class="fas fa-tachometer-alt"></i> Dashboard {{ module[:5]|lower }}
+	{% endif %}> <i class="fas fa-tachometer-alt"></i> Dashboard
 </a></li>
 {% for box in nav_items %}
+{% if (box.show_element is not defined or box.show_element == true) and 
+    (box.required_resources is not defined or box.required_resources == '' or
+    ((call_static('\\Froxlor\\CurrentUser', 'getField', [box.required_resources]) > 0 or call_static('\\Froxlor\\CurrentUser', 'getField', [box.required_resources]) == -1)
+    )) %}
 <li class="nav-item dropdown"><a
-	class="nav-link dropdown-toggle{% if module[:8]|lower == 'userdata' %} active{% endif %}"
+	class="nav-link dropdown-toggle{% if module[-8:]|lower == 'userdata' %} active{% endif %}"
 	href="#" id="navbarDropdown{{ module }}" data-toggle="dropdown"
 	aria-haspopup="true" aria-expanded="false"><i
 		class="fas fa-{% if box.icon is defined %}{{ box.icon }}{% else %}asterisk{% endif %}"></i>
 		{{ box.label  }}</a>
 	<div class="dropdown-menu" aria-labelledby="navbarDropdown{{ module }}">
 		{% for element in box.elements %}
-		{% if box.show_element is not defined or (box.show_element is defined and box.show_element == true) %}
+		{% if (element.show_element is not defined or element.show_element == true) and 
+    (element.required_resources is not defined or element.required_resources == '' or
+    ((call_static('\\Froxlor\\CurrentUser', 'getField', [element.required_resources]) > 0 or call_static('\\Froxlor\\CurrentUser', 'getField', [element.required_resources]) == -1)
+    )) %}
 		<a class="dropdown-item"
-			href="{% if element.url is defined %}{{ element.url }}{% else %}#{% endif %}">
+			href="{% if element.url is defined %}{{ element.url }}{% else %}#{% endif %}" {% if element.new_window %}rel="external"{% endif %}>
 			<i
 			class="fas fa-{% if element.icon is defined %}{{ element.icon }}{% else %}cog{% endif %}"></i>
 			{{ element.label }}
@@ -23,4 +29,5 @@
 		{% endif %}
 		{% endfor %}
 	</div></li>
+{% endif %}
 {% endfor %}

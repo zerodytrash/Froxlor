@@ -2,7 +2,42 @@
 
 {% block content %}
 <div class="row">
-	<div class="col-8"></div>
+	<div class="col">
+			<div class="card mb-2">
+			<ul class="list-group">
+				{% set userinfo = call_static('\\Froxlor\\CurrentUser', 'getData') %}
+				{% for key,value in usage_data %}
+				{% if value is empty %}
+				{% set value = 0 %}
+				{% endif %}
+				<li class="list-group-item list-group-item-action flex-column align-items-start">
+					<div class="d-flex w-100 justify-content-between">
+						<div class="progress mb-1">
+                          <div class="progress-bar bg-success p-25" role="progressbar" aria-valuenow="{{ value }}" aria-valuemin="0" aria-valuemax="{{ userinfo[key] }}"></div>
+                        </div>
+					</div>
+					<p class="mb-1">{{ key }}: {{ value }} / {% if userinfo[key] >= 0 %}{{ userinfo[key] }}{% else %}&infin;{% endif %}</p>
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="col">
+		<div class="card mb-2">
+			<div class="card-header">
+				{{ lng('admin.systemdetails') }}
+			</div>
+			<ul class="list-group">
+				{% for key,value in sysinfo %}
+				{% set lngkey = 'admin.' ~ key %}
+				<li
+					class="list-group-item d-flex justify-content-between align-items-center">
+					{{ lng(lngkey) }} <span class="badge badge-secondary">{{ value|raw }}</span>
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
 	<div class="col">
 		{% if get_setting('admin.show_news_feed') == 1 %}
 		<div class="card mb-2">
@@ -19,20 +54,6 @@
 				class="alert-link"><i class="fas fa-edit"></i></a>
 		</div>
 		{% endif %}
-		<div class="card mb-2">
-			<div class="card-header">
-				{{ lng('admin.systemdetails') }}
-			</div>
-			<ul class="list-group">
-				{% for key,value in sysinfo %}
-				{% set lngkey = 'admin.' ~ key %}
-				<li
-					class="list-group-item d-flex justify-content-between align-items-center">
-					{{ lng(lngkey) }} <span class="badge badge-secondary">{{ value|raw }}</span>
-				</li>
-				{% endfor %}
-			</ul>
-		</div>
 	</div>
 </div>
 {% endblock %}
