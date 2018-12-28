@@ -193,7 +193,7 @@ class Cronjob
 		$query = "SELECT `lastrun`, `desc_lng_key` FROM `" . TABLE_PANEL_CRONRUNS . "` WHERE `isactive` = '1' ORDER BY `cronfile` ASC";
 		$result = Database::query($query);
 
-		$cronjobs_last_run = '';
+		$cronjobs_last_run = array();
 		while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
 
 			$lastrun = $lng['cronjobs']['notyetrun'];
@@ -201,10 +201,10 @@ class Cronjob
 				$lastrun = date('d.m.Y H:i:s', $row['lastrun']);
 			}
 
-			$text = $lng['crondesc'][$row['desc_lng_key']];
-			$value = $lastrun;
-
-			eval("\$cronjobs_last_run .= \"" . \Froxlor\UI\Template::getTemplate("index/overview_item") . "\";");
+			$cronjobs_last_run[] = array(
+				'text' => $lng['crondesc'][$row['desc_lng_key']],
+				'value' => $lastrun
+			);
 		}
 
 		return $cronjobs_last_run;
@@ -231,8 +231,7 @@ class Cronjob
 		$query = "SELECT * FROM `" . TABLE_PANEL_TASKS . "` ORDER BY `type` ASC";
 		$result = Database::query($query);
 
-		$value = '<ul class="cronjobtask">';
-		$tasks = '';
+		$tasks = array();
 		while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
 
 			if ($row['data'] != '') {
@@ -290,21 +289,15 @@ class Cronjob
 			}
 
 			if ($task_desc != '') {
-				$tasks .= '<li>' . $task_desc . '</li>';
+				$tasks[] = $task_desc;
 			}
 		}
 
-		if (trim($tasks) == '') {
-			$value .= '<li>' . $lng['tasks']['noneoutstanding'] . '</li>';
-		} else {
-			$value .= $tasks;
+		if (empty($tasks)) {
+			$tasks[] = $lng['tasks']['noneoutstanding'];
 		}
 
-		$value .= '</ul>';
-		$text = $lng['tasks']['outstanding_tasks'];
-		eval("\$outstanding_tasks = \"" . \Froxlor\UI\Template::getTemplate("index/overview_item") . "\";");
-
-		return $outstanding_tasks;
+		return $tasks;
 	}
 
 	/**

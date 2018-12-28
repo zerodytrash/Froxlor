@@ -83,6 +83,16 @@ class AdminIndex extends FeModule
 
 		$overview['domains'] = $number_domains['number_domains'];
 
+		// calculate percentage
+		$overview_data = array();
+		foreach ($overview as $entity => $used) {
+			$overview_data[$entity] = array(
+				'avail' => \Froxlor\CurrentUser::getField($entity),
+				'used' => empty($used) ? 0 : $used,
+				'perc' => (\Froxlor\CurrentUser::getField($entity) >= 0) ? floor($used / \Froxlor\CurrentUser::getField($entity)) : 0
+			);
+		}
+
 		/*
 		 * @fixme
 		 $dec_places = Settings::Get('panel.decimal_places');
@@ -149,31 +159,20 @@ class AdminIndex extends FeModule
 		}
 		
 		// update check
-		if ((isset($_GET['lookfornewversion']) && $_GET['lookfornewversion'] == 'yes') || (isset($lookfornewversion) && $lookfornewversion == 'yes')) {
 			try {
 				$json_result = Froxlor::getLocal(\Froxlor\CurrentUser::getData())->checkUpdate();
 			} catch (\Exception $e) {
 				\Froxlor\UI\Response::dynamic_error($e->getMessage());
 			}
-			$result = json_decode($json_result, true)['data'];
-			
-			$lookfornewversion_lable = $result['version'];
-			$lookfornewversion_link = $result['link'];
-			$lookfornewversion_message = $result['message'];
-			$lookfornewversion_addinfo = $result['additional_info'];
-			$isnewerversion = $result['isnewerversion'];
-		} else {
-			$lookfornewversion_lable = $this->lng['admin']['lookfornewversion']['clickhere'];
-			$lookfornewversion_link = "index.php?module=AdminIndex&lookfornewversion=yes";
-			$lookfornewversion_message = '';
-			$lookfornewversion_addinfo = '';
-			$isnewerversion = 0;
-		}
+			$version_check_result = json_decode($json_result, true)['data'];
 
 		\Froxlor\Frontend\UI::TwigBuffer('admin/index/index.html.twig', array(
 			'page_title' => "Dashboard",
-			'usage_data' => $overview,
-			'sysinfo' => $sysinfo
+			'usage_data' => $overview_data,
+			'sysinfo' => $sysinfo,
+			'version_check_result' => $version_check_result,
+			'cron_last_runs' => $cron_last_runs,
+			'outstanding_tasks' => $outstanding_tasks
 		));
 	}
 
