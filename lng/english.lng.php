@@ -2054,3 +2054,5 @@ $lng['panel']['ihave_configured'] = 'I have configured the services';
 $lng['panel']['system_is_configured'] = 'System is already set as configured';
 $lng['panel']['settings_before_configuration'] = 'Please be sure you adjusted the settings prior to configuring the services here';
 $lng['panel']['alternative_cmdline_config'] = 'Alternatively, just run the following command as root-user in you shell to configure the services automatically';
+$lng['admin']['kernel'] = 'Kernel';
+$lng['admin']['uptime'] = 'Uptime';

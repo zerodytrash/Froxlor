@@ -1,5 +1,26 @@
+<!-- @todo show_element and required_resource -->
 <li class="nav-item"><a
-	class="nav-link {% if module == 'AdminIndex' %}active" href="#"
-	{% else %}" href="/app/?module=AdminIndex" {% endif %}> <i
-		class="fas fa-tachometer-alt"></i> Dashboard
+	class="nav-link {% if module[:5]|lower == 'index' %}active" href="#"
+	{% else %}" href="index.php?module={% if call_static('\\Froxlor\\CurrentUser', 'getField', ['adminsession']) == 1 %}Admin{% else %}Customer{% endif %}Index"
+	{% endif %}> <i class="fas fa-tachometer-alt"></i> Dashboard {{ module[:5]|lower }}
 </a></li>
+{% for box in nav_items %}
+<li class="nav-item dropdown"><a
+	class="nav-link dropdown-toggle{% if module[:8]|lower == 'userdata' %} active{% endif %}"
+	href="#" id="navbarDropdown{{ module }}" data-toggle="dropdown"
+	aria-haspopup="true" aria-expanded="false"><i
+		class="fas fa-7{% if box.icon is defined %}{{ box.item }}{% else %}user{% endif %}"></i>
+		{{ box.label  }}</a>
+	<div class="dropdown-menu" aria-labelledby="navbarDropdown{{ module }}">
+		{% for element in box.elements %}
+		{% if box.show_element is not defined or (box.show_element is defined and box.show_element == true) %}
+		<a class="dropdown-item"
+			href="{% if element.url is defined %}{{ element.url }}{% else %}#{% endif %}">
+			<i
+			class="fas fa-{% if element.icon is defined %}{{ element.icon }}{% else %}cog{% endif %}"></i>
+			{{ element.label }}
+		</a>
+		{% endif %}
+		{% endfor %}
+	</div></li>
+{% endfor %}

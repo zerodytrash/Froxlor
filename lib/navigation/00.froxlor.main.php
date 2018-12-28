@@ -23,7 +23,7 @@ return array(
 			'label' => $lng['admin']['overview'],
 			'elements' => array(
 				array(
-					'label' => $lng['menue']['main']['username']
+					'label' => $lng['menue']['main']['username'] . \Froxlor\CurrentUser::getField('loginname')
 				),
 				array(
 					'url' => 'customer_index.php?page=change_password',
@@ -170,11 +170,12 @@ return array(
 	),
 	'admin' => array(
 		'index' => array(
-			'url' => 'admin_index.php',
+			'url' => 'index.php?module=AdminIndex',
+			'icon' => 'tachometer-alt',
 			'label' => $lng['admin']['overview'],
 			'elements' => array(
 				array(
-					'label' => $lng['menue']['main']['username']
+					'label' => $lng['menue']['main']['username'] . \Froxlor\CurrentUser::getField('loginname')
 				),
 				array(
 					'url' => 'admin_index.php?page=change_password',
@@ -198,10 +199,6 @@ return array(
 					'url' => 'admin_index.php?page=apihelp',
 					'label' => $lng['menue']['main']['apihelp'],
 					'show_element' => (\Froxlor\Settings::Get('api.enabled') == true)
-				),
-				array(
-					'url' => 'admin_index.php?action=logout',
-					'label' => $lng['login']['logout']
 				)
 			)
 		),

@@ -178,6 +178,52 @@ if (\Froxlor\CurrentUser::hasSession() == false && $module != 'login') {
 	exit();
 }
 
+// navigation
+if (\Froxlor\CurrentUser::hasSession()) {
+	// Fills variables for navigation, header and footer
+	$navigation = "";
+	if (\Froxlor\Froxlor::hasUpdates() || \Froxlor\Froxlor::hasDbUpdates()) {
+		// if froxlor-files have been updated
+		// but not yet configured by the admin
+		// we only show logout and the update-page
+		$navigation_data = array(
+			'admin' => array(
+				'index' => array(
+					'url' => 'index.php?module=AdminIndex',
+					'label' => $lng['admin']['overview'],
+					'elements' => array(
+						array(
+							'label' => $lng['menue']['main']['username']
+						),
+						array(
+							'url' => 'index.php?module=AdminIndex&view=logout',
+							'label' => $lng['login']['logout']
+						)
+					)
+				),
+				'server' => array(
+					'label' => $lng['admin']['server'],
+					'required_resources' => 'change_serversettings',
+					'elements' => array(
+						array(
+							'url' => 'index.php?module=AdminUpdates',
+							'label' => $lng['update']['update'],
+							'required_resources' => 'change_serversettings'
+						)
+					)
+				)
+			)
+		);
+		$navigation = $navigation_data['admin'];
+	} else {
+		$navigation_data = \Froxlor\PhpHelper::loadConfigArrayDir(\Froxlor\Froxlor::getInstallDir() . '/lib/navigation/');
+		$area = \Froxlor\CurrentUser::getField('adminsession') == 1 ? 'admin' : 'customer';
+		$navigation = $navigation_data[$area];
+	}
+	unset($navigation_data);
+	\Froxlor\Frontend\UI::Twig()->addGlobal('nav_items', $navigation);
+}
+
 $module = ucfirst($module);
 $mod_fullpath = '\\Froxlor\\Frontend\\Modules\\' . $module;
 
@@ -312,48 +358,6 @@ if (isset($userinfo['loginname']) && $userinfo['loginname'] != '') {
 	$log = \Froxlor\FroxlorLogger::getInstanceOf($userinfo);
 }
 
-// Fills variables for navigation, header and footer
-$navigation = "";
-if (AREA == 'admin' || AREA == 'customer') {
-	if (\Froxlor\Froxlor::hasUpdates() || \Froxlor\Froxlor::hasDbUpdates()) {
-		// if froxlor-files have been updated
-		// but not yet configured by the admin
-		// we only show logout and the update-page
-		$navigation_data = array(
-			'admin' => array(
-				'index' => array(
-					'url' => 'admin_index.php',
-					'label' => $lng['admin']['overview'],
-					'elements' => array(
-						array(
-							'label' => $lng['menue']['main']['username']
-						),
-						array(
-							'url' => 'admin_index.php?action=logout',
-							'label' => $lng['login']['logout']
-						)
-					)
-				),
-				'server' => array(
-					'label' => $lng['admin']['server'],
-					'required_resources' => 'change_serversettings',
-					'elements' => array(
-						array(
-							'url' => 'admin_updates.php?page=overview',
-							'label' => $lng['update']['update'],
-							'required_resources' => 'change_serversettings'
-						)
-					)
-				)
-			)
-		);
-		$navigation = \Froxlor\UI\HTML::buildNavigation($navigation_data['admin'], $userinfo);
-	} else {
-		$navigation_data = \Froxlor\PhpHelper::loadConfigArrayDir('lib/navigation/');
-		$navigation = \Froxlor\UI\HTML::buildNavigation($navigation_data[AREA], $userinfo);
-	}
-	unset($navigation_data);
-}
 
 $js = "";
 if (array_key_exists('js', $_themeoptions['variants'][$themevariant]) && is_array($_themeoptions['variants'][$themevariant]['js'])) {

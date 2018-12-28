@@ -5,7 +5,7 @@
 	<div class="col-8"></div>
 	<div class="col">
 		{% if get_setting('admin.show_news_feed') == 1 %}
-		<div class="card">
+		<div class="card mb-2">
 			<div class="card-header">News</div>
 			<div class="list-group list-group-flush" id="newsfeed">
 				<a href="#" class="list-group-item list-group-item-action disabled"><i
@@ -13,12 +13,26 @@
 			</div>
 		</div>
 		{% else %}
-		<div class="alert alert-warning" role="alert">
+		<div class="alert alert-warning mb-2" role="alert">
 			{{ lng('panel.newsfeed_disabled') }}
 			<a href="index.php?module=AdminSettings&part=panel"
-				class="alert-link"><i class="fas fa-penicl"></i></a>.
+				class="alert-link"><i class="fas fa-edit"></i></a>
 		</div>
 		{% endif %}
+		<div class="card mb-2">
+			<div class="card-header">
+				{{ lng('admin.systemdetails') }}
+			</div>
+			<ul class="list-group">
+				{% for key,value in sysinfo %}
+				{% set lngkey = 'admin.' ~ key %}
+				<li
+					class="list-group-item d-flex justify-content-between align-items-center">
+					{{ lng(lngkey) }} <span class="badge badge-secondary">{{ value|raw }}</span>
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
 	</div>
 </div>
 {% endblock %}

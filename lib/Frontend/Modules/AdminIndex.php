@@ -83,73 +83,50 @@ class AdminIndex extends FeModule
 
 		$overview['number_domains'] = $number_domains['number_domains'];
 
-		$phpversion = phpversion();
-		$mysqlserverversion = Database::getAttribute(\PDO::ATTR_SERVER_VERSION);
-		$webserverinterface = strtoupper(@php_sapi_name());
-
-		if ((isset($_GET['lookfornewversion']) && $_GET['lookfornewversion'] == 'yes') || (isset($lookfornewversion) && $lookfornewversion == 'yes')) {
-			try {
-				$json_result = Froxlor::getLocal(\Froxlor\CurrentUser::getData())->checkUpdate();
-			} catch (\Exception $e) {
-				\Froxlor\UI\Response::dynamic_error($e->getMessage());
-			}
-			$result = json_decode($json_result, true)['data'];
-
-			$lookfornewversion_lable = $result['version'];
-			$lookfornewversion_link = $result['link'];
-			$lookfornewversion_message = $result['message'];
-			$lookfornewversion_addinfo = $result['additional_info'];
-			$isnewerversion = $result['isnewerversion'];
-		} else {
-			$lookfornewversion_lable = $this->lng['admin']['lookfornewversion']['clickhere'];
-			$lookfornewversion_link = "index.php?module=AdminIndex&lookfornewversion=yes";
-			$lookfornewversion_message = '';
-			$lookfornewversion_addinfo = '';
-			$isnewerversion = 0;
-		}
-
-		$dec_places = Settings::Get('panel.decimal_places');
 		/*
 		 * @fixme
-		$userinfo['diskspace'] = round($userinfo['diskspace'] / 1024, $dec_places);
-		$userinfo['diskspace_used'] = round($userinfo['diskspace_used'] / 1024, $dec_places);
-		$userinfo['traffic'] = round($userinfo['traffic'] / (1024 * 1024), $dec_places);
-		$userinfo['traffic_used'] = round($userinfo['traffic_used'] / (1024 * 1024), $dec_places);
-		$userinfo = \Froxlor\PhpHelper::strReplaceArray('-1', $this->lng['customer']['unlimited'], $userinfo, 'customers domains diskspace traffic mysqls emails email_accounts email_forwarders email_quota ftps subdomains');
+		 $dec_places = Settings::Get('panel.decimal_places');
+		 $userinfo['diskspace'] = round($userinfo['diskspace'] / 1024, $dec_places);
+		 $userinfo['diskspace_used'] = round($userinfo['diskspace_used'] / 1024, $dec_places);
+		 $userinfo['traffic'] = round($userinfo['traffic'] / (1024 * 1024), $dec_places);
+		 $userinfo['traffic_used'] = round($userinfo['traffic_used'] / (1024 * 1024), $dec_places);
+		 $userinfo = \Froxlor\PhpHelper::strReplaceArray('-1', $this->lng['customer']['unlimited'], $userinfo, 'customers domains diskspace traffic mysqls emails email_accounts email_forwarders email_quota ftps subdomains');
+		 
+		 $userinfo['custom_notes'] = ($userinfo['custom_notes'] != '') ? nl2br($userinfo['custom_notes']) : '';
+		 */
 
-		$userinfo['custom_notes'] = ($userinfo['custom_notes'] != '') ? nl2br($userinfo['custom_notes']) : '';
-		*/
+		$sysinfo = array();
+		$sysinfo['phpversion'] = phpversion();
+		$sysinfo['mysqlserverversion'] = Database::getAttribute(\PDO::ATTR_SERVER_VERSION);
+		$sysinfo['webserverinterface'] = strtoupper(@php_sapi_name());
 
 		$cron_last_runs = \Froxlor\System\Cronjob::getCronjobsLastRun();
 		$outstanding_tasks = \Froxlor\System\Cronjob::getOutstandingTasks();
 
-		$system_hostname = gethostname();
+		$sysinfo['hostname'] = gethostname();
+		$sysinfo['serversoftware'] = $_SERVER['SERVER_SOFTWARE'];
 		$meminfo = explode("\n", @file_get_contents("/proc/meminfo"));
-		$memory = "";
+		$sysinfo['memory'] = "";
 		for ($i = 0; $i < sizeof($meminfo); ++ $i) {
 			if (substr($meminfo[$i], 0, 3) === "Mem") {
-				$memory .= $meminfo[$i] . PHP_EOL;
+				$sysinfo['memory'] .= $meminfo[$i] . '<br>';
 			}
 		}
 
 		if (function_exists('sys_getloadavg')) {
 			$loadArray = sys_getloadavg();
-			$load = number_format($loadArray[0], 2, '.', '') . " / " . number_format($loadArray[1], 2, '.', '') . " / " . number_format($loadArray[2], 2, '.', '');
+			$sysinfo['sysload'] = number_format($loadArray[0], 2, '.', '') . " / " . number_format($loadArray[1], 2, '.', '') . " / " . number_format($loadArray[2], 2, '.', '');
 		} else {
-			$load = @file_get_contents('/proc/loadavg');
+			$sysinfo['sysload'] = @file_get_contents('/proc/loadavg');
 
-			if (! $load) {
-				$load = $this->lng['admin']['noloadavailable'];
+			if (! $sysinfo['sysload']) {
+				$sysinfo['sysload'] = $this->lng['admin']['noloadavailable'];
 			}
 		}
 
 		if (function_exists('posix_uname')) {
-			$showkernel = 1;
 			$kernel_nfo = posix_uname();
-			$kernel = $kernel_nfo['release'] . ' (' . $kernel_nfo['machine'] . ')';
-		} else {
-			$showkernel = 0;
-			$kernel = '';
+			$sysinfo['kernel'] = $kernel_nfo['release'] . ' (' . $kernel_nfo['machine'] . ')';
 		}
 
 		// Try to get the uptime
@@ -165,18 +142,37 @@ class AdminIndex extends FeModule
 			$hours = floor($hours - ($days * 24));
 			$minutes = floor($minutes - ($days * 24 * 60) - ($hours * 60));
 			$seconds = floor($seconds - ($days * 24 * 60 * 60) - ($hours * 60 * 60) - ($minutes * 60));
-			$uptime = "{$days}d, {$hours}h, {$minutes}m, {$seconds}s";
+			$sysinfo['uptime'] = "{$days}d, {$hours}h, {$minutes}m, {$seconds}s";
 
 			// Just cleanup
 			unset($uptime_array, $seconds, $minutes, $hours, $days);
+		}
+		
+		// update check
+		if ((isset($_GET['lookfornewversion']) && $_GET['lookfornewversion'] == 'yes') || (isset($lookfornewversion) && $lookfornewversion == 'yes')) {
+			try {
+				$json_result = Froxlor::getLocal(\Froxlor\CurrentUser::getData())->checkUpdate();
+			} catch (\Exception $e) {
+				\Froxlor\UI\Response::dynamic_error($e->getMessage());
+			}
+			$result = json_decode($json_result, true)['data'];
+			
+			$lookfornewversion_lable = $result['version'];
+			$lookfornewversion_link = $result['link'];
+			$lookfornewversion_message = $result['message'];
+			$lookfornewversion_addinfo = $result['additional_info'];
+			$isnewerversion = $result['isnewerversion'];
 		} else {
-			// Nothing of the above worked, show an error :/
-			$uptime = '';
+			$lookfornewversion_lable = $this->lng['admin']['lookfornewversion']['clickhere'];
+			$lookfornewversion_link = "index.php?module=AdminIndex&lookfornewversion=yes";
+			$lookfornewversion_message = '';
+			$lookfornewversion_addinfo = '';
+			$isnewerversion = 0;
 		}
 
-		//eval("echo \"" . \Froxlor\UI\Template::getTemplate("index/index") . "\";");
 		\Froxlor\Frontend\UI::TwigBuffer('admin/index/index.html.twig', array(
-			'page_title' => "Dashboard"
+			'page_title' => "Dashboard",
+			'sysinfo' => $sysinfo
 		));
 	}
 

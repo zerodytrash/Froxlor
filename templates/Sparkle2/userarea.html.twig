@@ -23,11 +23,7 @@
 	</button>
 	<div class="collapse navbar-collapse" id="navbarToggler">
 		<ul class="navbar-nav mr-auto">
-			{% if call_static('\\Froxlor\\CurrentUser', 'getField', ['adminsession']) == 1 %}
-			{{ include('admin/topmenu.html.twig') }}
-			{% else %}
-			{{ include('customer/topmenu.html.twig') }}
-			{% endif %}
+			{{ include('topmenu.html.twig') }}
 		</ul>
 		<ul class="navbar-nav navbar-right">
 			<li class="nav-item text-nowrap"><a

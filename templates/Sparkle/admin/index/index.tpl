@@ -161,55 +161,6 @@ $header
 				</table>
 				</if>
 
-				<table class="dboarditem">
-					<thead>
-						<tr>
-							<th colspan="2">{$lng['admin']['systemdetails']}</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>{$lng['admin']['hostname']}:</td>
-							<td>{$system_hostname}</td>
-						</tr>
-						<tr>
-							<td>{$lng['admin']['serversoftware']}:</td>
-							<td>{$_SERVER['SERVER_SOFTWARE']}</td>
-						</tr>
-						<tr>
-							<td>{$lng['admin']['phpversion']}:</td>
-							<td><a href="{$linker->getLink(array('section' => 'settings', 'page' => 'phpinfo'))}">$phpversion</a></td>
-						</tr>
-						<tr>
-							<td class="nowrap">{$lng['admin']['mysqlserverversion']}:</td>
-							<td>$mysqlserverversion</td>
-						</tr>
-						<tr>
-							<td>{$lng['admin']['webserverinterface']}:</td>
-							<td>$webserverinterface</td>
-						</tr>
-						<tr>
-							<td>{$lng['admin']['memory']}:</td>
-							<td><pre>$memory</pre></td>
-						</tr>
-						<tr>
-							<td>{$lng['admin']['sysload']}:</td>
-							<td>$load</td>
-						</tr>
-						<if $showkernel == 1>
-							<tr>
-								<td>Kernel:</td>
-								<td>$kernel</td>
-							</tr>
-						</if>
-						<if $uptime != ''>
-						<tr>
-							<td>Uptime:</td>
-							<td>$uptime</td>
-						</tr>
-						</if>
-					</tbody>
-				</table>
 
 				<table class="dboarditem">
 					<thead>
