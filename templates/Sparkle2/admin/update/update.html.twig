@@ -1,0 +1,26 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="container pt-5">
+	<form class="form" method="post" action="">
+		<img class="mb-4" src="{{ header_logo }}"
+			alt="Froxlor Server Management Panel">
+		<h1 class="h3 mb-3 font-weight-normal">
+			Froxlor&nbsp;-&nbsp;
+			{{ lng('update.update') }}
+		</h1>
+
+		<div class="card bg-light border-secondary mb-2">
+			<div class="card-body">
+				<p class="card-text">
+					{{ update_process|raw }}
+				</p>
+			</div>
+		</div>
+
+		<div class="text-center">
+			<a href="{{ redirect_url }}" class="btn btn-lg btn-primary">{{ lng('success.clickheretocontinue') }}</a>
+		</div>
+	</form>
+</div>
+{% endblock %}

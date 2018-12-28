@@ -1,0 +1,65 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="container pt-5">
+	<form class="form" method="post" action="">
+		<img class="mb-4" src="{{ header_logo }}"
+			alt="Froxlor Server Management Panel">
+		<h1 class="h3 mb-3 font-weight-normal">
+			Froxlor&nbsp;-&nbsp;
+			{{ lng('update.update') }}
+		</h1>
+		{% if message %}
+		<div class="alert alert-danger" role="alert">
+			<strong>{{ lng('error.error') }}</strong><br>
+			{{ message|raw }}
+		</div>
+		{% endif %}
+		<div class="alert alert-primary" role="alert">
+			{{ update_information|raw }}
+		</div>
+		{% if preconfig|length > 0 %}
+		<div class="preconfig mb-4">
+			<h4 class="red">PLEASE NOTE - Important update notifications</h4>
+			{% endif %}
+			{% for pc_item in preconfig %}
+			<div class="card bg-light border-secondary mb-2">
+				<div class="card-body">
+					<p class="card-text">
+						{{ pc_item.description|raw }}
+					</p>
+					<p class="card-text">
+						{% for q in pc_item.question %}
+					<div class="form-group">
+						<label>{{ q.title|raw }}</label>
+						{{ q.form|raw }}
+					</div>
+					{% endfor %}
+					</p>
+				</div>
+			</div>
+			{% endfor %}
+			{% if preconfig|length > 0 %}
+			<div class="form-check mt-2 text-center">
+				<input class="form-check-input" type="checkbox" value="1"
+					id="update_changesagreed" name="update_changesagreed"> <label
+					class="form-check-label" for="update_changesagreed"> <strong>I
+						have read the update notifications above and I am aware of the
+						changes made to my system.</strong>
+				</label>
+			</div>
+		</div>
+		<input type="hidden" name="update_preconfig" value="1" />
+		{% endif %}
+		<div class="alert alert-primary" role="alert">
+			{{ lng('update.update_information.part_b')|raw }}
+		</div>
+		<div class="text-center">
+			<input type="hidden" name="send" value="send" />
+			<button class="btn btn-lg btn-primary" type="submit">
+				{{ lng('update.proceed') }}
+			</button>
+		</div>
+	</form>
+</div>
+{% endblock %}

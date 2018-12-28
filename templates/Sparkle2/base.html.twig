@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="mobile-web-app-capable" content="yes">
+{% if get_setting('panel.no_robots') == '0' %}
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<meta name="GOOGLEBOT" content="nosnippet" />
+{% endif %}
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet"
+	href="../vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
+
+<!-- FontAwesome CSS -->
+<link rel="stylesheet"
+	href="../vendor/components/font-awesome/css/fontawesome-all.min.css">
+
+<!-- custom css -->
+<link href="../templates/Sparkle2/assets/css/main.css" rel="stylesheet">
+
+<!-- Bootstrap and necessary plugins -->
+<script src="../vendor/components/jquery/jquery.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"
+	integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
+	crossorigin="anonymous"></script>
+<script src="../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
+{% block custom_js %}
+{% endblock %}
+<title>Froxlor{% if page_title %} | {{ page_title }}{% endif %}</title>
+</head>
+
+
+<body>
+	<div class="container-fluid">
+		{% block navigation %}
+		{% endblock %}
+
+		{{ global_errors|raw }}
+
+		{% block body %}
+		{% endblock %}
+
+		<footer class="pt-5">
+			<span><img
+				src="../templates/Sparkle2/assets/img/logo_grey.png" alt="Froxlor" />
+				{% if (get_setting('admin.show_version_login') ==
+					'1' and filename== 'index.php') or (filename !='index.php'
+					and get_setting('admin.show_version_footer') =='1') %}
+				{{ call_static('\\Froxlor\\Froxlor', 'getFullVersion') }} {% endif %}
+				&copy; 2009-{{ "now"|date("Y") }} by <a
+				href="http://www.froxlor.org/" rel="external">the Froxlor Team</a><br />
+			</span>
+			{% if lng('translator') %}
+			<br /> <span>{{ lng('panel.translator') }}: {{ lng('translator') }}
+				{% endif %}
+		</footer>
+	</div>
+</body>
+</html>

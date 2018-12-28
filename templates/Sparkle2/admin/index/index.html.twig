@@ -1,0 +1,24 @@
+{% extends "userarea.html.twig" %}
+
+{% block content %}
+<div class="row">
+	<div class="col-8"></div>
+	<div class="col">
+		{% if get_setting('admin.show_news_feed') == 1 %}
+		<div class="card">
+			<div class="card-header">News</div>
+			<div class="list-group list-group-flush" id="newsfeed">
+				<a href="#" class="list-group-item list-group-item-action disabled"><i
+					class="fas fa-spinner fa-spin"></i> Loading newsfeed... </a>
+			</div>
+		</div>
+		{% else %}
+		<div class="alert alert-warning" role="alert">
+			{{ lng('panel.newsfeed_disabled') }}
+			<a href="index.php?module=AdminSettings&part=panel"
+				class="alert-link"><i class="fas fa-penicl"></i></a>.
+		</div>
+		{% endif %}
+	</div>
+</div>
+{% endblock %}

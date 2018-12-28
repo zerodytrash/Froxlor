@@ -1,0 +1,28 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="container container-login text-center">
+	<form class="form-signin" method="post" action="">
+		<img class="mb-4" src="{{ header_logo }}"
+			alt="Froxlor Server Management Panel">
+		<h1 class="h3 mb-3 font-weight-normal">
+			Froxlor&nbsp;-&nbsp;
+			{{ lng('login.2fa') }}
+		</h1>
+		<label for="2fa_code" class="sr-only">{{ lng('login.2facode') }}</label>
+		<input type="input" id="2fa_code" name="2fa_code" class="form-control"
+			placeholder="{{ lng('login.2facode') }}" required autofocus>
+		<br> <input type="hidden" name="script" value="{{ lastscript }}" />
+		<input type="hidden" name="qrystr" value="{{ lastqrystr }}" /> <input
+			type="hidden" name="action" value="2fa_verify" /> <input
+			type="hidden" name="send" value="send" />
+		<button class="btn btn-lg btn-primary btn-block" type="submit">
+			{{ lng('2fa.2fa_verifiy') }}
+		</button>
+		<p class="mt-5 mb-3 text-muted">
+			<a href="?index.php">{{ lng('login.backtologin') }}</a>
+			{% endif %}
+		</p>
+	</form>
+</div>
+{% endblock %}

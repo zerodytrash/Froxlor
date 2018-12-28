@@ -1,0 +1,11 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="alert alert-warning" role="alert">
+	<h4 class="alert-heading">{% trans "Nicht gefunden" %}</h4>
+	<p>{% trans "Die gewünschte Seite konnte nicht gefunden werden." %}</p>
+	{% if not_found_info %}<hr>
+	<p class="mb-0"><i>{{ not_found_info }}</i></p>
+	{% endif %}
+</div>
+{% endblock %}
