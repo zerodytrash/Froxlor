@@ -2057,3 +2057,4 @@ $lng['panel']['alternative_cmdline_config'] = 'Alternatively, just run the follo
 $lng['admin']['kernel'] = 'Kernel';
 $lng['admin']['uptime'] = 'Uptime';
 $lng['admin']['mydata'] = 'My data';
+$lng['panel']['current_user'] = 'Current user';

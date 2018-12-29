@@ -1,4 +1,5 @@
 <?php
+namespace Froxlor\Frontend\Modules;
 
 /**
  * This file is part of the Froxlor project.
@@ -9,31 +10,54 @@
  * file that was distributed with this source code. You can also view the
  * COPYING file online at http://files.froxlor.org/misc/COPYING.txt
  *
- * @copyright  (c) the authors
- * @author     Florian Lippert <flo@syscp.org> (2003-2009)
- * @author     Froxlor team <team@froxlor.org> (2010-)
- * @license    GPLv2 http://files.froxlor.org/misc/COPYING.txt
- * @package    Panel
+ * @copyright (c) the authors
+ * @author Florian Lippert <flo@syscp.org> (2003-2009)
+ * @author Froxlor team <team@froxlor.org> (2010-)
+ * @license GPLv2 http://files.froxlor.org/misc/COPYING.txt
+ * @package Panel
  *
  */
-define('AREA', 'admin');
-require './lib/init.php';
-
 use Froxlor\Database\Database;
+use Froxlor\Frontend\FeModule;
 use Froxlor\Settings;
+use Froxlor\Api\Commands\Froxlor as Froxlor;
 use Froxlor\Api\Commands\Admins as Admins;
 
-if (isset($_POST['id'])) {
-	$id = intval($_POST['id']);
-} elseif (isset($_GET['id'])) {
-	$id = intval($_GET['id']);
-}
+class AdminAdmins extends FeModule
+{
+	public function overview()
+	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			return;
+		}
 
-if ($page == 'admins' && $userinfo['change_serversettings'] == '1') {
+		\Froxlor\FroxlorLogger::getInstanceOf(\Froxlor\CurrentUser::getData())->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "viewed AdminAdmins");
 
-	if ($action == '') {
+		try {
+			$json_result = Admins::getLocal(\Froxlor\CurrentUser::getData())->listing();
+		} catch (\Exception $e) {
+			\Froxlor\UI\Response::dynamic_error($e->getMessage());
+		}
+		$result = json_decode($json_result, true)['data'];
+		
+		$admins = $result['list'];
+		foreach ($admins as $index => $admin) {
+			// add some extra fields
+			$admin['diskspace_perc'] = 0;
+			$admin['traffic_perc'] = 0;
+			if ($admin['diskspace'] >= 0) {
+				// not unlimited
+				$admin['diskspace_perc'] = floor($admin['diskspace_used'] / $admin['diskspace']);
+			}
+			if ($admin['traffic'] >= 0) {
+				// not unlimited
+				$admin['traffic_perc'] = floor($admin['traffic_used'] / $admin['traffic']);
+			}
+			$result['list'][$index] = $admin;
+		}
 
-		$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "viewed admin_admins");
+		/*
 		$fields = array(
 			'loginname' => $lng['login']['username'],
 			'name' => $lng['customer']['name'],
@@ -57,9 +81,9 @@ if ($page == 'admins' && $userinfo['change_serversettings'] == '1') {
 
 		$dec_places = Settings::Get('panel.decimal_places');
 
-		while ($row = $result_stmt->fetch(PDO::FETCH_ASSOC)) {
+		foreach ($result as $row) {
 
-			if ($paging->checkDisplay($i)) {
+			//if ($paging->checkDisplay($i)) {
 
 				$row['traffic_used'] = round($row['traffic_used'] / (1024 * 1024), $dec_places);
 				$row['traffic'] = round($row['traffic'] / (1024 * 1024), $dec_places);
@@ -92,8 +116,8 @@ if ($page == 'admins' && $userinfo['change_serversettings'] == '1') {
 					$traffic_percent = 100;
 				}
 
-				$row = \Froxlor\PhpHelper::strReplaceArray('-1', 'UL', $row, 'customers domains diskspace traffic mysqls emails email_accounts email_forwarders email_quota ftps subdomains');
-				$row = \Froxlor\PhpHelper::htmlentitiesArray($row);
+				//$row = \Froxlor\PhpHelper::strReplaceArray('-1', 'UL', $row, 'customers domains diskspace traffic mysqls emails email_accounts email_forwarders email_quota ftps subdomains');
+				//$row = \Froxlor\PhpHelper::htmlentitiesArray($row);
 
 				$row['custom_notes'] = ($row['custom_notes'] != '') ? nl2br($row['custom_notes']) : '';
 
@@ -105,6 +129,15 @@ if ($page == 'admins' && $userinfo['change_serversettings'] == '1') {
 
 		$admincount = $numrows_admins;
 		eval("echo \"" . \Froxlor\UI\Template::getTemplate("admins/admins") . "\";");
+		*/
+		
+		\Froxlor\Frontend\UI::TwigBuffer('admin/admins/index.html.twig', array(
+			'page_title' => $this->lng['admin']['admins'],
+			'accounts' => $result
+		));
+	}
+}
+/*
 	} elseif ($action == 'su') {
 
 		try {
@@ -340,3 +373,4 @@ if ($page == 'admins' && $userinfo['change_serversettings'] == '1') {
 		}
 	}
 }
+*/

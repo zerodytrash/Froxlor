@@ -1,0 +1,167 @@
+{% extends "userarea.html.twig" %}
+
+{% block content %}
+{% set userinfo = call_static('\\Froxlor\\CurrentUser', 'getData') %}
+<div class="card">
+	<div class="card-header">
+		<ul class="nav nav-tabs card-header-tabs" id="subnav-tab"
+			role="tablist">
+			<li class="nav-item"><a class="nav-link active"
+				id="subnav-acc-tab" data-toggle="tab" href="#tab-acc" role="tab"
+				aria-controls="subnav-acc" aria-selected="true">{{ lng('admin.admins') }}&nbsp;<span
+					class="badge badge-pill badge-secondary">{{ accounts.count }}</span></a></li>
+			<li class="nav-item"><a class="nav-link" id="subnav-add-tab"
+				data-toggle="tab" href="#tab-add" role="tab"
+				aria-controls="subnav-add" aria-selected="false"><i
+					class="fas fa-user-plus"></i>&nbsp;{{ lng('admin.admin_add') }}</a></li>
+		</ul>
+	</div>
+	<div class="card-body tab-content" id="subnav-tabContent">
+		<div class="tab-pane fade show active" id="tab-acc" role="tabpanel"
+			aria-labelledby="subnav-acc-tab">
+			<div class="card">
+				<div class="card-body" id="accounts-list">
+					{% import "table-listing.html.twig" as t %}
+					{% set content %}
+					{% for user in accounts.list %}
+					<tr class="d-flex">
+						<td class="col-sm-3"><strong>{{ user.name }}</strong>
+							{% if call_static('\\Froxlor\\CurrentUser', 'getField', ['adminid']) == user.adminid %}
+							&nbsp;<i class="fas fa-user" data-toggle="tooltip"
+							data-placement="right" title="{{ lng('panel.current_user') }}"></i> {% endif %}</td>
+						<td class="col-sm-2"><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
+						<td class="col-sm-1">{{ user.customers_used }} / {% if user.customers < 0 %}&infin;{% else %}{{ user.customers }}{% endif %}</span></td>
+						<td class="col-sm-3">
+							<div class="row">
+								<div class="col-3"><small>Webspace</small></div>
+								<div class="col">
+									<div class="progress">
+                                      <div class="progress-bar" role="progressbar" id="pb-disk-{{ user.adminid }}" aria-valuenow="{{ user.diskspace_used }}" aria-valuemin="0" aria-valuemax="{{ user.diskspace }}}">{% if user.diskspace < 0 %}&infin;{% else %}{{ user.diskspace_perc }}%{% endif %}</div>
+                                    </div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-3"><small>Traffic</small></div>
+								<div class="col">
+									<div class="progress">
+                                      <div class="progress-bar" role="progressbar" id="pb-traf-{{ user.adminid }}" aria-valuenow="{{ user.traffic_used }}" aria-valuemin="0" aria-valuemax="{{ user.traffic }}}">{% if user.traffic < 0 %}&infin;{% else %}{{ user.traffic_perc }}%{% endif %}</div>
+                                    </div>
+								</div>
+							</div>
+						</td>
+						<td class="col-sm-2">{% if user.lastlogin > 0 %} {{ user.lastlogin|date('d.m.Y H:i') }}
+							{% else %}{% trans "keine Anmeldung bisher" %}{% endif %}</td>
+						<td class="col-sm-1 text-right">{% if call_static('\\Froxlor\\CurrentUser', 'getField', ['adminid']) == user.adminid %}
+							<span class="text-muted"><i class="fas fa-trash-alt"></i></span>
+							{% else %} <a href="#" class="text-danger delete-btn"
+							data-id="{{ user.id }}" data-container="body"
+							data-toggle="tooltip" data-placement="left" title="{% trans "Konto löschen" %}"><i
+								class="fas fa-trash-alt"></i></a> {% endif %}</td>
+					</tr>
+					{% endfor %}
+					{% endset %}
+					{% if accounts|length > 0 %}
+					{{ t.listing("accounts-listing", ["Name", "E-Mail", "Kunden", "", "Letzter Login", "|Optionen"], content, [3,2,1,3,2,1]) }}
+					<script>
+					{% for user in accounts.list %}
+						{% if user.diskspace < 0 %}
+							$('#pb-disk-{{ user.adminid }}').css('width', '100%');
+							$('#pb-disk-{{ user.adminid }}').addClass('bg-success');
+						{% else %}
+							$('#pb-disk-{{ user.adminid }}').css('width', '{{ user.diskspace_perc }}%');
+						{% endif %}
+						{% if user.traffic < 0 %}
+    						$('#pb-traf-{{ user.adminid }}').css('width', '100%');
+    						$('#pb-traf-{{ user.adminid }}').addClass('bg-success');
+    					{% else %}
+    						$('#pb-traf-{{ user.adminid }}').css('width', '{{ user.traffic_perc }}%');
+    	    						
+    					{% endif %}
+					{% endfor %}
+					</script>
+					{% else %}
+					<div class="alert alert-info" role="alert">{% trans "Keine Konten" %}</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+
+		<div class="tab-pane fade container" id="tab-add" role="tabpanel"
+			aria-labelledby="subnav-add-tab">
+			<div class="card">
+				<div class="card-body">
+					<!-- add sys-account data -->
+					<h5>
+						<i class="fas fa-user-plus"></i>&nbsp;{% trans "Konto hinzufügen" %}
+					</h5>
+					<form id="sysaccount-data">
+						<div class="form-group form-row">
+							<label for="inputMail" class="col-sm-2 col-form-label">{% trans "E-Mail" %}</label>
+							<div class="col-sm-10">
+								<input type="email" class="form-control" id="inputMail"
+									name="inputMail" placeholder="{% trans "E-Mail" %}" required>
+							</div>
+						</div>
+						<div class="form-group form-row">
+							<label for="inputFirstName" class="col-sm-2 col-form-label">{% trans "Vorname" %}</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="inputFirstName"
+									name="inputFirstName" placeholder="{% trans "Vorname" %}" required>
+							</div>
+						</div>
+						<div class="form-group form-row">
+							<label for="inputLastName" class="col-sm-2 col-form-label">{% trans "Nachname" %}</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="inputLastName"
+									name="inputLastName" placeholder="{% trans "Nachname" %}" required>
+							</div>
+						</div>
+						<div class="form-group form-row">
+							<label for="inputPhone" class="col-sm-2 col-form-label">{% trans "Telefon" %}</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="inputPhone"
+									name="inputPhone" placeholder="{% trans "Telefon" %} (004933344444444)">
+							</div>
+						</div>
+						<div class="form-group form-row">
+							<label for="inputMobile" class="col-sm-2 col-form-label">{% trans "Mobil" %}</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="inputMobile"
+									name="inputMobile" placeholder="{% trans "Mobil" %} (004933344444444)">
+							</div>
+						</div>
+						<div class="form-group form-row">
+							<label for="inputDepartment" class="col-sm-2 col-form-label">{% trans "Abteilung" %}</label>
+							<div class="col-sm-10">
+								<select class="form-control" id="inputDepartment"
+									name="inputDepartment">
+									{% for key,dep in departments %}
+									<option value="{{ key }}">{{ dep }}</option>
+									{% endfor %}
+								</select>
+							</div>
+						</div>
+						<div class="form-group form-row">
+							<label for="staticPasswordNfo" class="col-sm-2 col-form-label">{% trans "Passwort" %}</label>
+							<div class="col-sm-10">
+								<input type="text" readonly class="form-control-plaintext"
+									id="staticPasswordNfo"
+									value="{% trans "Ein Passwort wird automatisch generiert und an die hier angegebene E-Mail Adresse geschickt." %}">
+							</div>
+						</div>
+						<div class="form-group form-row">
+							<div class="col-sm-12 text-right">
+								<button type="submit" class="btn btn-primary"
+									id="add-sysaccount-data">
+									<i class="fas fa-plus-circle"></i>&nbsp;{% trans "Hinzufügen" %}
+								</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+{% endblock %}

@@ -159,12 +159,12 @@ class AdminIndex extends FeModule
 		}
 		
 		// update check
-			try {
-				$json_result = Froxlor::getLocal(\Froxlor\CurrentUser::getData())->checkUpdate();
-			} catch (\Exception $e) {
-				\Froxlor\UI\Response::dynamic_error($e->getMessage());
-			}
-			$version_check_result = json_decode($json_result, true)['data'];
+		try {
+			$json_result = Froxlor::getLocal(\Froxlor\CurrentUser::getData())->checkUpdate();
+		} catch (\Exception $e) {
+			\Froxlor\UI\Response::dynamic_error($e->getMessage());
+		}
+		$version_check_result = json_decode($json_result, true)['data'];
 
 		\Froxlor\Frontend\UI::TwigBuffer('admin/index/index.html.twig', array(
 			'page_title' => "Dashboard",

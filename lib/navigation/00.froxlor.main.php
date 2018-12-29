@@ -219,7 +219,7 @@ return array(
 					'icon' => 'users'
 				),
 				array(
-					'url' => 'admin_admins.php?page=admins',
+					'url' => 'index.php?module=AdminAdmins',
 					'label' => $lng['admin']['admins'],
 					'required_resources' => 'change_serversettings',
 					'icon' => 'user-shield'

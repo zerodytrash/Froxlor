@@ -1,0 +1,52 @@
+{% macro listing(tablename, header, content, sizes, nosearch) %}
+{% if not nosearch|default(false) %}
+<div class="row">
+	<div class="col-lg-4 offset-lg-8 col-md-12 text-right">
+		<input class="form-control" id="{{ tablename }}-input" type="text"
+			placeholder="{% trans "Suche..." %}"><br />
+	</div>
+</div>
+{% endif %}
+<div class="table-responsive">
+	<table class="table table-striped table-hover table-sm"
+		id="{{ tablename }}">
+		<thead>
+			<tr class="d-flex">
+				{% for idx,head in header %}
+				<!-- centered -->
+				{% if head[:1] == '*' %}
+				{% set head = head[1:] %}
+				<th scope="col"
+					class="{% if sizes[idx] is defined %}col-{{ sizes[idx] }} {% endif %}text-center">
+					<!-- right-aligned --> {% elseif head[:1] == '|' %} {% set head = head[1:] %}
+				<th scope="col"
+					class="{% if sizes[idx] is defined %}col-{{ sizes[idx] }} {% endif %}text-right">
+					<!-- left-aligned --> {% else %}
+				<th scope="col" {% if sizes[idx] is defined %}
+					class="col-{{ sizes[idx] }}" {% endif %}>{% endif %}
+					{{ head }}</th>
+				{% endfor %}
+			</tr>
+		</thead>
+		<tbody id="{{ tablename }}-body">
+			{{ content }}
+		</tbody>
+	</table>
+</div>
+<script>
+	$(document).ready(function() {
+		$("#{{ tablename }}-input").on("keyup", function() {
+			var value = $(this).val().toLowerCase();
+			$("#{{ tablename }}-body tr").filter(function() {
+				if ($(this).text().toLowerCase().indexOf(value) > -1) {
+					$(this).removeClass("d-none");
+					$(this).addClass("d-flex");
+				} else {
+					$(this).addClass("d-none");
+					$(this).removeClass("d-flex");
+				}
+			});
+		});
+	});
+</script>
+{% endmacro %}
