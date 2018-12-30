@@ -330,7 +330,7 @@ class MasterCron extends \Froxlor\Cron\FroxlorCron
 		\Froxlor\Cron\CronConfig::checkCrondConfigurationFile();
 
 		if (\Froxlor\Settings::Get('logger.log_cron') == '1') {
-			\Froxlor\FroxlorLogger::getInstanceOf()->setCronLog(0);
+			\Froxlor\FroxlorLogger::setCronLog(0);
 			fwrite(self::$debugHandler, 'Logging for cron has been shutdown' . "\n");
 		}
 

@@ -235,6 +235,7 @@ if (! class_exists($mod_fullpath)) {
 	if (method_exists($mod_fullpath, $view)) {
 		$mod->lng = $lng;
 		$mod->mail = new \Froxlor\System\Mailer(true);
+		\Froxlor\FroxlorLogger::getLog()->addNotice("viewed ".$module."::".$view);
 		$mod->{$view}();
 	} else {
 		\Froxlor\UI\Response::dynamic_error(sprintf(_('Module function %s does not exist'), $view));

@@ -32,8 +32,6 @@ class AdminAdmins extends FeModule
 			return;
 		}
 
-		\Froxlor\FroxlorLogger::getLog()->addNotice("viewed AdminAdmins");
-
 		try {
 			$json_result = Admins::getLocal(\Froxlor\CurrentUser::getData())->listing();
 		} catch (\Exception $e) {

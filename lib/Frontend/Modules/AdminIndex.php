@@ -54,7 +54,6 @@ class AdminIndex extends FeModule
 
 	public function overview()
 	{
-		\Froxlor\FroxlorLogger::getLog()->addNotice("viewed AdminIndex");
 		$overview_stmt = Database::prepare("SELECT COUNT(*) AS `customers`,
 			SUM(`diskspace_used`) AS `diskspace`,
 			SUM(`traffic_used`) AS `traffic`,

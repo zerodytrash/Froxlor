@@ -214,7 +214,7 @@ return array(
 			'elements' => array(
 				array(
 					'url' => 'admin_customers.php?page=customers',
-					'label' => $lng['admin']['customers'],
+					'label' => $lng['panel']['customers'],
 					'required_resources' => 'customers',
 					'icon' => 'users'
 				),
