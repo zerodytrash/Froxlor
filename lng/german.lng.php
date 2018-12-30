@@ -60,15 +60,15 @@ $lng['customer']['phone'] = 'Telefon';
 $lng['customer']['fax'] = 'Fax';
 $lng['customer']['email'] = 'E-Mail-Adresse';
 $lng['customer']['customernumber'] = 'Kundennummer';
-$lng['customer']['diskspace'] = 'Webspace (MiB)';
-$lng['customer']['traffic'] = 'Traffic (GiB)';
-$lng['customer']['mysqls'] = 'MySQL-Datenbanken';
-$lng['customer']['emails'] = 'E-Mail-Adressen';
-$lng['customer']['accounts'] = 'E-Mail-Konten';
-$lng['customer']['forwarders'] = 'E-Mail-Weiterleitungen';
-$lng['customer']['ftps'] = 'FTP-Konten';
-$lng['customer']['subdomains'] = 'Subdomain(s)';
-$lng['customer']['domains'] = 'Domain(s)';
+$lng['panel']['diskspace'] = 'Webspace (MiB)';
+$lng['panel']['traffic'] = 'Traffic (GiB)';
+$lng['panel']['mysqls'] = 'MySQL-Datenbanken';
+$lng['panel']['emails'] = 'E-Mail-Adressen';
+$lng['panel']['email_accounts'] = 'E-Mail-Konten';
+$lng['panel']['email_forwarders'] = 'E-Mail-Weiterleitungen';
+$lng['panel']['ftps'] = 'FTP-Konten';
+$lng['panel']['subdomains'] = 'Subdomain(s)';
+$lng['panel']['domains'] = 'Domain(s)';
 
 /**
  * Customermenue
@@ -273,7 +273,7 @@ $lng['admin']['lookfornewversion']['clickhere'] = 'per Webservice abfragen - Hie
 $lng['admin']['lookfornewversion']['error'] = 'Fehler bei Abfrage';
 $lng['admin']['resources'] = 'Ressourcen';
 $lng['admin']['customer'] = 'Kunde';
-$lng['admin']['customers'] = 'Kunden';
+$lng['panel']['customers'] = 'Kunden';
 $lng['admin']['customer_add'] = 'Kunden anlegen';
 $lng['admin']['customer_edit'] = 'Kunden bearbeiten';
 $lng['admin']['domains'] = 'Domains';
@@ -785,7 +785,7 @@ $lng['serversettings']['allow_password_reset_admin']['description'] = 'Admins/Re
 // ADDED IN 1.2.19-svn25
 // Mailquota
 
-$lng['emails']['quota'] = 'Kontingent';
+$lng['panel']['email_quota'] = 'Kontingent';
 $lng['emails']['noquota'] = 'Kein Kontingent';
 $lng['emails']['updatequota'] = 'Update Kontingent';
 $lng['serversettings']['mail_quota']['title'] = 'Mailbox-Kontingent';

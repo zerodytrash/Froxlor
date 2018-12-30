@@ -112,10 +112,9 @@ class Login extends FeModule
 					$adminsession = '1';
 				} else {
 					// Log failed login
-					$rstlog = FroxlorLogger::getInstanceOf(array(
+					FroxlorLogger::getLog(array(
 						'loginname' => $_SERVER['REMOTE_ADDR']
-					));
-					$rstlog->logAction(\Froxlor\FroxlorLogger::LOGIN_ACTION, LOG_WARNING, "Unknown user '" . $loginname . "' tried to login.");
+					))->addWarning("Unknown user '" . $loginname . "' tried to login.");
 
 					\Froxlor\UI\Response::redirectTo('index.php', array(
 						'showmessage' => '2'
@@ -170,10 +169,9 @@ class Login extends FeModule
 				));
 
 				// Log failed login
-				$rstlog = FroxlorLogger::getInstanceOf(array(
+				FroxlorLogger::getLog(array(
 					'loginname' => $_SERVER['REMOTE_ADDR']
-				));
-				$rstlog->logAction(\Froxlor\FroxlorLogger::LOGIN_ACTION, LOG_WARNING, "User '" . $loginname . "' tried to login with wrong password.");
+				))->addWarning("User '" . $loginname . "' tried to login with wrong password.");
 
 				unset($userinfo);
 				\Froxlor\UI\Response::redirectTo('index.php', array(
@@ -224,10 +222,9 @@ class Login extends FeModule
 					}
 
 					if ($_mailerror) {
-						$rstlog = FroxlorLogger::getInstanceOf(array(
+						FroxlorLogger::getLog(array(
 							'loginname' => '2fa code-sending'
-						));
-						$rstlog->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_ERR, "Error sending mail: " . $this->mailerr_msg);
+						))->addError("Error sending mail: " . $this->mailerr_msg);
 						\Froxlor\UI\Response::redirectTo('index.php', array(
 							'showmessage' => '4',
 							'customermail' => $userinfo['email']
@@ -555,10 +552,9 @@ class Login extends FeModule
 						);
 						Database::pexecute($stmt, $params);
 
-						$rstlog = FroxlorLogger::getInstanceOf(array(
+						FroxlorLogger::getLog(array(
 							'loginname' => 'password_reset'
-						));
-						$rstlog->logAction(\Froxlor\FroxlorLogger::USR_ACTION, LOG_WARNING, "User '" . $user['loginname'] . "' requested a link for setting a new password.");
+						))->addWarning("User '" . $user['loginname'] . "' requested a link for setting a new password.");
 
 						// Set together our activation link
 						$protocol = empty($_SERVER['HTTPS']) ? 'http' : 'https';
@@ -624,10 +620,9 @@ class Login extends FeModule
 						}
 
 						if ($_mailerror) {
-							$rstlog = FroxlorLogger::getInstanceOf(array(
+							FroxlorLogger::getLog(array(
 								'loginname' => 'password_reset'
-							));
-							$rstlog->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_ERR, "Error sending mail: " . $this->mailerr_msg);
+							))->addError("Error sending mail: " . $this->mailerr_msg);
 							\Froxlor\UI\Response::redirectTo('index.php', array(
 								'showmessage' => '4',
 								'customermail' => $user['email']
@@ -641,10 +636,9 @@ class Login extends FeModule
 						));
 						exit();
 					} else {
-						$rstlog = FroxlorLogger::getInstanceOf(array(
+						FroxlorLogger::getLog(array(
 							'loginname' => 'password_reset'
-						));
-						$rstlog->logAction(\Froxlor\FroxlorLogger::USR_ACTION, LOG_WARNING, "User '" . $loginname . "' requested to set a new password, but was not found in database!");
+						))->addWarning("User '" . $loginname . "' requested to set a new password, but was not found in database!");
 						$message = $this->lng['login']['combination_not_found'];
 					}
 
@@ -729,10 +723,9 @@ class Login extends FeModule
 								"userid" => $result['userid']
 							));
 
-							$rstlog = FroxlorLogger::getInstanceOf(array(
+							FroxlorLogger::getLog(array(
 								'loginname' => 'password_reset'
-							));
-							$rstlog->logAction(\Froxlor\FroxlorLogger::USR_ACTION, LOG_NOTICE, "changed password using password reset.");
+							))->addNotice("changed password using password reset.");
 
 							// Remove activation code from DB
 							$stmt = Database::prepare("DELETE FROM `" . TABLE_PANEL_ACTIVATION . "`

@@ -57,14 +57,14 @@ class AdminIndex extends FeModule
 		\Froxlor\FroxlorLogger::getInstanceOf()->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "viewed AdminIndex");
 		$overview_stmt = Database::prepare("SELECT COUNT(*) AS `customers`,
 			SUM(`diskspace_used`) AS `diskspace`,
+			SUM(`traffic_used`) AS `traffic`,
 			SUM(`mysqls_used`) AS `mysqls`,
+			SUM(`ftps_used`) AS `ftps`,
 			SUM(`emails_used`) AS `emails`,
 			SUM(`email_accounts_used`) AS `email_accounts`,
 			SUM(`email_forwarders_used`) AS `email_forwarders`,
 			SUM(`email_quota_used`) AS `email_quota`,
-			SUM(`ftps_used`) AS `ftps`,
-			SUM(`subdomains_used`) AS `subdomains`,
-			SUM(`traffic_used`) AS `traffic`
+			SUM(`subdomains_used`) AS `subdomains`
 			FROM `" . TABLE_PANEL_CUSTOMERS . "`" . (\Froxlor\CurrentUser::getField('customers_see_all') ? '' : " WHERE `adminid` = :adminid "));
 		$overview = Database::pexecute_first($overview_stmt, array(
 			'adminid' => \Froxlor\CurrentUser::getField('adminid')
@@ -79,6 +79,11 @@ class AdminIndex extends FeModule
 
 		$overview['domains'] = $number_domains['number_domains'];
 
+		if (\Froxlor\Settings::Get('system.mail_quota_enabled') == 0)
+		{
+			unset($overview['email_quota']);
+		}
+		
 		// calculate percentage
 		$overview_data = array();
 		foreach ($overview as $entity => $used) {
@@ -88,7 +93,7 @@ class AdminIndex extends FeModule
 				'perc' => (\Froxlor\CurrentUser::getField($entity) >= 0) ? floor($used / \Froxlor\CurrentUser::getField($entity)) : 0
 			);
 		}
-		ksort($overview_data);
+		//ksort($overview_data);
 
 		/*
 		 * @fixme

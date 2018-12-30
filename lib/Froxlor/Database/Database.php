@@ -350,8 +350,6 @@ class Database
 	 */
 	private static function showerror($error, $showerror = true, $json_response = false, \PDOStatement $stmt = null)
 	{
-		global $userinfo, $theme, $linker;
-
 		// include userdata.inc.php
 		require \Froxlor\Froxlor::getInstallDir() . "/lib/userdata.inc.php";
 
@@ -428,7 +426,7 @@ class Database
 
 		if ($showerror) {
 			// fallback
-			$theme = 'Sparkle';
+			$theme = 'Sparkle2';
 
 			// clean up sensitive data
 			unset($sql);
@@ -436,7 +434,22 @@ class Database
 
 			if ((isset($theme) && $theme != '') && ! isset($_SERVER['SHELL']) || (isset($_SERVER['SHELL']) && $_SERVER['SHELL'] == '')) {
 				// if we're not on the shell, output a nice error
-				$_errtpl = dirname($sl_dir) . '/templates/' . $theme . '/misc/dberrornice.tpl';
+				if (\Froxlor\CurrentUser::hasSession()) {
+					$_errtpl = 'misc/alert.html.twig';
+				} else {
+					$_errtpl = 'misc/alert_nosession.html.twig';
+				}
+				\Froxlor\Frontend\UI::TwigBuffer($_errtpl, array(
+					'page_title' => "Database error",
+					'type' => "danger",
+					'heading' => "Database error",
+					'alert_msg' => $error_message,
+					'alert_info' => $error_trace,
+					'errorid' => $errid
+				));
+				\Froxlor\Frontend\UI::TwigOutputBuffer();
+				exit;
+				/*
 				if (file_exists($_errtpl)) {
 					$err_hint = file_get_contents($_errtpl);
 					// replace values
@@ -458,6 +471,7 @@ class Database
 					// show
 					die($err_hint);
 				}
+				*/
 			}
 			die("We are sorry, but a MySQL - error occurred. The administrator may find more information in the syslog");
 		}
