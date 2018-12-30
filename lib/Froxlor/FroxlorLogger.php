@@ -96,7 +96,7 @@ class FroxlorLogger
 			}
 
 			$level = Logger::DEBUG;
-			if (Settings::Get('logger.severity') == '1') {
+			if (Settings::Get('logger.severity') == '1' && !self::$crondebug_flag) {
 				$level = Logger::NOTICE;
 			}
 
@@ -116,7 +116,13 @@ class FroxlorLogger
 			}
 
 			if (self::$crondebug_flag) {
-				self::$ml->pushHandler(new StreamHandler('php://stdout', Logger::WARNING));
+				// the default output format is "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\n"
+				$output = "[%datetime%] %level_name%: %message%\n";
+				// finally, create a formatter
+				$formatter = new \Monolog\Formatter\LineFormatter($output);
+				$cliout = new StreamHandler('php://stdout', $level);
+				$cliout->setFormatter($formatter);
+				self::$ml->pushHandler($cliout);
 			}
 
 			self::$ml->pushProcessor(function ($entry) {
