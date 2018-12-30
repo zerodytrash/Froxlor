@@ -38,13 +38,7 @@ class IntegrityCheck
 	 */
 	public function __construct()
 	{
-		global $userinfo;
-		if (! isset($userinfo) || ! is_array($userinfo)) {
-			$userinfo = array(
-				'loginname' => 'integrity-check'
-			);
-		}
-		$this->log = \Froxlor\FroxlorLogger::getInstanceOf($userinfo);
+		$this->log = \Froxlor\FroxlorLogger::getLog();
 		$this->available = get_class_methods($this);
 		unset($this->available[array_search('__construct', $this->available)]);
 		unset($this->available[array_search('checkAll', $this->available)]);

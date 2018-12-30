@@ -33,14 +33,12 @@ class Updates
 	 */
 	public function showUpdateStep($task = null, $needs_status = true)
 	{
-		if (! $needs_status)
-			echo "<b>";
-
+		echo '<li class="list-group-item d-flex justify-content-between align-items-center">';
 		// output
-		echo $task;
+		echo trim($task);
 
 		if (! $needs_status) {
-			echo "</b><br />";
+			echo "</li>";
 		}
 
 		\Froxlor\FroxlorLogger::getLog()->addWarning($task);
@@ -62,30 +60,30 @@ class Updates
 		switch ($status) {
 
 			case 0:
-				$status_sign = ($message != '') ? '[' . $message . ']' : '[OK]';
-				$status_color = 'ok';
+				$status_sign = ($message != '') ? $message : 'OK';
+				$status_color = 'success';
 				break;
 			case 1:
-				$status_sign = ($message != '') ? '[' . $message . ']' : '[??]';
-				$status_color = 'warn';
+				$status_sign = ($message != '') ? $message : '??';
+				$status_color = 'warning';
 				break;
 			case 2:
-				$status_sign = ($message != '') ? '[' . $message . ']' : '[!!]';
-				$status_color = 'err';
+				$status_sign = ($message != '') ? $message : '!!';
+				$status_color = 'danger';
 				break;
 			default:
-				$status_sign = '[unknown]';
-				$status_color = 'unknown';
+				$status_sign = 'unknown';
+				$status_color = 'secondary';
 				break;
 		}
 
 		// output
-		echo "<span class=\"update-step update-step-" . $status_color . "\">" . $status_sign . "</span><br />";
+		echo '<span class="badge badge-'.$status_color.'">'.$status_sign.'</span></li>';
 
 		if ($status == - 1 || $status == 2) {
 			\Froxlor\FroxlorLogger::getLog()->addWarning( 'Attention - last update task failed!!!');
 		} elseif ($status == 0 || $status == 1) {
-			\Froxlor\FroxlorLogger::getLog()->addNotice('Success');
+			\Froxlor\FroxlorLogger::getLog()->addWarning('Success');
 		}
 	}
 }

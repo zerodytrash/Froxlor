@@ -26,6 +26,13 @@ class UI
 	private static $lng = array();
 
 	/**
+	 * default fallback theme
+	 *
+	 * @var string
+	 */
+	private static $default_theme = 'Sparkle2';
+
+	/**
 	 * send various security related headers
 	 */
 	public static function sendHeaders()
@@ -91,7 +98,7 @@ class UI
 	public static function initTwig()
 	{
 		// init twig template engine
-		$loader = new \Twig_Loader_Filesystem(\Froxlor\Froxlor::getInstallDir() . '/templates/Sparkle2/');
+		$loader = new \Twig_Loader_Filesystem(\Froxlor\Froxlor::getInstallDir() . '/templates/');
 		self::$twig = new \Twig_Environment($loader, array(
 			'debug' => true,
 			'cache' => '../cache',
@@ -125,8 +132,23 @@ class UI
 	public static function TwigBuffer($name, array $context = [])
 	{
 		self::$twigbuf[] = [
-			$name => $context
+			self::getTheme() . '/' . $name => $context
 		];
+	}
+
+	public static function getTheme()
+	{
+		// fallback
+		$theme = self::$default_theme;
+		if (\Froxlor\Settings::Get('panel.db_version') >= "201812300") {
+			// system default
+			$theme = (\Froxlor\Settings::Get('panel.default_theme') !== null) ? \Froxlor\Settings::Get('panel.default_theme') : $theme;
+			// customer theme
+			if (\Froxlor\CurrentUser::hasSession() && \Froxlor\CurrentUser::getField('theme') != $theme) {
+				$theme = \Froxlor\CurrentUser::getField('theme');
+			}
+		}
+		return $theme;
 	}
 
 	/**
@@ -137,7 +159,32 @@ class UI
 		$output = "";
 		foreach (self::$twigbuf as $buf) {
 			foreach ($buf as $name => $context) {
-				$output .= self::$twig->render($name, $context);
+				try {
+					$output .= self::$twig->render($name, $context);
+				} catch (\Exception $e) {
+					// whoops, template error
+					$errtpl = 'alert_nosession.html.twig';
+					if (\Froxlor\CurrentUser::hasSession()) {
+						$errtpl = 'alert.html.twig';
+					}
+					$edata = array(
+						'type' => "danger",
+						'heading' => "Template error",
+						'alert_msg' => $e->getMessage(),
+						'alert_info' => $e->getTraceAsString()
+					);
+					try {
+						// try with user theme if set
+						$output .= self::$twig->render(self::getTheme() . '/misc/' . $errtpl, $edata);
+					} catch (\Exception $e) {
+						// try with default theme if different from user theme
+						if (self::getTheme() != self::$default_theme) {
+							$output .= self::$twig->render(self::$default_theme . '/misc/' . $errtpl, $edata);
+						} else {
+							throw $e;
+						}
+					}
+				}
 			}
 		}
 		echo $output;

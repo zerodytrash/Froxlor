@@ -1,4 +1,4 @@
-{% extends "base.html.twig" %}
+{% extends "Sparkle2/base.html.twig" %}
 
 {% block body %}
 <div class="container pt-5">
@@ -13,7 +13,9 @@
 		<div class="card bg-light border-secondary mb-2">
 			<div class="card-body">
 				<p class="card-text">
-					{{ update_process|raw }}
+					<ul class="list-group">
+					    {{ update_process|raw }}
+					</ul>
 				</p>
 			</div>
 		</div>

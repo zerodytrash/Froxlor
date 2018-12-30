@@ -320,34 +320,6 @@ if (isset($s) && $s != "" && $nosession != 1) {
 // Initialize our new link - class
 $linker = new \Froxlor\UI\Linker('index.php', $s);
 
-// global Theme-variable
-$theme = (Settings::Get('panel.default_theme') !== null) ? Settings::Get('panel.default_theme') : $_deftheme;
-
-// overwrite with customer/admin theme if defined
-if (isset($userinfo['theme']) && $userinfo['theme'] != $theme) {
-	$theme = $userinfo['theme'];
-}
-
-// Check if a different variant of the theme is used
-$themevariant = "default";
-if (preg_match("/([a-z0-9\.\-]+)_([a-z0-9\.\-]+)/i", $theme, $matches)) {
-	$theme = $matches[1];
-	$themevariant = $matches[2];
-}
-
-// check for existence of the theme
-if (! file_exists('templates/' . $theme . '/config.json')) {
-	// Fallback
-	$theme = $_deftheme;
-}
-
-$_themeoptions = json_decode(file_get_contents('templates/' . $theme . '/config.json'), true);
-
-// check for existence of variant in theme
-if (! array_key_exists('variants', $_themeoptions) || ! array_key_exists($themevariant, $_themeoptions['variants'])) {
-	$themevariant = "default";
-}
-
 // Redirects to index.php (login page) if no session exists
 if ($nosession == 1 && AREA != 'login') {
 	unset($userinfo);

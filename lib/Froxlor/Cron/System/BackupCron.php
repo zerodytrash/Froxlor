@@ -96,7 +96,7 @@ class BackupCron extends \Froxlor\Cron\FroxlorCron
 						\Froxlor\FileDir::safe_exec('mkdir -p ' . escapeshellarg($row['data']['destdir']));
 					}
 
-					self::createCustomerBackup($row['data'], $customerdocroot, FroxlorLogger::getInstanceOf());
+					self::createCustomerBackup($row['data'], $customerdocroot);
 				}
 			}
 
@@ -120,7 +120,7 @@ class BackupCron extends \Froxlor\Cron\FroxlorCron
 	 * @return void
 	 *
 	 */
-	private static function createCustomerBackup($data = null, $customerdocroot = null, &$cronlog = null)
+	private static function createCustomerBackup($data = null, $customerdocroot = null)
 	{
 		self::$cronjob->addInfo('Creating Backup for user "' . $data['loginname'] . '"');
 

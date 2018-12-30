@@ -174,11 +174,30 @@ if (\Froxlor\Froxlor::isDatabaseVersion('201812180')) {
 	if (Settings::Get('system.dns_server') != 'bind') {
 		$dns_target = 'PowerDNS';
 	}
-	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_SETTINGS . "` SET `value`  = :v WHERE `settinggroup` = 'system' AND `varname` = 'dns_server'");
+	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_SETTINGS . "` SET `value` = :v WHERE `settinggroup` = 'system' AND `varname` = 'dns_server'");
 	Database::pexecute($upd_stmt, array(
 		'v' => $dns_target
 	));
 	Updates::lastStepStatus(0);
 
 	\Froxlor\Froxlor::updateToDbVersion('201812190');
+}
+
+if (\Froxlor\Froxlor::isDatabaseVersion('201812190')) {
+
+	Updates::showUpdateStep("Updating theme for all users");
+	\Froxlor\Settings::Set('panel.default_theme', 'Sparkle2', true);
+	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_ADMINS . "` SET `theme` = :theme");
+	Database::pexecute($upd_stmt, array(
+		'theme' => 'Sparkle2'
+	));
+	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_CUSTOMERS . "` SET `theme` = :theme");
+	Database::pexecute($upd_stmt, array(
+		'theme' => 'Sparkle2'
+	));
+	// just to be sure
+	\Froxlor\CurrentUser::setField('theme', 'Sparkle2');
+	Updates::lastStepStatus(0);
+
+	\Froxlor\Froxlor::updateToDbVersion('201812300');
 }

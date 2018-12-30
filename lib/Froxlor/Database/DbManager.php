@@ -149,7 +149,7 @@ class DbManager
 			Database::needSqlData();
 			$sql_root = Database::getSqlData();
 
-			$dbm = new DbManager(\Froxlor\FroxlorLogger::getInstanceOf());
+			$dbm = new DbManager(\Froxlor\FroxlorLogger::getLog());
 			$users = $dbm->getManager()->getAllSqlUsers(false);
 
 			$databases = array(

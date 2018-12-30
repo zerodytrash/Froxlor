@@ -34,7 +34,7 @@ class NewsFeed extends FeModule
 		}
 
 		if (function_exists("simplexml_load_file") == false) {
-			echo \Froxlor\Frontend\UI::Twig()->render('newsfeed/warning.html.twig', array(
+			echo \Froxlor\Frontend\UI::Twig()->render(\Froxlor\Frontend\UI::getTheme() . '/newsfeed/warning.html.twig', array(
 				'warning' => "Newsfeed not available due to missing php-simplexml extension.<br>Please install the php-simplexml extension in order to view our newsfeed."
 			));
 			return;
@@ -44,7 +44,7 @@ class NewsFeed extends FeModule
 			$output = \Froxlor\Http\HttpClient::urlGet($feed);
 			$news = simplexml_load_string(trim($output));
 		} else {
-			echo \Froxlor\Frontend\UI::Twig()->render('newsfeed/warning.html.twig', array(
+			echo \Froxlor\Frontend\UI::Twig()->render(\Froxlor\Frontend\UI::getTheme() . '/newsfeed/warning.html.twig', array(
 				'warning' => "Newsfeed not available due to missing php-curl extension.<br>Please install the php-curl extension in order to view our newsfeed."
 			));
 			return;
@@ -60,7 +60,7 @@ class NewsFeed extends FeModule
 				$content = preg_replace("/[\r\n]+/", " ", strip_tags($item->description));
 				$content = substr($content, 0, 150) . "...";
 
-				echo \Froxlor\Frontend\UI::Twig()->render('newsfeed/item.html.twig', array(
+				echo \Froxlor\Frontend\UI::Twig()->render(\Froxlor\Frontend\UI::getTheme() . '/newsfeed/item.html.twig', array(
 					'title' => $title,
 					'link' => $link,
 					'date' => $date,
