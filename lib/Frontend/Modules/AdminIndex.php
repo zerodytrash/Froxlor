@@ -28,7 +28,7 @@ class AdminIndex extends FeModule
 
 	public function logout()
 	{
-		\Froxlor\FroxlorLogger::getInstanceOf(\Froxlor\CurrentUser::getData())->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "logged out");
+		\Froxlor\FroxlorLogger::getLog()->addNotice("logged out");
 
 		$params = array(
 			'adminid' => (int) \Froxlor\CurrentUser::getField('adminid')
@@ -54,7 +54,7 @@ class AdminIndex extends FeModule
 
 	public function overview()
 	{
-		\Froxlor\FroxlorLogger::getInstanceOf()->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "viewed AdminIndex");
+		\Froxlor\FroxlorLogger::getLog()->addNotice("viewed AdminIndex");
 		$overview_stmt = Database::prepare("SELECT COUNT(*) AS `customers`,
 			SUM(`diskspace_used`) AS `diskspace`,
 			SUM(`traffic_used`) AS `traffic`,
@@ -220,7 +220,7 @@ class AdminIndex extends FeModule
 				} catch (\Exception $e) {
 					\Froxlor\UI\Response::dynamic_error($e->getMessage());
 				}
-				\Froxlor\FroxlorLogger::getInstanceOf()->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, 'changed password');
+				\Froxlor\FroxlorLogger::getLog()->addNotice('changed password');
 				\Froxlor\UI\Response::redirectTo($filename, Array(
 					's' => $s
 				));
@@ -260,7 +260,7 @@ class AdminIndex extends FeModule
 					'hash' => $s
 				));
 			}
-			\Froxlor\FroxlorLogger::getInstanceOf()->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "changed his/her default language to '" . $def_language . "'");
+			\Froxlor\FroxlorLogger::getLog()->addNotice("changed his/her default language to '" . $def_language . "'");
 			\Froxlor\UI\Response::redirectTo($filename, array(
 				's' => $s
 			));
@@ -309,7 +309,7 @@ class AdminIndex extends FeModule
 				'hash' => $s
 			));
 
-			\Froxlor\FroxlorLogger::getInstanceOf()->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "changed his/her theme to '" . $theme . "'");
+			\Froxlor\FroxlorLogger::getLog()->addNotice("changed his/her theme to '" . $theme . "'");
 			\Froxlor\UI\Response::redirectTo($filename, array(
 				's' => $s
 			));

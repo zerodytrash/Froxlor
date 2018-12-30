@@ -36,7 +36,7 @@ class AdminAutoupdate extends FeModule
 			\Froxlor\UI\Response::standard_error('autoupdate_2');
 		}
 
-		\Froxlor\FroxlorLogger::getInstanceOf(\Froxlor\CurrentUser::getData())->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "checking auto-update");
+		\Froxlor\FroxlorLogger::getLog()->addNotice("checking auto-update");
 
 		// check for new version
 		try {
@@ -111,7 +111,7 @@ class AdminAutoupdate extends FeModule
 			// name archive
 			$localArchive = \Froxlor\Froxlor::getInstallDir() . '/updates/' . basename($toLoad);
 
-			$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "Downloading " . $toLoad . " to " . $localArchive);
+			\Froxlor\FroxlorLogger::getLog()->addNotice("Downloading " . $toLoad . " to " . $localArchive);
 
 			// remove old archive
 			if (file_exists($localArchive)) {
@@ -162,7 +162,7 @@ class AdminAutoupdate extends FeModule
 			$zip = new \ZipArchive();
 			$res = $zip->open($localArchive);
 			if ($res === true) {
-				$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "Extracting " . $localArchive . " to " . \Froxlor\Froxlor::getInstallDir());
+				\Froxlor\FroxlorLogger::getLog()->addNotice("Extracting " . $localArchive . " to " . \Froxlor\Froxlor::getInstallDir());
 				$zip->extractTo(\Froxlor\Froxlor::getInstallDir());
 				$zip->close();
 				// success - remove unused archive

@@ -32,7 +32,7 @@ class AdminAdmins extends FeModule
 			return;
 		}
 
-		\Froxlor\FroxlorLogger::getInstanceOf(\Froxlor\CurrentUser::getData())->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "viewed AdminAdmins");
+		\Froxlor\FroxlorLogger::getLog()->addNotice("viewed AdminAdmins");
 
 		try {
 			$json_result = Admins::getLocal(\Froxlor\CurrentUser::getData())->listing();
@@ -174,7 +174,7 @@ class AdminAdmins extends FeModule
 				'lang' => $result['language']
 			);
 			Database::pexecute($ins_stmt, $ins_data);
-			$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_INFO, "switched adminuser and is now '" . $destination_admin . "'");
+			\Froxlor\FroxlorLogger::getLog()->addInfo("switched adminuser and is now '" . $destination_admin . "'");
 			\Froxlor\UI\Response::redirectTo('admin_index.php', array(
 				's' => $s
 			));

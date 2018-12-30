@@ -34,7 +34,10 @@ use Froxlor\Settings;
 class LeScriptV2
 {
 
-	// https://letsencrypt.org/repository/
+	/**
+	 * 
+	 * @var \Monolog\Logger
+	 */
 	private $logger;
 
 	private $client;
@@ -258,7 +261,7 @@ class LeScriptV2
 					} else {
 						$errmsg = "";
 					}
-					$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_WARNING, "[Lets Encrypt self-check] Please check $uri - token seems to be not available. This is just a simple self-check, it might be wrong but consider using this information when Let's Encrypt fails to issue a certificate" . $errmsg);
+					$this->logger->addWarning("[Lets Encrypt self-check] Please check $uri - token seems to be not available. This is just a simple self-check, it might be wrong but consider using this information when Let's Encrypt fails to issue a certificate" . $errmsg);
 				}
 			}
 
@@ -493,6 +496,6 @@ keyUsage = nonRepudiation, digitalSignature, keyEncipherment');
 
 	protected function log($message)
 	{
-		$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_INFO, "letsencrypt-v2 " . $message);
+		$this->logger->addInfo("letsencrypt-v2 " . $message);
 	}
 }

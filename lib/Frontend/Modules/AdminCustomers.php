@@ -32,7 +32,7 @@ class AdminCustomers extends FeModule
 			return;
 		}
 
-		\Froxlor\FroxlorLogger::getInstanceOf(\Froxlor\CurrentUser::getData())->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "viewed AdminCustomers");
+		\Froxlor\FroxlorLogger::getLog()->addNotice("viewed AdminCustomers");
 		
 		try {
 			$json_result = Customers::getLocal(\Froxlor\CurrentUser::getData())->listing();
@@ -227,7 +227,7 @@ class AdminCustomers extends FeModule
 				'lastact' => time(),
 				'lang' => $result['language']
 			));
-			$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_INFO, "switched user and is now '" . $destination_user . "'");
+			\Froxlor\FroxlorLogger::getLog()->addInfo("switched user and is now '" . $destination_user . "'");
 
 			$target = (isset($_GET['target']) ? $_GET['target'] : 'index');
 			$redirect = "customer_" . $target . ".php";

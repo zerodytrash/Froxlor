@@ -37,9 +37,9 @@ class DbManager
 {
 
 	/**
-	 * FroxlorLogger object
+	 * Logger object
 	 *
-	 * @var object
+	 * @var \Monolog\Logger
 	 */
 	private $log = null;
 
@@ -53,7 +53,7 @@ class DbManager
 	/**
 	 * main constructor
 	 *
-	 * @param \Froxlor\FroxlorLogger $log
+	 * @param \Monolog\Logger $log
 	 */
 	public function __construct($log = null)
 	{
@@ -98,12 +98,12 @@ class DbManager
 
 		// now create the database itself
 		$this->getManager()->createDatabase($username);
-		$this->log->logAction(\Froxlor\FroxlorLogger::USR_ACTION, LOG_INFO, "created database '" . $username . "'");
+		$this->log->addInfo("created database '" . $username . "'");
 
 		// and give permission to the user on every access-host we have
 		foreach (array_map('trim', explode(',', Settings::Get('system.mysql_access_host'))) as $mysql_access_host) {
 			$this->getManager()->grantPrivilegesTo($username, $password, $mysql_access_host);
-			$this->log->logAction(\Froxlor\FroxlorLogger::USR_ACTION, LOG_NOTICE, "grant all privileges for '" . $username . "'@'" . $mysql_access_host . "'");
+			$this->log->addNotice("grant all privileges for '" . $username . "'@'" . $mysql_access_host . "'");
 		}
 
 		$this->getManager()->flushPrivileges();

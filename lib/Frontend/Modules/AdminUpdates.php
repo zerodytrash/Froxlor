@@ -24,7 +24,7 @@ class AdminUpdates extends FeModule
 
 	public function overview()
 	{
-		\Froxlor\FroxlorLogger::getInstanceOf(\Froxlor\CurrentUser::getData())->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "viewed AdminUpdates");
+		\Froxlor\FroxlorLogger::getLog()->addNotice("viewed AdminUpdates");
 
 		/**
 		 * this is a dirty hack but syscp 1.4.2.1 does not

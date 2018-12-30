@@ -26,7 +26,10 @@ class IntegrityCheck
 	// Store all available checks
 	public $available = array();
 
-	// logger object
+	/**
+	 * logger object
+	 * @var \Monolog\Logger
+	 */
 	private $log = null;
 
 	/**
@@ -91,7 +94,7 @@ class IntegrityCheck
 		));
 		$charset = isset($resp['default_character_set_name']) ? $resp['default_character_set_name'] : null;
 		if (! empty($charset) && strtolower($charset) != 'utf8') {
-			$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "database charset seems to be different from UTF-8, integrity-check can fix that");
+			$this->log->addNotice("database charset seems to be different from UTF-8, integrity-check can fix that");
 			if ($fix) {
 				// fix database
 				Database::query('ALTER DATABASE `' . Database::getDbName() . '` CHARACTER SET utf8 COLLATE utf8_general_ci');
@@ -101,7 +104,7 @@ class IntegrityCheck
 					$table = $row[0];
 					Database::query('ALTER TABLE `' . $table . '` CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;');
 				}
-				$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_WARNING, "database charset was different from UTF-8, integrity-check fixed that");
+				$this->log->addWarning("database charset was different from UTF-8, integrity-check fixed that");
 			} else {
 				return false;
 			}
@@ -176,9 +179,9 @@ class IntegrityCheck
 						'domainid' => $row['id_domain'],
 						'ipandportid' => $row['id_ipandports']
 					));
-					$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_WARNING, "found an ip/port-id in domain <> ip table which does not exist, integrity check fixed this");
+					$this->log->addWarning("found an ip/port-id in domain <> ip table which does not exist, integrity check fixed this");
 				} else {
-					$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "found an ip/port-id in domain <> ip table which does not exist, integrity check can fix this");
+					$this->log->addNotice("found an ip/port-id in domain <> ip table which does not exist, integrity check can fix this");
 					return false;
 				}
 			}
@@ -188,9 +191,9 @@ class IntegrityCheck
 						'domainid' => $row['id_domain'],
 						'ipandportid' => $row['id_ipandports']
 					));
-					$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_WARNING, "found a domain-id in domain <> ip table which does not exist, integrity check fixed this");
+					$this->log->addWarning("found a domain-id in domain <> ip table which does not exist, integrity check fixed this");
 				} else {
-					$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "found a domain-id in domain <> ip table which does not exist, integrity check can fix this");
+					$this->log->addNotice("found a domain-id in domain <> ip table which does not exist, integrity check can fix this");
 					return false;
 				}
 			}
@@ -208,9 +211,9 @@ class IntegrityCheck
 							'ipandportid' => $defaultip
 						));
 					}
-					$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_WARNING, "found a domain-id with no entry in domain <> ip table, integrity check fixed this");
+					$this->log->addWarning("found a domain-id with no entry in domain <> ip table, integrity check fixed this");
 				} else {
-					$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "found a domain-id with no entry in domain <> ip table, integrity check can fix this");
+					$this->log->addNotice("found a domain-id with no entry in domain <> ip table, integrity check can fix this");
 					return false;
 				}
 			}
@@ -292,10 +295,10 @@ class IntegrityCheck
 				Database::pexecute($upd_stmt, array(
 					'domainid' => $id
 				));
-				$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_WARNING, "found a subdomain with ssl_redirect=1 but parent-domain has ssl=0, integrity check fixed this");
+				$this->log->addWarning("found a subdomain with ssl_redirect=1 but parent-domain has ssl=0, integrity check fixed this");
 			} else {
 				// It's just the check, let the function fail
-				$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "found a subdomain with ssl_redirect=1 but parent-domain has ssl=0, integrity check can fix this");
+				$this->log->addNotice("found a subdomain with ssl_redirect=1 but parent-domain has ssl=0, integrity check can fix this");
 				return false;
 			}
 		}
@@ -376,10 +379,10 @@ class IntegrityCheck
 				Database::pexecute($upd_stmt, array(
 					'domainid' => $id
 				));
-				$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_WARNING, "found a subdomain with letsencrypt=1 but parent-domain has ssl=0, integrity check fixed this");
+				$this->log->addWarning("found a subdomain with letsencrypt=1 but parent-domain has ssl=0, integrity check fixed this");
 			} else {
 				// It's just the check, let the function fail
-				$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "found a subdomain with letsencrypt=1 but parent-domain has ssl=0, integrity check can fix this");
+				$this->log->addNotice("found a subdomain with letsencrypt=1 but parent-domain has ssl=0, integrity check can fix this");
 				return false;
 			}
 		}
@@ -415,7 +418,7 @@ class IntegrityCheck
 		));
 
 		if ($cwg_stmt->rowCount() > 0) {
-			$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "Customers are missing the webserver-user as group-member, integrity-check can fix that");
+			$this->log->addNotice("Customers are missing the webserver-user as group-member, integrity-check can fix that");
 			if ($fix) {
 				// prepare update statement
 				$upd_stmt = Database::prepare("
@@ -430,7 +433,7 @@ class IntegrityCheck
 					$upd_data['id'] = $cwg_row['id'];
 					Database::pexecute($upd_stmt, $upd_data);
 				}
-				$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "Customers were missing the webserver-user as group-member, integrity-check fixed that");
+				$this->log->addNotice("Customers were missing the webserver-user as group-member, integrity-check fixed that");
 			} else {
 				return false;
 			}
@@ -483,7 +486,7 @@ class IntegrityCheck
 		));
 
 		if ($cwg_stmt->rowCount() > 0) {
-			$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "Customers are missing the local froxlor-user as group-member, integrity-check can fix that");
+			$this->log->addNotice("Customers are missing the local froxlor-user as group-member, integrity-check can fix that");
 			if ($fix) {
 				// prepare update statement
 				$upd_stmt = Database::prepare("
@@ -498,7 +501,7 @@ class IntegrityCheck
 					$upd_data['id'] = $cwg_row['id'];
 					Database::pexecute($upd_stmt, $upd_data);
 				}
-				$this->log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "Customers were missing the local froxlor-user as group-member, integrity-check fixed that");
+				$this->log->addNotice("Customers were missing the local froxlor-user as group-member, integrity-check fixed that");
 			} else {
 				return false;
 			}

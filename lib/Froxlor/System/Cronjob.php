@@ -18,7 +18,7 @@ class Cronjob
 	 */
 	public static function checkLastGuid()
 	{
-		$mylog = \Froxlor\FroxlorLogger::getInstanceOf();
+		$mylog = \Froxlor\FroxlorLogger::getLog();
 
 		$group_lines = array();
 		$group_guids = array();
@@ -73,17 +73,17 @@ class Cronjob
 
 					// now check if it differs from our settings
 					if ($update_to_guid != Settings::Get('system.lastguid')) {
-						$mylog->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_NOTICE, 'Updating froxlor last guid to ' . $update_to_guid);
+						$mylog->addNotice('Updating froxlor last guid to ' . $update_to_guid);
 						Settings::Set('system.lastguid', $update_to_guid);
 					}
 				} else {
-					$mylog->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_NOTICE, 'File /etc/group not readable; cannot check for latest guid');
+					$mylog->addNotice('File /etc/group not readable; cannot check for latest guid');
 				}
 			} else {
-				$mylog->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_NOTICE, 'File /etc/group not readable; cannot check for latest guid');
+				$mylog->addNotice('File /etc/group not readable; cannot check for latest guid');
 			}
 		} else {
-			$mylog->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_NOTICE, 'File /etc/group does not exist; cannot check for latest guid');
+			$mylog->addNotice('File /etc/group does not exist; cannot check for latest guid');
 		}
 	}
 
