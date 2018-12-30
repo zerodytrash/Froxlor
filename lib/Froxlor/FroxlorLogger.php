@@ -96,7 +96,7 @@ class FroxlorLogger
 			}
 
 			$level = Logger::DEBUG;
-			if (Settings::Get('logger.severity') == '1' && !self::$crondebug_flag) {
+			if (Settings::Get('logger.severity') == '1') {
 				$level = Logger::NOTICE;
 			}
 
@@ -120,7 +120,7 @@ class FroxlorLogger
 				$output = "[%datetime%] %level_name%: %message%\n";
 				// finally, create a formatter
 				$formatter = new \Monolog\Formatter\LineFormatter($output);
-				$cliout = new StreamHandler('php://stdout', $level);
+				$cliout = new StreamHandler('php://stdout', Logger::DEBUG);
 				$cliout->setFormatter($formatter);
 				self::$ml->pushHandler($cliout);
 			}
