@@ -224,6 +224,11 @@ if (\Froxlor\CurrentUser::hasSession()) {
 	\Froxlor\Frontend\UI::Twig()->addGlobal('nav_items', $navigation);
 }
 
+$no_log_modules = array(
+	'Login',
+	'NewsFeed'
+);
+
 $module = ucfirst($module);
 $mod_fullpath = '\\Froxlor\\Frontend\\Modules\\' . $module;
 
@@ -235,7 +240,9 @@ if (! class_exists($mod_fullpath)) {
 	if (method_exists($mod_fullpath, $view)) {
 		$mod->lng = $lng;
 		$mod->mail = new \Froxlor\System\Mailer(true);
-		\Froxlor\FroxlorLogger::getLog()->addNotice("viewed ".$module."::".$view);
+		if (\Froxlor\CurrentUser::hasSession() && !in_array($module, $no_log_modules)) {
+			\Froxlor\FroxlorLogger::getLog()->addNotice("viewed " . $module . "::" . $view);
+		}
 		$mod->{$view}();
 	} else {
 		\Froxlor\UI\Response::dynamic_error(sprintf(_('Module function %s does not exist'), $view));

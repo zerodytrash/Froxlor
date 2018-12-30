@@ -9,52 +9,43 @@
 {% set userinfo = call_static('\\Froxlor\\CurrentUser', 'getData') %}
 <div class="row">
 	<div class="col-md-8 col-sm-12">
-		<div class="row">
-			{% for key,value in usage_data %}
-			<div class="col">
-				<div class="card text-center mb-2">
-					<div class="card-body">
-						<div
-							class="c100 center p{{ value.perc }} {% if value.perc < 75 %}green{% else %}{% if value.avail >= 0 %}orange{% else %}dark{% endif %}{% endif %}">
-							<span id="span_progress">{% if value.avail >= 0 %}
-								{{ value.perc }}%{% else %}&infin;{% endif %}</span>
-							<div class="slice">
-								<div class="bar"></div>
-								<div class="fill"></div>
+		<div class="card mb-2">
+			<div class="card-body">
+				<div class="row">
+					{% for key,value in usage_data %}
+					<div class="col-md-3 col-sm-12">
+						<div class="card text-center mb-2">
+							<div class="card-body">
+								<div
+									class="c100 small center p{{ value.perc }} {% if value.perc < 75 %}green{% else %}{% if value.avail >= 0 %}orange{% else %}dark{% endif %}{% endif %}">
+									<span id="span_progress">{% if value.avail >= 0 %} {{ value.perc }}%{% else %}&infin;{% endif %}</span>
+									<div class="slice">
+										<div class="bar"></div>
+										<div class="fill"></div>
+									</div>
+								</div>
+							</div>
+							<div class="card-footer">
+								{% set lngkey = 'panel.' ~ key %}
+								{% if key == 'diskspace' or key == 'traffic' or key == 'quota' %}
+								<p class="card-text">
+									{{ lng(lngkey) }}
+									<br>
+									{{ value.used|formatBytes }} / {% if value.avail >= 0 %}{{ value.avail|formatBytes }}{% else %}&infin;{% endif %}
+								</p>
+								{% else %}
+								<p class="card-text">
+									{{ lng(lngkey) }}
+									<br>
+									{{ value.used }} / {% if value.avail >= 0 %}{{ value.avail }}{% else %}&infin;{% endif %}
+								</p>
+								{% endif %}
 							</div>
 						</div>
 					</div>
-					<div class="card-footer">
-						{% set lngkey = 'panel.' ~ key %}
-						{% if key == 'diskspace' or key == 'traffic' or key == 'quota' %}
-						<p class="card-text">
-							{{ lng(lngkey) }}
-							<br>
-							{{ value.used|formatBytes }}
-							/
-							{% if value.avail >= 0 %}
-							{{ value.avail|formatBytes }}
-							{% else %}
-							&infin;
-							{% endif %}
-						</p>
-						{% else %}
-						<p class="card-text">
-							{{ lng(lngkey) }}
-							<br>
-							{{ value.used }}
-							/
-							{% if value.avail >= 0 %}
-							{{ value.avail }}
-							{% else %}
-							&infin;
-							{% endif %}
-						</p>
-						{% endif %}
-					</div>
+					{% endfor %}
 				</div>
 			</div>
-			{% endfor %}
 		</div>
 		<div class="row">
 			<div class="col">
