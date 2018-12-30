@@ -22,6 +22,11 @@ use Froxlor\Cron\Http\Php\PhpInterface;
 class NginxFcgi extends Nginx
 {
 
+	public function __construct($logger)
+	{
+		parent::__construct($logger);
+	}
+
 	protected function composePhpOptions($domain, $ssl_vhost = false)
 	{
 		$php_options_text = '';

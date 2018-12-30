@@ -1415,7 +1415,7 @@ $lng['tasks']['remove_ftpacc_files'] = 'Kunden FTP-Konto Dateien löschen';
 $lng['tasks']['regenerating_crond'] = 'Neuerstellung der cron.d-Datei';
 $lng['serversettings']['system_crondreload']['title'] = 'Cron-Daemon reload Befehl';
 $lng['serversettings']['system_crondreload']['description'] = 'Geben Sie hier den Befehl zum Neuladen des Cron-Daemons an';
-$lng['admin']['integritycheck'] = 'Datenbankpr&uuml;fung';
+$lng['admin']['integritycheck'] = 'Datenbankprüfung';
 $lng['admin']['integrityid'] = '#';
 $lng['admin']['integrityname'] = 'Name';
 $lng['admin']['integrityresult'] = 'Ergebnis';
@@ -1472,10 +1472,10 @@ $lng['admin']['configfiles']['files'] = '<span class="red">Konfigurationsdateien
 $lng['serversettings']['apache_itksupport']['title'] = 'Anpassungen für Apache ITK-MPM verwenden';
 $lng['serversettings']['apache_itksupport']['description'] = '<div class="red">Achtung: Bitte nur verwenden, wenn wirklich Apache itk-mpm verwendet wird, ansonsten wird der Webserver nicht starten.</div>';
 $lng['integrity_check']['DatabaseCharset'] = 'Characterset der Datenbank (sollte UTF-8 sein)';
-$lng['integrity_check']['DomainIpTable'] = 'IP &lt;&dash;&gt; Domain Verkn&uuml;pfung';
+$lng['integrity_check']['DomainIpTable'] = 'IP &lt;&dash;&gt; Domain Verknüpfung';
 $lng['integrity_check']['SubdomainSslRedirect'] = 'Falsches SSL-redirect Flag bei nicht-SSL Domains';
-$lng['integrity_check']['FroxlorLocalGroupMemberForFcgidPhpFpm'] = 'froxlor-Benutzer in Kunden-Gruppen (f&uuml;r FCGID/php-fpm)';
-$lng['integrity_check']['WebserverGroupMemberForFcgidPhpFpm'] = 'Webserver-Benutzer in Kunden-Gruppen (f&uuml;r FCGID/php-fpm)';
+$lng['integrity_check']['FroxlorLocalGroupMemberForFcgidPhpFpm'] = 'froxlor-Benutzer in Kunden-Gruppen (für FCGID/php-fpm)';
+$lng['integrity_check']['WebserverGroupMemberForFcgidPhpFpm'] = 'Webserver-Benutzer in Kunden-Gruppen (für FCGID/php-fpm)';
 $lng['integrity_check']['SubdomainLetsencrypt'] = 'Hauptdomains ohne zugewiesenen SSL-Port haben keine Subdomain mit aktiviertem SSL-Redirect';
 $lng['admin']['mod_fcgid_umask']['title'] = 'Umask (Standard: 022)';
 

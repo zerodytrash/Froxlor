@@ -42,22 +42,17 @@ class FroxlorLogger
 
 	const USR_ACTION = '10';
 
-	const RES_ACTION = '20';
-
 	const ADM_ACTION = '30';
 
 	const CRON_ACTION = '40';
 
 	const LOGIN_ACTION = '50';
 
-	const LOG_ERROR = '99';
-
 	/**
 	 * Class constructor.
 	 */
 	protected function __construct($userinfo = array())
 	{
-		$this->initMonolog();
 		self::$userinfo = $userinfo;
 		self::$logtypes = array();
 
@@ -72,20 +67,46 @@ class FroxlorLogger
 			}
 		}
 
+		$level = Logger::DEBUG;
+		if (Settings::Get('logger.severity') == '1') {
+			$level = Logger::NOTICE;
+		}
+
 		foreach (self::$logtypes as $logger) {
 
 			switch ($logger) {
 				case 'syslog':
-					self::$ml->pushHandler(new SyslogHandler('froxlor', LOG_USER, Logger::DEBUG));
+					self::$ml->pushHandler(new SyslogHandler('froxlor', LOG_USER, $level));
 					break;
 				case 'file':
-					self::$ml->pushHandler(new StreamHandler(Settings::Get('logger.logfile'), Logger::DEBUG));
+					self::$ml->pushHandler(new StreamHandler(Settings::Get('logger.logfile'), $level));
 					break;
 				case 'mysql':
-					self::$ml->pushHandler(new MysqlHandler(Logger::DEBUG));
+					self::$ml->pushHandler(new MysqlHandler($level));
 					break;
 			}
 		}
+
+		if (self::$crondebug_flag) {
+			self::$ml->pushHandler(new StreamHandler('php://stdout', Logger::WARNING));
+		}
+
+		$action = self::LOGIN_ACTION;
+		if (self::$userinfo['adminsession']) {
+			if (self::$userinfo['adminsession'] == 1) {
+				$action = self::ADM_ACTION;
+			} elseif (self::$userinfo['adminsession'] == 0) {
+				$action = self::USR_ACTION;
+			} else {
+				$action = self::CRON_ACTION;
+			}
+		}
+
+		self::$ml->pushProcessor(function ($entry) {
+			$entry['extra']['user'] = self::$userinfo['loginname'];
+			$entry['extra']['action'] = $action;
+			return $entry;
+		});
 	}
 
 	/**
@@ -93,16 +114,21 @@ class FroxlorLogger
 	 *
 	 * @param array $userinfo
 	 *
-	 * @return FroxlorLogger
+	 * @return \Monolog\Logger
 	 */
-	public static function getInstanceOf($userinfo = array())
+	public static function getLog($userinfo = array())
 	{
 		if (empty($userinfo)) {
-			$userinfo = array(
-				'loginname' => 'system'
-			);
+			if (\Froxlor\CurrentUser::hasSession()) {
+				self::$userinfo = \Froxlor\CurrentUser::getData();
+			} else {
+				self::$userinfo = array(
+					'loginname' => 'system',
+					'adminsession' => - 1
+				);
+			}
 		}
-		return new FroxlorLogger($userinfo);
+		return self::initMonolog();
 	}
 
 	/**
@@ -110,67 +136,13 @@ class FroxlorLogger
 	 *
 	 * @return \Monolog\Logger
 	 */
-	private function initMonolog()
+	private static function initMonolog()
 	{
 		if (empty(self::$ml)) {
 			// get Theme object
 			self::$ml = new Logger('froxlor');
 		}
 		return self::$ml;
-	}
-
-	/**
-	 * logs a given text to all enabled logger-facilities
-	 *
-	 * @param int $action
-	 * @param int $type
-	 * @param string $text
-	 */
-	public function logAction($action = \Froxlor\FroxlorLogger::USR_ACTION, $type = LOG_NOTICE, $text = null)
-	{
-		// not logging normal stuff if not set to "paranoid" logging
-		if (! self::$crondebug_flag && Settings::Get('logger.severity') == '1' && $type > LOG_NOTICE) {
-			return;
-		}
-
-		if (empty(self::$ml)) {
-			$this->initMonolog();
-		}
-
-		if (self::$crondebug_flag || ($action == \Froxlor\FroxlorLogger::CRON_ACTION && $type <= LOG_WARNING)) {
-			echo "[" . $this->getLogLevelDesc($type) . "] " . $text . PHP_EOL;
-		}
-
-		// warnings, errors and critical mesages WILL be logged
-		if (Settings::Get('logger.log_cron') == '0' && $action == \Froxlor\FroxlorLogger::CRON_ACTION && $type > LOG_WARNING) {
-			return;
-		}
-
-		$logExtra = array(
-			'source' => $this->getActionTypeDesc($action),
-			'action' => $action,
-			'user' => self::$userinfo['loginname']
-		);
-
-		switch ($type) {
-			case LOG_DEBUG:
-				self::$ml->addDebug($text, $logExtra);
-				break;
-			case LOG_INFO:
-				self::$ml->addInfo($text, $logExtra);
-				break;
-			case LOG_NOTICE:
-				self::$ml->addNotice($text, $logExtra);
-				break;
-			case LOG_WARNING:
-				self::$ml->addWarning($text, $logExtra);
-				break;
-			case LOG_ERR:
-				self::$ml->addError($text, $logExtra);
-				break;
-			default:
-				self::$ml->addDebug($text, $logExtra);
-		}
 	}
 
 	/**
@@ -198,9 +170,11 @@ class FroxlorLogger
 	 *
 	 * @return void
 	 */
-	public function setCronDebugFlag($_flag = false)
+	public static function setCronDebugFlag($_flag = false)
 	{
 		self::$crondebug_flag = (bool) $_flag;
+		// force re-init
+		self::$ml = null;
 	}
 
 	public function getLogLevelDesc($type)

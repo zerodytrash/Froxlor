@@ -23,7 +23,11 @@ abstract class FroxlorCron
 
 	abstract public static function run();
 
-	protected static $cronlog = null;
+	/**
+	 *
+	 * @var \Monolog\Logger
+	 */
+	public static $cronlog = null;
 
 	protected static $lockfile = null;
 

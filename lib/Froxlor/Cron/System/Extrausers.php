@@ -47,17 +47,17 @@ class Extrausers
 	private static function generateFile($file, $query, &$cronlog)
 	{
 		$type = basename($file);
-		$cronlog->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_NOTICE, 'Creating ' . $type . ' file');
+		$cronlog->addNotice('Creating ' . $type . ' file');
 
 		if (! file_exists($file)) {
-			$cronlog->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_NOTICE, $type . ' file does not yet exist');
+			$cronlog->addNotice($type . ' file does not yet exist');
 			@mkdir(dirname($file), 0750, true);
 			touch($file);
 		}
 
 		$data_sel_stmt = Database::query($query);
 		$data_content = "";
-		$cronlog->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_NOTICE, 'Writing ' . $data_sel_stmt->rowCount() . ' entries to ' . $type . ' file');
+		$cronlog->addNotice('Writing ' . $data_sel_stmt->rowCount() . ' entries to ' . $type . ' file');
 		while ($u = $data_sel_stmt->fetch(\PDO::FETCH_ASSOC)) {
 			switch ($type) {
 				case 'passwd':
@@ -78,9 +78,9 @@ class Extrausers
 			$data_content .= $line;
 		}
 		if (file_put_contents($file, $data_content) !== false) {
-			$cronlog->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_NOTICE, 'Succesfully wrote ' . $type . ' file');
+			$cronlog->addNotice('Succesfully wrote ' . $type . ' file');
 		} else {
-			$cronlog->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_NOTICE, 'Error when writing ' . $type . ' file entries');
+			$cronlog->addError('Error when writing ' . $type . ' file entries');
 		}
 	}
 }

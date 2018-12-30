@@ -70,10 +70,6 @@ class AdminIndex extends FeModule
 			'adminid' => \Froxlor\CurrentUser::getField('adminid')
 		));
 
-		$dec_places = Settings::Get('panel.decimal_places');
-		$overview['traffic'] = round($overview['traffic'] / (1024 * 1024), $dec_places);
-		$overview['diskspace'] = round($overview['diskspace'] / 1024, $dec_places);
-
 		$number_domains_stmt = Database::prepare("
 			SELECT COUNT(*) AS `number_domains` FROM `" . TABLE_PANEL_DOMAINS . "`
 			WHERE `parentdomainid`='0'" . (\Froxlor\CurrentUser::getField('customers_see_all') ? '' : " AND `adminid` = :adminid"));
@@ -92,6 +88,7 @@ class AdminIndex extends FeModule
 				'perc' => (\Froxlor\CurrentUser::getField($entity) >= 0) ? floor($used / \Froxlor\CurrentUser::getField($entity)) : 0
 			);
 		}
+		ksort($overview_data);
 
 		/*
 		 * @fixme

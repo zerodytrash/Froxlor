@@ -1,4 +1,5 @@
 <?php
+namespace Froxlor\Frontend\Modules;
 
 /**
  * This file is part of the Froxlor project.
@@ -9,32 +10,74 @@
  * file that was distributed with this source code. You can also view the
  * COPYING file online at http://files.froxlor.org/misc/COPYING.txt
  *
- * @copyright  (c) the authors
- * @author     Florian Lippert <flo@syscp.org> (2003-2009)
- * @author     Froxlor team <team@froxlor.org> (2010-)
- * @license    GPLv2 http://files.froxlor.org/misc/COPYING.txt
- * @package    Panel
- *
+ * @copyright (c) the authors
+ * @author Florian Lippert <flo@syscp.org> (2003-2009)
+ * @author Froxlor team <team@froxlor.org> (2010-)
+ * @license GPLv2 http://files.froxlor.org/misc/COPYING.txt
+ * @package Panel
+ *         
  */
-define('AREA', 'admin');
-require './lib/init.php';
-
 use Froxlor\Database\Database;
 use Froxlor\Settings;
 use Froxlor\Api\Commands\Customers as Customers;
+use Froxlor\Frontend\FeModule;
 
-if (isset($_POST['id'])) {
-	$id = intval($_POST['id']);
-} elseif (isset($_GET['id'])) {
-	$id = intval($_GET['id']);
-}
+class AdminCustomers extends FeModule
+{
 
-if ($page == 'customers' && $userinfo['customers'] != '0') {
-	if ($action == '') {
-		// clear request data
-		unset($_SESSION['requestData']);
+	public function overview()
+	{
+		if (\Froxlor\CurrentUser::getField('customers') > 0) {
+			// no customers allowed
+			return;
+		}
 
-		$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "viewed admin_customers");
+		\Froxlor\FroxlorLogger::getInstanceOf(\Froxlor\CurrentUser::getData())->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "viewed AdminCustomers");
+		
+		try {
+			$json_result = Customers::getLocal(\Froxlor\CurrentUser::getData())->listing();
+		} catch (\Exception $e) {
+			\Froxlor\UI\Response::dynamic_error($e->getMessage());
+		}
+		$result = json_decode($json_result, true)['data'];
+		
+		$domains_stmt = Database::prepare("
+			SELECT COUNT(`id`) AS `domains`
+			FROM `" . TABLE_PANEL_DOMAINS . "`
+			WHERE `customerid` = :cid
+			AND `parentdomainid` = '0'
+			AND `id`<> :stdd
+		");
+		
+		$customers = $result['list'];
+		foreach ($customers as $index => $customer) {
+			// count domains
+			Database::pexecute($domains_stmt, array(
+				'cid' => $customer['customerid'],
+				'stdd' => $customer['standardsubdomain']
+			));
+			$domains = $domains_stmt->fetch(\PDO::FETCH_ASSOC);
+			$customer['domains'] = intval($domains['domains']);
+			// checked whether is locked
+			$customer['islocked'] = 0;
+			if ($customer['loginfail_count'] >= Settings::Get('login.maxloginattempts') && $customer['lastlogin_fail'] > (time() - Settings::Get('login.deactivatetime'))) {
+				$customer['islocked'] = 1;
+			}
+			// add some extra fields
+			$customer['diskspace_perc'] = 0;
+			$customer['traffic_perc'] = 0;
+			if ($customer['diskspace'] >= 0) {
+				// not unlimited
+				$customer['diskspace_perc'] = floor(($customer['diskspace_used'] * 100) / $customer['diskspace']);
+			}
+			if ($customer['traffic'] >= 0) {
+				// not unlimited
+				$customer['traffic_perc'] = floor(($customer['traffic_used'] * 100) / $customer['traffic']);
+			}
+			$result['list'][$index] = $customer;
+		}
+
+		/*
 		$fields = array(
 			'c.loginname' => $lng['login']['username'],
 			'a.loginname' => $lng['admin']['admin'],
@@ -71,18 +114,8 @@ if ($page == 'customers' && $userinfo['customers'] != '0') {
 
 			if ($paging->checkDisplay($i)) {
 
-				$domains_stmt = Database::prepare("
-					SELECT COUNT(`id`) AS `domains`
-					FROM `" . TABLE_PANEL_DOMAINS . "`
-					WHERE `customerid` = :cid
-					AND `parentdomainid` = '0'
-					AND `id`<> :stdd");
-				Database::pexecute($domains_stmt, array(
-					'cid' => $row['customerid'],
-					'stdd' => $row['standardsubdomain']
-				));
-				$domains = $domains_stmt->fetch(PDO::FETCH_ASSOC);
-				$row['domains'] = intval($domains['domains']);
+				
+				
 				$dec_places = Settings::Get('panel.decimal_places');
 
 				// get disk-space usages for web, mysql and mail
@@ -101,9 +134,7 @@ if ($page == 'customers' && $userinfo['customers'] != '0') {
 				$row['diskspace'] = round($row['diskspace'] / 1024, $dec_places);
 				$last_login = ((int) $row['lastlogin_succ'] == 0) ? $lng['panel']['neverloggedin'] : date('d.m.Y', $row['lastlogin_succ']);
 
-				/**
-				 * percent-values for progressbar
-				 */
+				// percent-values for progressbar
 				// For Disk usage
 				if ($row['diskspace'] > 0) {
 					$disk_percent = round(($row['diskspace_used'] * 100) / $row['diskspace'], 0);
@@ -119,11 +150,6 @@ if ($page == 'customers' && $userinfo['customers'] != '0') {
 				} else {
 					$traffic_percent = 0;
 					$traffic_doublepercent = 0;
-				}
-
-				$islocked = 0;
-				if ($row['loginfail_count'] >= Settings::Get('login.maxloginattempts') && $row['lastlogin_fail'] > (time() - Settings::Get('login.deactivatetime'))) {
-					$islocked = 1;
 				}
 
 				$row = \Froxlor\PhpHelper::strReplaceArray('-1', 'UL', $row, 'diskspace traffic mysqls emails email_accounts email_forwarders ftps subdomains');
@@ -148,6 +174,15 @@ if ($page == 'customers' && $userinfo['customers'] != '0') {
 
 		$customercount = $num_rows;
 		eval("echo \"" . \Froxlor\UI\Template::getTemplate("customers/customers") . "\";");
+		*/
+		
+		\Froxlor\Frontend\UI::TwigBuffer('admin/customers/index.html.twig', array(
+			'page_title' => $this->lng['panel']['customers'],
+			'accounts' => $result
+		));
+	}
+}
+/*
 	} elseif ($action == 'su' && $id != 0) {
 		try {
 			$json_result = Customers::getLocal($userinfo, array(
@@ -352,9 +387,7 @@ if ($page == 'customers' && $userinfo['customers'] != '0') {
 		}
 		$result = json_decode($json_result, true)['data'];
 
-		/*
-		 * information for moving customer
-		 */
+		// information for moving customer
 		$available_admins_stmt = Database::prepare("
 			SELECT * FROM `" . TABLE_PANEL_ADMINS . "`
 			WHERE (`customers` = '-1' OR `customers` > `customers_used`)");
@@ -365,9 +398,7 @@ if ($page == 'customers' && $userinfo['customers'] != '0') {
 			$admin_select .= \Froxlor\UI\HTML::makeoption($available_admin['name'] . " (" . $available_admin['loginname'] . ")", $available_admin['adminid'], null, true, true);
 			$admin_select_cnt ++;
 		}
-		/*
-		 * end of moving customer stuff
-		 */
+		// end of moving customer stuff
 
 		if ($result['loginname'] != '') {
 
@@ -489,3 +520,4 @@ if ($page == 'customers' && $userinfo['customers'] != '0') {
 		}
 	}
 }
+*/

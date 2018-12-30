@@ -48,11 +48,11 @@ class AdminAdmins extends FeModule
 			$admin['traffic_perc'] = 0;
 			if ($admin['diskspace'] >= 0) {
 				// not unlimited
-				$admin['diskspace_perc'] = floor($admin['diskspace_used'] / $admin['diskspace']);
+				$admin['diskspace_perc'] = floor(($admin['diskspace_used'] * 100) / $admin['diskspace']);
 			}
 			if ($admin['traffic'] >= 0) {
 				// not unlimited
-				$admin['traffic_perc'] = floor($admin['traffic_used'] / $admin['traffic']);
+				$admin['traffic_perc'] = floor(($admin['traffic_used'] * 100) / $admin['traffic']);
 			}
 			$result['list'][$index] = $admin;
 		}

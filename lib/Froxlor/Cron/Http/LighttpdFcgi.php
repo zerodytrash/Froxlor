@@ -21,6 +21,10 @@ use Froxlor\Cron\Http\Php\PhpInterface;
  */
 class LighttpdFcgi extends Lighttpd
 {
+	public function __construct($logger)
+	{
+		parent::__construct($logger);
+	}
 
 	protected function composePhpOptions($domain)
 	{

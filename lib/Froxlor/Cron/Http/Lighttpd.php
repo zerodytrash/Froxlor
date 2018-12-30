@@ -45,6 +45,11 @@ class Lighttpd extends HttpConfigBase
 	 */
 	private $deactivated = false;
 
+	public function __construct($logger)
+	{
+		parent::__construct($logger);
+	}
+
 	public function reload()
 	{
 		if ((int) Settings::Get('phpfpm.enabled') == 1) {
@@ -58,14 +63,14 @@ class Lighttpd extends HttpConfigBase
 				// so we need to create a dummy
 				$_conffiles = glob(\Froxlor\FileDir::makeCorrectFile($restart_cmd['config_dir'] . "/*.conf"));
 				if ($_conffiles === false || empty($_conffiles)) {
-					$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_INFO, 'lighttpd::reload: fpm config directory "' . $restart_cmd['config_dir'] . '" is empty. Creating dummy.');
+					$this->logger->addInfo('lighttpd::reload: fpm config directory "' . $restart_cmd['config_dir'] . '" is empty. Creating dummy.');
 					Fpm::createDummyPool($restart_cmd['config_dir']);
 				}
-				$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_INFO, 'lighttpd::reload: running ' . $restart_cmd['reload_cmd']);
+				$this->logger->addInfo('lighttpd::reload: running ' . $restart_cmd['reload_cmd']);
 				\Froxlor\FileDir::safe_exec(escapeshellcmd($restart_cmd['reload_cmd']));
 			}
 		}
-		$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_INFO, 'lighttpd::reload: reloading lighttpd');
+		$this->logger->addInfo('lighttpd::reload: reloading lighttpd');
 		\Froxlor\FileDir::safe_exec(escapeshellcmd(Settings::Get('system.apachereload_command')));
 	}
 
@@ -84,7 +89,7 @@ class Lighttpd extends HttpConfigBase
 				$ipv6 = '';
 			}
 
-			$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_INFO, 'lighttpd::createIpPort: creating ip/port settings for  ' . $ip . ":" . $port);
+			$this->logger->addInfo('lighttpd::createIpPort: creating ip/port settings for  ' . $ip . ":" . $port);
 			$vhost_filename = \Froxlor\FileDir::makeCorrectFile(Settings::Get('system.apacheconf_vhost') . '/10_froxlor_ipandport_' . trim(str_replace(':', '.', $row_ipsandports['ip']), '.') . '.' . $row_ipsandports['port'] . '.conf');
 
 			if (! isset($this->lighttpd_data[$vhost_filename])) {
@@ -213,7 +218,7 @@ class Lighttpd extends HttpConfigBase
 					if (! file_exists($row_ipsandports['ssl_cert_file'])) {
 						// explicitly disable ssl for this vhost
 						$row_ipsandports['ssl_cert_file'] = "";
-						$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_DEBUG, 'System certificate file "' . Settings::Get('system.ssl_cert_file') . '" does not seem to exist. Disabling SSL-vhost for "' . Settings::Get('system.hostname') . '"');
+						$this->logger->addDebug('System certificate file "' . Settings::Get('system.ssl_cert_file') . '" does not seem to exist. Disabling SSL-vhost for "' . Settings::Get('system.hostname') . '"');
 					}
 				}
 
@@ -247,7 +252,7 @@ class Lighttpd extends HttpConfigBase
 
 					// check for existence, #1485
 					if (! file_exists($domain['ssl_cert_file'])) {
-						$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_ERR, $ip . ':' . $port . ' :: certificate file "' . $domain['ssl_cert_file'] . '" does not exist! Cannot create ssl-directives');
+						$this->logger->addError($ip . ':' . $port . ' :: certificate file "' . $domain['ssl_cert_file'] . '" does not exist! Cannot create ssl-directives');
 						echo $ip . ':' . $port . ' :: certificate file "' . $domain['ssl_cert_file'] . '" does not exist! Cannot create SSL-directives' . "\n";
 					} else {
 						$this->lighttpd_data[$vhost_filename] .= 'ssl.engine = "enable"' . "\n";
@@ -269,7 +274,7 @@ class Lighttpd extends HttpConfigBase
 						if ($domain['ssl_ca_file'] != '') {
 							// check for existence, #1485
 							if (! file_exists($domain['ssl_ca_file'])) {
-								$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_ERR, $ip . ':' . $port . ' :: certificate CA file "' . $domain['ssl_ca_file'] . '" does not exist! Cannot create ssl-directives');
+								$this->logger->addError($ip . ':' . $port . ' :: certificate CA file "' . $domain['ssl_ca_file'] . '" does not exist! Cannot create ssl-directives');
 								echo $ip . ':' . port . ' :: certificate CA file "' . $domain['ssl_ca_file'] . '" does not exist! SSL-directives might not be working' . "\n";
 							} else {
 								$this->lighttpd_data[$vhost_filename] .= 'ssl.ca-file = "' . \Froxlor\FileDir::makeCorrectFile($domain['ssl_ca_file']) . '"' . "\n";
@@ -567,7 +572,7 @@ class Lighttpd extends HttpConfigBase
 				if (! file_exists($domain['ssl_cert_file'])) {
 					// explicitly disable ssl for this vhost
 					$domain['ssl_cert_file'] = "";
-					$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_DEBUG, 'System certificate file "' . Settings::Get('system.ssl_cert_file') . '" does not seem to exist. Disabling SSL-vhost for "' . $domain['domain'] . '"');
+					$this->logger->addDebug('System certificate file "' . Settings::Get('system.ssl_cert_file') . '" does not seem to exist. Disabling SSL-vhost for "' . $domain['domain'] . '"');
 				}
 			}
 
@@ -947,7 +952,7 @@ class Lighttpd extends HttpConfigBase
 
 	public function writeConfigs()
 	{
-		$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_INFO, "lighttpd::writeConfigs: rebuilding " . Settings::Get('system.apacheconf_vhost'));
+		$this->logger->addInfo("lighttpd::writeConfigs: rebuilding " . Settings::Get('system.apacheconf_vhost'));
 
 		$vhostDir = new \Froxlor\Http\Directory(Settings::Get('system.apacheconf_vhost'));
 		if (! $vhostDir->isConfigDir()) {
@@ -974,7 +979,7 @@ class Lighttpd extends HttpConfigBase
 			fclose($vhosts_file_handler);
 		} else {
 			if (! file_exists(Settings::Get('system.apacheconf_vhost'))) {
-				$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_NOTICE, 'lighttpd::writeConfigs: mkdir ' . escapeshellarg(\Froxlor\FileDir::makeCorrectDir(Settings::Get('system.apacheconf_vhost'))));
+				$this->logger->addNotice('lighttpd::writeConfigs: mkdir ' . escapeshellarg(\Froxlor\FileDir::makeCorrectDir(Settings::Get('system.apacheconf_vhost'))));
 				\Froxlor\FileDir::safe_exec('mkdir ' . escapeshellarg(\Froxlor\FileDir::makeCorrectDir(Settings::Get('system.apacheconf_vhost'))));
 			}
 

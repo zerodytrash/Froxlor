@@ -1,27 +1,113 @@
 {% extends "userarea.html.twig" %}
 
 {% block custom_css %}
-<link href="../templates/Sparkle2/assets/css/circle.css" rel="stylesheet">
+<link href="../templates/Sparkle2/assets/css/circle.css"
+	rel="stylesheet">
 {% endblock %}
 
 {% block content %}
 {% set userinfo = call_static('\\Froxlor\\CurrentUser', 'getData') %}
 <div class="row">
-	<div class="col">
-		<div class="card mb-2">
-			<div class="row">
+	<div class="col-md-8 col-sm-12">
+		<div class="row">
 			{% for key,value in usage_data %}
 			<div class="col">
-			<div class="c100 p{{ value.perc }} {% if value.perc < 75 %}green{% else %}{% if value.avail >= 0 %}orange{% else %}dark{% endif %}{% endif %}">
-				<span id="span_progress">{{ value.used }} / {% if value.avail >= 0 %}{{ value.avail }}{% else %}&infin;{% endif %}</span>
-				<div class="slice">
-					<div class="bar"></div>
-					<div class="fill"></div>
+				<div class="card text-center mb-2">
+					<div class="card-body">
+						<div
+							class="c100 center p{{ value.perc }} {% if value.perc < 75 %}green{% else %}{% if value.avail >= 0 %}orange{% else %}dark{% endif %}{% endif %}">
+							<span id="span_progress">{% if value.avail >= 0 %}
+								{{ value.perc }}%{% else %}&infin;{% endif %}</span>
+							<div class="slice">
+								<div class="bar"></div>
+								<div class="fill"></div>
+							</div>
+						</div>
+					</div>
+					<div class="card-footer">
+						{% set lngkey = 'panel.' ~ key %}
+						{% if key == 'diskspace' or key == 'traffic' or key == 'quota' %}
+						<p class="card-text">
+							{{ lng(lngkey) }}
+							<br>
+							{{ value.used|formatBytes }}
+							/
+							{% if value.avail >= 0 %}
+							{{ value.avail|formatBytes }}
+							{% else %}
+							&infin;
+							{% endif %}
+						</p>
+						{% else %}
+						<p class="card-text">
+							{{ lng(lngkey) }}
+							<br>
+							{{ value.used }}
+							/
+							{% if value.avail >= 0 %}
+							{{ value.avail }}
+							{% else %}
+							&infin;
+							{% endif %}
+						</p>
+						{% endif %}
+					</div>
 				</div>
 			</div>
-			{{ key }}
-			</div>
 			{% endfor %}
+		</div>
+		<div class="row">
+			<div class="col">
+				<div class="card mb-2">
+					<div class="card-header">
+						{{ lng('admin.froxlordetails') }}
+					</div>
+					<ul class="list-group">
+						<li
+							class="list-group-item d-flex justify-content-between align-items-center">
+							{{ lng('admin.installedversion') }} <span>{% if version_check_result.isnewerversion == 0 %}<span
+								class="text-success"><i class="fas fa-check"></i></span> {% else %}<span
+								class="text-danger"><i class="fas fa-exclamation-circle"></i></span>
+								{% endif %}&nbsp;{{ call_static('\\Froxlor\\Froxlor', 'getVersionString') }}</span>
+						</li>
+						{% if version_check_result.isnewerversion == 1 %}
+						<li
+							class="list-group-item list-group-item-warning d-flex justify-content-between align-items-center">
+							{{ version_check_result.message }} <span><a
+								href="{{ version_check_result.link }}" rel="external">{{ version_check_result.version }}</a></span>
+						</li>
+						{% endif %}
+						<li
+							class="list-group-item d-flex justify-content-between align-items-center">
+							{{ lng('tasks.outstanding_tasks') }} <span>{% for task in outstanding_tasks %}
+								{{ task|raw }}<br> {% endfor %}</span>
+						</li>
+						{% if cron_last_runs|length > 0 %}
+						{% for cronrun in cron_last_runs %}
+						<li
+							class="list-group-item d-flex justify-content-between align-items-center">
+							{{ cronrun.text }} <span>{{ cronrun.value }}</span>
+						</li>
+						{% endfor %}
+						{% endif %}
+					</ul>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card mb-2">
+					<div class="card-header">
+						{{ lng('admin.systemdetails') }}
+					</div>
+					<ul class="list-group">
+						{% for key,value in sysinfo %}
+						{% set lngkey = 'admin.' ~ key %}
+						<li
+							class="list-group-item d-flex justify-content-between align-items-center">
+							{{ lng(lngkey) }} <span>{{ value|raw }}</span>
+						</li>
+						{% endfor %}
+					</ul>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -34,43 +120,6 @@
 			</div>
 		</div>
 		{% endif %}
-		<div class="card mb-2">
-			<div class="card-header">
-				{{ lng('admin.froxlordetails') }}
-			</div>
-			<ul class="list-group">
-				<li
-					class="list-group-item d-flex justify-content-between align-items-center">
-					{{ lng('admin.installedversion') }} <span>{% if version_check_result.isnewerversion == 0 %}<span
-						class="text-success"><i class="fas fa-check"></i></span> {% else %}<span
-						class="text-danger"><i class="fas fa-exclamation-circle"></i></span>
-						{% endif %}&nbsp;{{ call_static('\\Froxlor\\Froxlor', 'getVersionString') }}</span>
-				</li>
-				{% if version_check_result.isnewerversion == 1 %}
-				<li
-					class="list-group-item list-group-item-warning d-flex justify-content-between align-items-center">
-					{{ version_check_result.message }} <span><a
-						href="{{ version_check_result.link }}" rel="external">{{ version_check_result.version }}</a></span>
-				</li>
-				{% endif %}
-				<li
-					class="list-group-item d-flex justify-content-between align-items-center">
-					{{ lng('tasks.outstanding_tasks') }} <span>{% for task in outstanding_tasks %}
-						{{ task|raw }}<br>
-					{% endfor %}</span>
-				</li>
-				{% if cron_last_runs|length > 0 %}
-				{% for cronrun in cron_last_runs %}
-				<li
-					class="list-group-item d-flex justify-content-between align-items-center">
-					{{ cronrun.text }} <span>{{ cronrun.value }}</span>
-				</li>
-				{% endfor %}
-				{% endif %}
-			</ul>
-		</div>
-	</div>
-	<div class="col">
 		{% if get_setting('admin.show_news_feed') == 1 %}
 		<div class="card mb-2">
 			<div class="card-header">News</div>
@@ -86,20 +135,6 @@
 				class="alert-link"><i class="fas fa-edit"></i></a>
 		</div>
 		{% endif %}
-		<div class="card mb-2">
-			<div class="card-header">
-				{{ lng('admin.systemdetails') }}
-			</div>
-			<ul class="list-group">
-				{% for key,value in sysinfo %}
-				{% set lngkey = 'admin.' ~ key %}
-				<li
-					class="list-group-item d-flex justify-content-between align-items-center">
-					{{ lng(lngkey) }} <span>{{ value|raw }}</span>
-				</li>
-				{% endfor %}
-			</ul>
-		</div>
 	</div>
 </div>
 {% endblock %}

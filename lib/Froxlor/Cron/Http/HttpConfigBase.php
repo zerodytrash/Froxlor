@@ -26,7 +26,17 @@ use Froxlor\Settings;
  */
 class HttpConfigBase
 {
-
+	/**
+	 *
+	 * @var \Monolog\Logger
+	 */
+	protected $logger = false;
+	
+	public function __construct($logger)
+	{
+		$this->logger = $logger;
+	}
+		
 	/**
 	 * process special config as template, by substituting {VARIABLE} with the
 	 * respective value.

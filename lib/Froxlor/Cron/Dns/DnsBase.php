@@ -27,6 +27,10 @@ use Froxlor\Settings;
 abstract class DnsBase
 {
 
+	/**
+	 * 
+	 * @var \Monolog\Logger
+	 */
 	protected $logger = false;
 
 	protected $ns = array();
@@ -151,15 +155,15 @@ abstract class DnsBase
 				if (isset($domains[$domains[$key]['ismainbutsubto']])) {
 					$domains[$domains[$key]['ismainbutsubto']]['children'][] = $domains[$key]['id'];
 				} else {
-					$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_ERR, 'Database inconsistency: domain ' . $domain['domain'] . ' (ID #' . $key . ') is set to to be subdomain to non-existent domain ID #' . $domains[$key]['ismainbutsubto'] . '. No DNS record(s) will be created for this domain.');
+					$this->logger->addError('Database inconsistency: domain ' . $domain['domain'] . ' (ID #' . $key . ') is set to to be subdomain to non-existent domain ID #' . $domains[$key]['ismainbutsubto'] . '. No DNS record(s) will be created for this domain.');
 				}
 			}
 		}
 
-		$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_DEBUG, str_pad('domId', 9, ' ') . str_pad('domain', 40, ' ') . 'ismainbutsubto ' . str_pad('parent domain', 40, ' ') . "list of child domain ids");
+		$this->logger->addDebug(str_pad('domId', 9, ' ') . str_pad('domain', 40, ' ') . 'ismainbutsubto ' . str_pad('parent domain', 40, ' ') . "list of child domain ids");
 		foreach ($domains as $domain) {
 			$logLine = str_pad($domain['id'], 9, ' ') . str_pad($domain['domain'], 40, ' ') . str_pad($domain['ismainbutsubto'], 15, ' ') . str_pad(((isset($domains[$domain['ismainbutsubto']])) ? $domains[$domain['ismainbutsubto']]['domain'] : '-'), 40, ' ') . join(', ', $domain['children']);
-			$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_DEBUG, $logLine);
+			$this->logger->addDebug($logLine);
 		}
 
 		return $domains;
@@ -172,9 +176,9 @@ abstract class DnsBase
 		$cmdStatus = 1;
 		\Froxlor\FileDir::safe_exec(escapeshellcmd($cmd), $cmdStatus);
 		if ($cmdStatus === 0) {
-			$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_INFO, Settings::Get('system.dns_server') . ' daemon reloaded');
+			$this->logger->addInfo(Settings::Get('system.dns_server') . ' daemon reloaded');
 		} else {
-			$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_ERR, 'Error while running `' . $cmd . '`: exit code (' . $cmdStatus . ') - please check your system logs');
+			$this->logger->addError('Error while running `' . $cmd . '`: exit code (' . $cmdStatus . ') - please check your system logs');
 		}
 	}
 
@@ -182,7 +186,7 @@ abstract class DnsBase
 	{
 		if (Settings::Get('dkim.use_dkim') == '1') {
 			if (! file_exists(\Froxlor\FileDir::makeCorrectDir(Settings::Get('dkim.dkim_prefix')))) {
-				$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_NOTICE, 'mkdir -p ' . escapeshellarg(\Froxlor\FileDir::makeCorrectDir(Settings::Get('dkim.dkim_prefix'))));
+				$this->logger->addNotice('mkdir -p ' . escapeshellarg(\Froxlor\FileDir::makeCorrectDir(Settings::Get('dkim.dkim_prefix'))));
 				\Froxlor\FileDir::safe_exec('mkdir -p ' . escapeshellarg(\Froxlor\FileDir::makeCorrectDir(Settings::Get('dkim.dkim_prefix'))));
 			}
 
@@ -254,7 +258,7 @@ abstract class DnsBase
 			fclose($dkimkeys_file_handler);
 
 			\Froxlor\FileDir::safe_exec(escapeshellcmd(Settings::Get('dkim.dkimrestart_command')));
-			$this->logger->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_INFO, 'Dkim-milter reloaded');
+			$this->logger->addInfo('Dkim-milter reloaded');
 		}
 	}
 }
