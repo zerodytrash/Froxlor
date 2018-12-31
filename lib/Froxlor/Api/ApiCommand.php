@@ -180,6 +180,9 @@ abstract class ApiCommand extends ApiParameter
 
 		// set array for ApiCommand
 		$this->lng = $lng;
+
+		// set language for Frontend
+		\Froxlor\Frontend\UI::setLng($lng);
 	}
 
 	/**

@@ -71,9 +71,6 @@ class Response
 	 */
 	public static function standard_error($errors = '', $replacer = '', $throw_exception = false)
 	{
-		global $userinfo, $s, $header, $footer, $lng, $theme;
-
-		$_SESSION['requestData'] = $_POST;
 		$replacer = htmlentities($replacer);
 
 		if (! is_array($errors)) {
@@ -82,15 +79,10 @@ class Response
 			);
 		}
 
-		$link = '';
-		if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST']) !== false) {
-			$link = '<a href="' . htmlentities($_SERVER['HTTP_REFERER']) . '">' . $lng['panel']['back'] . '</a>';
-		}
-
 		$error = '';
 		foreach ($errors as $single_error) {
-			if (isset($lng['error'][$single_error])) {
-				$single_error = $lng['error'][$single_error];
+			if (! empty(\Froxlor\Frontend\UI::getLng('error.' . $single_error))) {
+				$single_error = \Froxlor\Frontend\UI::getLng('error.' . $single_error);
 				$single_error = strtr($single_error, array(
 					'%s' => $replacer
 				));
@@ -109,21 +101,31 @@ class Response
 		if ($throw_exception) {
 			throw new \Exception(strip_tags($error), 400);
 		}
-		eval("echo \"" . Template::getTemplate('misc/error', '1') . "\";");
-		exit();
-	}
 
-	public static function dynamic_error($message)
-	{
-		global $userinfo, $s, $header, $footer, $lng, $theme;
-		$_SESSION['requestData'] = $_POST;
 		$link = '';
 		if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST']) !== false) {
-			$link = '<a href="' . htmlentities($_SERVER['HTTP_REFERER']) . '">' . $lng['panel']['back'] . '</a>';
+			$link = '<a href="' . htmlentities($_SERVER['HTTP_REFERER']) . '" class="btn btn-danger">' . \Froxlor\Frontend\UI::getLng('panel.back') . '</a>';
 		}
-		$error = $message;
-		eval("echo \"" . Template::getTemplate('misc/error', '1') . "\";");
-		exit();
+
+		self::outputAlert($error, \Froxlor\Frontend\UI::getLng('error.error'), 'danger', $link);
+	}
+
+	/**
+	 * output dynamic contet error-message
+	 *
+	 * @param string $message
+	 * @param string $title
+	 */
+	public static function dynamic_error($message, $title = null)
+	{
+		if (empty($title)) {
+			$title = \Froxlor\Frontend\UI::getLng('error.error');
+		}
+		$link = '';
+		if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST']) !== false) {
+			$link = '<a href="' . htmlentities($_SERVER['HTTP_REFERER']) . '" class="btn btn-danger">' . \Froxlor\Frontend\UI::getLng('panel.back') . '</a>';
+		}
+		self::outputAlert($message, $title, 'danger', $link);
 	}
 
 	/**
@@ -140,8 +142,8 @@ class Response
 	 */
 	public static function standard_success($success_message = '', $replacer = '', $params = array(), $throw_exception = false)
 	{
-		if (isset($lng['success'][$success_message])) {
-			$success_message = strtr($lng['success'][$success_message], array(
+		if (! empty(\Froxlor\Frontend\UI::getLng('success.' . $success_message))) {
+			$success_message = strtr(\Froxlor\Frontend\UI::getLng('success.' . $success_message), array(
 				'%s' => htmlentities($replacer)
 			));
 		}
@@ -163,11 +165,18 @@ class Response
 			$redirect_url = '';
 		}
 
-		eval("echo \"" . Template::getTemplate('misc/success', '1') . "\";");
-		exit();
+		self::outputAlert($success_message, \Froxlor\Frontend\UI::getLng('success.success'), 'success', "", $redirect_url);
 	}
 
 	public static function dynamic_success($message, $title = null)
+	{
+		if (empty($title)) {
+			$title = \Froxlor\Frontend\UI::getLng('success.success');
+		}
+		self::outputAlert($message, $title, 'success');
+	}
+
+	private static function outputAlert($message, $title = null, $type = "danger", $extra = "", $redirect = "")
 	{
 		if (\Froxlor\CurrentUser::hasSession()) {
 			$alerttpl = 'misc/alert.html.twig';
@@ -176,9 +185,11 @@ class Response
 		}
 		\Froxlor\Frontend\UI::TwigBuffer($alerttpl, array(
 			'page_title' => $title,
-			'type' => "success",
+			'type' => $type,
 			'heading' => $title,
-			'alert_msg' => $message
+			'alert_msg' => $message,
+			'alert_info' => $extra,
+			'redirect_link' => $redirect
 		));
 		\Froxlor\Frontend\UI::TwigOutputBuffer();
 		exit();
