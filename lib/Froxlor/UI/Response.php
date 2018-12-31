@@ -102,12 +102,12 @@ class Response
 			throw new \Exception(strip_tags($error), 400);
 		}
 
-		$link = '';
+		$link = '#';
 		if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST']) !== false) {
-			$link = '<a href="' . htmlentities($_SERVER['HTTP_REFERER']) . '" class="btn btn-danger">' . \Froxlor\Frontend\UI::getLng('panel.back') . '</a>';
+			$link = htmlentities($_SERVER['HTTP_REFERER']);
 		}
 
-		self::outputAlert($error, \Froxlor\Frontend\UI::getLng('error.error'), 'danger', $link);
+		self::outputAlert($error, \Froxlor\Frontend\UI::getLng('error.error'), 'danger', "", $link);
 	}
 
 	/**
@@ -121,11 +121,11 @@ class Response
 		if (empty($title)) {
 			$title = \Froxlor\Frontend\UI::getLng('error.error');
 		}
-		$link = '';
+		$link = '#';
 		if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST']) !== false) {
-			$link = '<a href="' . htmlentities($_SERVER['HTTP_REFERER']) . '" class="btn btn-danger">' . \Froxlor\Frontend\UI::getLng('panel.back') . '</a>';
+			$link = htmlentities($_SERVER['HTTP_REFERER']);
 		}
-		self::outputAlert($message, $title, 'danger', $link);
+		self::outputAlert($message, $title, 'danger', "", $link);
 	}
 
 	/**
@@ -168,12 +168,24 @@ class Response
 		self::outputAlert($success_message, \Froxlor\Frontend\UI::getLng('success.success'), 'success', "", $redirect_url);
 	}
 
-	public static function dynamic_success($message, $title = null)
+	public static function dynamic_success($message, $title = null, $params = array())
 	{
 		if (empty($title)) {
 			$title = \Froxlor\Frontend\UI::getLng('success.success');
 		}
-		self::outputAlert($message, $title, 'success');
+		if (is_array($params) && isset($params['filename'])) {
+			$redirect_url = $params['filename'];
+			unset($params['filename']);
+			
+			foreach ($params as $varname => $value) {
+				if ($value != '') {
+					$redirect_url .= '&amp;' . $varname . '=' . $value;
+				}
+			}
+		} else {
+			$redirect_url = '';
+		}
+		self::outputAlert($message, $title, 'success', "", $redirect_url);
 	}
 
 	private static function outputAlert($message, $title = null, $type = "danger", $extra = "", $redirect = "")

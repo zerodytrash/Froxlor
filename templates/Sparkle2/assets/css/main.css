@@ -16,6 +16,10 @@ body {
 	display: -ms-flexbox;
 }
 
+.container-login h1 {
+	display: none;
+}
+
 .form-signin {
 	width: 100%;
 	max-width: 330px;
@@ -81,4 +85,3 @@ body {
 .border-bottom {
 	border-bottom: 1px solid #e5e5e5;
 }
- 

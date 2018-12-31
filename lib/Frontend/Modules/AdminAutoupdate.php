@@ -1,5 +1,5 @@
 <?php
-namespace Froxlor\Frontend;
+namespace Froxlor\Frontend\Modules;
 
 /**
  * This file is part of the Froxlor project.
@@ -19,6 +19,7 @@ namespace Froxlor\Frontend;
  *       
  */
 use Froxlor\Api\Commands\Froxlor;
+use Froxlor\Frontend\FeModule;
 use Froxlor\Http\HttpClient;
 
 class AdminAutoupdate extends FeModule
@@ -46,48 +47,22 @@ class AdminAutoupdate extends FeModule
 		}
 		$version_check_result = json_decode($json_result, true)['data'];
 
-		if (is_array($latestversion) && count($latestversion) >= 1) {
-			$_version = $latestversion[0];
-			$_message = isset($latestversion[1]) ? $latestversion[1] : '';
-			$_link = isset($latestversion[2]) ? $latestversion[2] : htmlspecialchars($filename . '?s=' . urlencode($s) . '&page=' . urlencode($page) . '&lookfornewversion=yes');
-
-			// add the branding so debian guys are not gettings confused
-			// about their version-number
-			$version_label = $_version . $branding;
-			$version_link = $_link;
-			$message_addinfo = $_message;
-
-			// not numeric -> error-message
-			if (! preg_match('/^((\d+\\.)(\d+\\.)(\d+\\.)?(\d+)?(\-(svn|dev|rc)(\d+))?)$/', $_version)) {
-				// check for customized version to not output
-				// "There is a newer version of froxlor" besides the error-message
-				\Froxlor\UI\Response::redirectTo($filename, array(
-					's' => $s,
-					'page' => 'error',
-					'errno' => 3
-				));
-			} elseif (\Froxlor\Froxlor::versionCompare2($version, $_version) == - 1) {
-				// there is a newer version - yay
-				$isnewerversion = 1;
-			} else {
-				// nothing new
-				$isnewerversion = 0;
-			}
-
-			// anzeige über version-status mit ggfls. formular
-			// zum update schritt #1 -> download
-			if ($isnewerversion == 1) {
-				$text = 'There is a newer version available. Update to version <b>' . $_version . '</b> now?<br/>(Your current version is: ' . $version . ')';
-				$hiddenparams = '<input type="hidden" name="newversion" value="' . $_version . '" />';
-				$yesfile = $filename . '?s=' . $s . '&amp;page=getdownload';
-				eval("echo \"" . \Froxlor\UI\Template::getTemplate("misc/question_yesno", true) . "\";");
-				exit();
-			} elseif ($isnewerversion == 0) {
-				// all good
-				\Froxlor\UI\Response::standard_success('noupdatesavail');
-			} else {
-				\Froxlor\UI\Response::standard_error('customized_version');
-			}
+		// anzeige über version-status mit ggfls. formular
+		// zum update schritt #1 -> download
+		if ($version_check_result['isnewerversion'] == 1) {
+			$hiddenparams = '<input type="hidden" name="newversion" value="' . $version_check_result['version'] . '" />';
+			$yesfile = 'index.php?module=AdminAutoupdate&amp;page=getdownload';
+			\Froxlor\Frontend\UI::TwigBuffer('misc/yesno.html.twig', array(
+				'page_title' => $this->lng['question']['question'],
+				'yesno_msg' => $version_check_result['message'] . '<br><strong>' . $this->lng['question']['update_now'] . '</strong>',
+				'hiddenparams' => $hiddenparams,
+				'yesfile' => $yesfile
+			));
+		} elseif ($version_check_result['isnewerversion'] == 0) {
+			// all good
+			\Froxlor\UI\Response::standard_success('noupdatesavail');
+		} else {
+			\Froxlor\UI\Response::standard_error('customized_version');
 		}
 	}
 

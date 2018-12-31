@@ -1,4 +1,8 @@
 <?php
+namespace Froxlor\Frontend\Modules;
+
+use Froxlor\Database\Database;
+use Froxlor\Frontend\FeModule;
 
 /**
  * This file is part of the Froxlor project.
@@ -9,20 +13,23 @@
  * file that was distributed with this source code. You can also view the
  * COPYING file online at http://files.froxlor.org/misc/COPYING.txt
  *
- * @copyright  (c) the authors
- * @author     Florian Lippert <flo@syscp.org> (2003-2009)
- * @author     Froxlor team <team@froxlor.org> (2010-)
- * @license    GPLv2 http://files.froxlor.org/misc/COPYING.txt
- * @package    Panel
- *
+ * @copyright (c) the authors
+ * @author Florian Lippert <flo@syscp.org> (2003-2009)
+ * @author Froxlor team <team@froxlor.org> (2010-)
+ * @license GPLv2 http://files.froxlor.org/misc/COPYING.txt
+ * @package Panel
+ *         
  */
-define('AREA', 'admin');
-require './lib/init.php';
+class AdminAdmins extends FeModule
+{
 
-use Froxlor\Database\Database;
+	public function overview()
+	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			return;
+		}
 
-if ($page == 'log' && $userinfo['change_serversettings'] == '1') {
-	if ($action == '') {
 		$fields = array(
 			'date' => $lng['logger']['date'],
 			'type' => $lng['logger']['type'],
@@ -41,7 +48,7 @@ if ($page == 'log' && $userinfo['change_serversettings'] == '1') {
 		$pagingcode = $paging->getHtmlPagingCode($filename . '?page=' . $page . '&s=' . $s);
 		$clog = array();
 
-		while ($row = $result_stmt->fetch(PDO::FETCH_ASSOC)) {
+		while ($row = $result_stmt->fetch(\PDO::FETCH_ASSOC)) {
 
 			if (! isset($clog[$row['action']]) || ! is_array($clog[$row['action']])) {
 				$clog[$row['action']] = array();
@@ -83,7 +90,7 @@ if ($page == 'log' && $userinfo['change_serversettings'] == '1') {
 						case \Froxlor\FroxlorLogger::LOGIN_ACTION:
 							$_action = $lng['logger']['login'];
 							break;
-						case LOG_ERROR:
+						case \Froxlor\FroxlorLogger::LOG_ERROR:
 							$_action = $lng['logger']['intern'];
 							break;
 						default:
@@ -107,8 +114,10 @@ if ($page == 'log' && $userinfo['change_serversettings'] == '1') {
 		}
 
 		eval("echo \"" . \Froxlor\UI\Template::getTemplate('logger/logger') . "\";");
-	} elseif ($action == 'truncate') {
+	}
 
+	public function truncate()
+	{
 		if (isset($_POST['send']) && $_POST['send'] == 'send') {
 			$truncatedate = time() - (60 * 10);
 			$trunc_stmt = Database::prepare("

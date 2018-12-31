@@ -17,10 +17,7 @@ namespace Froxlor\Frontend\Modules;
  * @package Panel
  *
  */
-use Froxlor\Database\Database;
 use Froxlor\Frontend\FeModule;
-use Froxlor\Settings;
-use Froxlor\Api\Commands\Froxlor as Froxlor;
 use Froxlor\Api\Commands\Admins as Admins;
 
 class AdminAdmins extends FeModule

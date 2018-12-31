@@ -85,7 +85,9 @@ class SslCertificates extends FeModule
 					'id' => $id
 				))->delete();
 				$success_message = sprintf($this->lng['domains']['ssl_certificate_removed'], $id);
-				\Froxlor\UI\Response::dynamic_success($success_message, $this->lng['success']['success']);
+				\Froxlor\UI\Response::dynamic_success($success_message, $this->lng['success']['success'], array(
+					'filename' => 'index.php?module=SslCertificates'
+				));
 			} catch (\Exception $e) {
 				\Froxlor\UI\Response::dynamic_error($e->getMessage());
 			}

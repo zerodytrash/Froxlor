@@ -1,0 +1,20 @@
+{% extends "Sparkle2/userarea.html.twig" %}
+
+{% block content %}
+<div class="alert alert-info fade show" role="alert">
+	<h4 class="alert-heading">
+		{{ lng('question.question') }}
+	</h4>
+	<p>
+		{{ yesno_msg|raw }}
+	</p>
+	<p class="mt-1 text-center">
+		<form action="{{ yesfile }}" method="post">
+		    {{ hiddenparams|raw }}
+			<input type="hidden" name="send" value="send" />
+			<button type="submit" name="submitbutton" class="btn btn-success">{{ lng('panel.yes') }}</button>&nbsp;
+			<a href="javascript:window.history.back();" id="historyback" class="btn btn-secondary">{{ lng('panel.no') }}</a>
+		</form>
+	</p>
+</div>
+{% endblock %}

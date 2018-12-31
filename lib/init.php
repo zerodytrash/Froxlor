@@ -230,12 +230,12 @@ $no_log_modules = array(
 );
 
 $module = ucfirst($module);
+\Froxlor\Frontend\UI::Twig()->addGlobal('module', $module);
 $mod_fullpath = '\\Froxlor\\Frontend\\Modules\\' . $module;
 
 if (! class_exists($mod_fullpath)) {
 	\Froxlor\UI\Response::dynamic_error(sprintf(_('Module %s does not exist'), $module));
 } else {
-	\Froxlor\Frontend\UI::Twig()->addGlobal('module', $module);
 	$mod = new $mod_fullpath();
 	if (method_exists($mod_fullpath, $view)) {
 		$mod->lng = $lng;

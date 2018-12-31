@@ -259,15 +259,18 @@ return array(
 		'traffic' => array(
 			'label' => $lng['admin']['traffic'],
 			'required_resources' => 'customers',
-			'icon' => 'chart-bar',
+			'url' => 'index.php?module=AdminTraffic',
+			'icon' => 'chart-bar'
+/*
 			'elements' => array(
 				array(
-					'url' => 'index.php?module=AdminTraffic',
+					
 					'label' => $lng['admin']['customertraffic'],
 					'required_resources' => 'customers',
 					'icon' => 'chart-bar'
 				)
 			)
+*/
 		),
 		'server' => array(
 			'label' => $lng['admin']['server'],

@@ -6,19 +6,19 @@
 		{{ heading }}
 	</h4>
 	<p>
-		{{ alert_msg }}
+		{{ alert_msg|raw }}
 	</p>
 	{% if alert_info %}
 	<hr>
 	<p class="mb-0">
 	<pre>
-		{{ alert_info }}
+		{{ alert_info|raw }}
 	</pre>
 	</p>
 	{% endif %}
 	{% if redirect_link %}
-	<p class="mt-1 text-right">
-		<a href="{{ redirect_link }}" class="btn btn-{{ type }}">{{ lng('success.clickheretocontinue') }}</a>
+	<p class="mt-1 text-center">
+		<a href="{{ redirect_link }}" class="btn btn-{{ type }}">{% if type == 'danger' %}{{ lng('panel.back') }}{% else %}{{ lng('success.clickheretocontinue') }}{% endif %}</a>
 	</p>
 	{% endif %}
 </div>
