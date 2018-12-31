@@ -27,7 +27,7 @@ class CurrentUser
 	 */
 	public static function isAdmin()
 	{
-		return (self::getField('adminsession') == 1);
+		return (self::getField('adminsession') == 1 && self::getField('adminid') > 0);
 	}
 
 	/**

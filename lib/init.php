@@ -169,7 +169,7 @@ if (\Froxlor\CurrentUser::hasSession() == false && $module != 'login') {
 	exit();
 } elseif (\Froxlor\CurrentUser::hasSession() && ($module == 'login' && $view != 'su')) {
 	$module = "Index";
-	if (\Froxlor\CurrentUser::getField('adminsession') == 1) {
+	if (\Froxlor\CurrentUser::isAdmin()) {
 		$module = 'admin' . $module;
 	} else {
 		$module = 'customer' . $module;
@@ -217,7 +217,7 @@ if (\Froxlor\CurrentUser::hasSession()) {
 		$navigation = $navigation_data['admin'];
 	} else {
 		$navigation_data = \Froxlor\PhpHelper::loadConfigArrayDir(\Froxlor\Froxlor::getInstallDir() . '/lib/navigation/');
-		$area = \Froxlor\CurrentUser::getField('adminsession') == 1 ? 'admin' : 'customer';
+		$area = \Froxlor\CurrentUser::isAdmin() ? 'admin' : 'customer';
 		$navigation = $navigation_data[$area];
 	}
 	unset($navigation_data);
@@ -297,7 +297,8 @@ if (isset($s) && $s != "" && $nosession != 1) {
 	$userinfo_stmt = Database::prepare($query);
 	$userinfo = Database::pexecute_first($userinfo_stmt, $userinfo_data);
 
-	if ((($userinfo['adminsession'] == '1' && AREA == 'admin' && isset($userinfo['adminid'])) || ($userinfo['adminsession'] == '0' && (AREA == 'customer' || AREA == 'login') && isset($userinfo['customerid']))) && (! isset($userinfo['deactivated']) || $userinfo['deactivated'] != '1')) {
+	if ((($userinfo[
+'adminsession'] == '1' && AREA == 'admin' && isset($userinfo['adminid'])) || ($userinfo['adminsession'] == '0' && (AREA == 'customer' || AREA == 'login') && isset($userinfo['customerid']))) && (! isset($userinfo['deactivated']) || $userinfo['deactivated'] != '1')) {
 		$upd_stmt = Database::prepare("
 			UPDATE `" . TABLE_PANEL_SESSIONS . "` SET
 			`lastactivity` = :lastactive

@@ -28,7 +28,7 @@
 		<ul class="navbar-nav navbar-right">
 			<li class="nav-item text-nowrap"><a
 				class="btn btn-danger btn-sm"
-				href="index.php?module={% if call_static('\\Froxlor\\CurrentUser', 'getField', ['adminsession']) == 1 %}Admin{% else %}Customer{% endif %}Index&view=logout"><i
+				href="index.php?module={% if call_static('\\Froxlor\\CurrentUser', 'isAdmin') %}Admin{% else %}Customer{% endif %}Index&view=logout"><i
 					class="fas fa-power-off"></i> Logout</a></li>
 		</ul>
 	</div>

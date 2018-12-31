@@ -1,6 +1,6 @@
 <li class="nav-item"><a
 	class="nav-link {% if module[-5:]|lower == 'index' %}active" href="#"
-	{% else %}" href="index.php?module={% if call_static('\\Froxlor\\CurrentUser', 'getField', ['adminsession']) == 1 %}Admin{% else %}Customer{% endif %}Index"
+	{% else %}" href="index.php?module={% if call_static('\\Froxlor\\CurrentUser', 'isAdmin') %}Admin{% else %}Customer{% endif %}Index"
 	{% endif %}> <i class="fas fa-tachometer-alt"></i> Dashboard
 </a></li>
 {% for box in nav_items %}
