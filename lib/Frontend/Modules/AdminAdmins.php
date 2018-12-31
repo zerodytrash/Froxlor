@@ -125,6 +125,7 @@ class AdminAdmins extends FeModule
 		$admincount = $numrows_admins;
 		eval("echo \"" . \Froxlor\UI\Template::getTemplate("admins/admins") . "\";");
 		*/
+		\Froxlor\PhpHelper::sortListBy($result['list'], 'loginname');
 		
 		\Froxlor\Frontend\UI::TwigBuffer('admin/admins/index.html.twig', array(
 			'page_title' => $this->lng['admin']['admins'],

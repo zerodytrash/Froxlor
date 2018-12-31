@@ -173,7 +173,8 @@ class AdminCustomers extends FeModule
 		$customercount = $num_rows;
 		eval("echo \"" . \Froxlor\UI\Template::getTemplate("customers/customers") . "\";");
 		*/
-		
+		\Froxlor\PhpHelper::sortListBy($result['list'], 'loginname');
+
 		\Froxlor\Frontend\UI::TwigBuffer('admin/customers/index.html.twig', array(
 			'page_title' => $this->lng['panel']['customers'],
 			'accounts' => $result
