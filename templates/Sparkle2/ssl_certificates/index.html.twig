@@ -1,0 +1,56 @@
+{% extends "Sparkle2/userarea.html.twig" %}
+
+{% block content %}
+<div class="card">
+	<div class="card-header">
+		<ul class="nav nav-tabs card-header-tabs" id="subnav-tab"
+			role="tablist">
+			<li class="nav-item"><a class="nav-link active"
+				id="subnav-crt-tab" data-toggle="tab" href="#tab-crt" role="tab"
+				aria-controls="subnav-crt" aria-selected="true">{{ lng('domains.ssl_certificates') }}&nbsp;<span
+					class="badge badge-pill badge-secondary">{{ certificates.count }}</span></a></li>
+		</ul>
+	</div>
+	<div class="card-body tab-content" id="subnav-tabContent">
+		<div class="tab-pane fade show active" id="tab-crt" role="tabpanel"
+			aria-labelledby="subnav-crt-tab">
+			<div class="card">
+				<div class="card-body" id="certificates-list">
+					{% import "Sparkle2/table-listing.html.twig" as t %}
+					{% set content %}
+					{% for cert in certificates.list %}
+					<tr
+						class="d-flex{% if cert.isValid == false %}bg-danger{% endif %}">
+						<td class="col-sm-3"><a href="https://{{ cert.domain }}"
+							rel="external">{{ cert.domain }}</a> {% if call_static('\\Froxlor\\CurrentUser', 'isAdmin') and cert.domainid > 0 and cert.loginname is not empty %}
+							(<a
+							href="index.php?module=AdminCustomers&view=su&id={{ cert.customerid }}"
+							rel="external">{{ cert.loginname }}</a>) {% endif %}</td>
+						<td class="col-sm-3">{{ cert.data.subject.CN }} {% for san in cert.sanlist %}<br>
+							{{ san }} {% endfor %}</td>
+						<td class="col-sm-3">{{ cert.data.issuer['O'] }}</td>
+						<td class="col-sm-1">{{ cert.data['validFrom_time_t']|date('d.m.Y H:i') }}</td>
+						<td class="col-sm-1">{% if cert.isValid == false %}<strong
+							class="text-danger">{% endif %} {{ cert.data['validTo_time_t']|date('d.m.Y H:i') }}
+								{% if cert.isValid == false %}</strong> {% endif %}</td>
+						<td class="col-sm-1 text-right"><a href="index.php?module=SslCertificates&view=delete&id={{ cert.id }}"
+							class="text-danger delete-btn"
+							data-container="body" data-toggle="tooltip" data-placement="left"
+							title="{{ lng('panel.delete') }}"><i class="fas fa-trash-alt"></i></a></td>
+					</tr>
+					{% endfor %}
+					{% endset %}
+					{% if certificates.count > 0 %}
+					{{ t.listing("certificates-listing", [lng('domains.domainname'), "Certificate for", "Issuer", "Valid from", "Valid until", "|Optionen"], content, [3,3,3,1,1,1]) }}
+					{% else %}
+					<div class="alert alert-info" role="alert">
+						{{ lng('domains.no_ssl_certificates') }}
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+{% endblock %}

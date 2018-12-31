@@ -178,29 +178,29 @@ return array(
 					'icon' => 'user-circle'
 				),
 				array(
-					'url' => 'admin_index.php?page=change_password',
+					'url' => 'index.php?module=AdminIndex&view=change_password',
 					'label' => $lng['menue']['main']['changepassword'],
 					'icon' => 'user-lock'
 				),
 				array(
-					'url' => 'admin_index.php?page=change_language',
+					'url' => 'index.php?module=AdminIndex&view=change_language',
 					'label' => $lng['menue']['main']['changelanguage'],
 					'icon' => 'flag'
 				),
 				array(
-					'url' => 'admin_index.php?page=change_theme',
+					'url' => 'index.php?module=AdminIndex&view=change_theme',
 					'label' => $lng['menue']['main']['changetheme'],
 					'show_element' => (\Froxlor\Settings::Get('panel.allow_theme_change_admin') == true),
 					'icon' => 'images'
 				),
 				array(
-					'url' => 'admin_index.php?page=apikeys',
+					'url' => 'index.php?module=ApiKeys',
 					'label' => $lng['menue']['main']['apikeys'],
 					'show_element' => (\Froxlor\Settings::Get('api.enabled') == true),
 					'icon' => 'key'
 				),
 				array(
-					'url' => 'admin_index.php?page=apihelp',
+					'url' => 'index.php?module=ApiKeys&view=apihelp',
 					'label' => $lng['menue']['main']['apihelp'],
 					'show_element' => (\Froxlor\Settings::Get('api.enabled') == true),
 					'icon' => 'question-circle'
@@ -213,7 +213,7 @@ return array(
 			'icon' => 'boxes',
 			'elements' => array(
 				array(
-					'url' => 'admin_customers.php?page=customers',
+					'url' => 'index.php?module=AdminCustomers',
 					'label' => $lng['panel']['customers'],
 					'required_resources' => 'customers',
 					'icon' => 'users'
@@ -225,31 +225,31 @@ return array(
 					'icon' => 'user-shield'
 				),
 				array(
-					'url' => 'admin_domains.php?page=domains',
+					'url' => 'index.php?module=AdminDomains',
 					'label' => $lng['admin']['domains'],
 					'required_resources' => 'domains',
 					'icon' => 'globe'
 				),
 				array(
-					'url' => 'admin_domains.php?page=sslcertificates',
+					'url' => 'index.php?module=SslCertificates',
 					'label' => $lng['domains']['ssl_certificates'],
 					'required_resources' => 'domains',
 					'icon' => 'certificate'
 				),
 				array(
-					'url' => 'admin_ipsandports.php?page=ipsandports',
+					'url' => 'index.php?module=AdminIpsandports',
 					'label' => $lng['admin']['ipsandports']['ipsandports'],
 					'required_resources' => 'change_serversettings',
 					'icon' => 'network-wired'
 				),
 				array(
-					'url' => 'admin_plans.php?page=overview',
+					'url' => 'index.php?module=AdminPlans',
 					'label' => $lng['admin']['plans']['plans'],
 					'required_resources' => 'customers',
 					'icon' => 'sticky-note'
 				),
 				array(
-					'url' => 'admin_settings.php?page=updatecounters',
+					'url' => 'index.php?module=AdminSettings&view=updatecounters',
 					'label' => $lng['admin']['updatecounters'],
 					'required_resources' => 'change_serversettings',
 					'icon' => 'sync'
@@ -262,7 +262,7 @@ return array(
 			'icon' => 'chart-bar',
 			'elements' => array(
 				array(
-					'url' => 'admin_traffic.php?page=customers',
+					'url' => 'index.php?module=AdminTraffic',
 					'label' => $lng['admin']['customertraffic'],
 					'required_resources' => 'customers',
 					'icon' => 'chart-bar'
@@ -275,45 +275,45 @@ return array(
 			'icon' => 'toolbox',
 			'elements' => array(
 				array(
-					'url' => 'admin_configfiles.php?page=configfiles',
+					'url' => 'index.php?module=AdminConfigfiles',
 					'label' => $lng['admin']['configfiles']['serverconfiguration'],
 					'required_resources' => 'change_serversettings',
 					'icon' => 'cogs'
 				),
 				array(
-					'url' => 'admin_settings.php?page=overview',
+					'url' => 'index.php?module=AdminSettings',
 					'label' => $lng['admin']['serversettings'],
 					'required_resources' => 'change_serversettings',
 					'icon' => 'wrench'
 				),
 				array(
-					'url' => 'admin_cronjobs.php?page=overview',
+					'url' => 'index.php?module=AdminCronjobs',
 					'label' => $lng['admin']['cron']['cronsettings'],
 					'required_resources' => 'change_serversettings',
 					'icon' => 'redo'
 				),
 				array(
-					'url' => 'admin_logger.php?page=log',
+					'url' => 'index.php?module=AdminLogger',
 					'label' => $lng['menue']['logger']['logger'],
 					'required_resources' => 'change_serversettings',
 					'show_element' => (\Froxlor\Settings::Get('logger.enabled') == true),
 					'icon' => 'eye'
 				),
 				array(
-					'url' => 'admin_settings.php?page=rebuildconfigs',
+					'url' => 'index.php?module=AdminSettings&view=rebuildconfigs',
 					'label' => $lng['admin']['rebuildconf'],
 					'required_resources' => 'change_serversettings',
 					'icon' => 'play'
 				),
 				array(
-					'url' => 'admin_autoupdate.php?page=overview',
+					'url' => 'index.php?module=AdminAutoupdate',
 					'label' => $lng['admin']['autoupdate'],
 					'required_resources' => 'change_serversettings',
 					'show_element' => extension_loaded('zip'),
 					'icon' => 'arrow-circle-down'
 				),
 				array(
-					'url' => 'admin_settings.php?page=wipecleartextmailpws',
+					'url' => 'index.php?module=AdminSettings&view=wipecleartextmailpws',
 					'label' => $lng['admin']['wipecleartextmailpwd'],
 					'required_resources' => 'change_serversettings',
 					'show_element' => (\Froxlor\Settings::Get('system.mailpwcleartext') == true),
@@ -327,33 +327,33 @@ return array(
 			'icon' => 'server',
 			'elements' => array(
 				array(
-					'url' => 'admin_phpsettings.php?page=overview',
+					'url' => 'index.php?module=AdminPhpSettings',
 					'label' => $lng['menue']['phpsettings']['maintitle'],
 					'show_element' => (\Froxlor\Settings::Get('system.mod_fcgid') == true || \Froxlor\Settings::Get('phpfpm.enabled') == true),
 					'icon' => 'cogs'
 				),
 				array(
-					'url' => 'admin_phpsettings.php?page=fpmdaemons',
+					'url' => 'index.php?module=AdminPhpSettings&view=fpmdaemons',
 					'label' => $lng['menue']['phpsettings']['fpmdaemons'],
 					'required_resources' => 'change_serversettings',
 					'show_element' => \Froxlor\Settings::Get('phpfpm.enabled') == true,
 					'icon' => 'cogs'
 				),
 				array(
-					'url' => 'admin_settings.php?page=phpinfo',
+					'url' => 'index.php?module=AdminSettings&view=phpinfo',
 					'label' => $lng['admin']['phpinfo'],
 					'required_resources' => 'change_serversettings',
 					'icon' => 'info-circle'
 				),
 				array(
-					'url' => 'admin_apcuinfo.php?page=showinfo',
+					'url' => 'index.php?module=AdminApcuInfo',
 					'label' => $lng['admin']['apcuinfo'],
 					'required_resources' => 'change_serversettings',
 					'show_element' => (function_exists('apcu_cache_info') === true),
 					'icon' => 'info-circle'
 				),
 				array(
-					'url' => 'admin_opcacheinfo.php?page=showinfo',
+					'url' => 'index.php?module=AdminOpcacheInfo',
 					'label' => $lng['admin']['opcacheinfo'],
 					'required_resources' => 'change_serversettings',
 					'show_element' => (function_exists('opcache_get_configuration') === true),
@@ -366,23 +366,23 @@ return array(
 			'icon' => 'asterisk',
 			'elements' => array(
 				array(
-					'url' => 'admin_settings.php?page=integritycheck',
+					'url' => 'index.php?module=AdminSettings&view=integritycheck',
 					'label' => $lng['admin']['integritycheck'],
 					'required_resources' => 'change_serversettings',
 					'icon' => 'check-circle'
 				),
 				array(
-					'url' => 'admin_templates.php?page=email',
+					'url' => 'index.php?module=AdminTemplates',
 					'label' => $lng['admin']['templates']['email'],
 					'icon' => 'user-edit'
 				),
 				array(
-					'url' => 'admin_message.php?page=message',
+					'url' => 'index.php?module=AdminMessage',
 					'label' => $lng['admin']['message'],
 					'icon' => 'envelope'
 				),
 				array(
-					'url' => 'admin_settings.php?page=testmail',
+					'url' => 'index.php?module=AdminSettings&view=testmail',
 					'label' => $lng['admin']['testmail'],
 					'icon' => 'clipboard-check'
 				)

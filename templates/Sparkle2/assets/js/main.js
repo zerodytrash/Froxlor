@@ -1,5 +1,8 @@
 $(document).ready(function() {
 
+	// make rel="external" links open in a new window
+	$("a[rel='external']").attr('target', '_blank');
+
 	// Load Newsfeed
 	var role = "";
 	if (typeof $("#newsfeed").data("role") !== "undefined") {

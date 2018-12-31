@@ -23,6 +23,15 @@ class CurrentUser
 
 	/**
 	 *
+	 * @return bool
+	 */
+	public static function isAdmin()
+	{
+		return (self::getField('adminsession') == 1);
+	}
+
+	/**
+	 *
 	 * @param string $index
 	 *
 	 * @return string|array

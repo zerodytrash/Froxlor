@@ -127,12 +127,12 @@ class Response
 	}
 
 	/**
-	 * Prints one ore more errormessages on screen
+	 * Prints one ore more successmessages on screen
 	 *
 	 * @param array $success_message
-	 *        	Errormessages
+	 *        	successmessages
 	 * @param string $replacer
-	 *        	A %s in the errormessage will be replaced by this string.
+	 *        	A %s in the successmessage will be replaced by this string.
 	 * @param array $params
 	 * @param bool $throw_exception
 	 *
@@ -140,8 +140,6 @@ class Response
 	 */
 	public static function standard_success($success_message = '', $replacer = '', $params = array(), $throw_exception = false)
 	{
-		global $s, $header, $footer, $lng, $theme;
-
 		if (isset($lng['success'][$success_message])) {
 			$success_message = strtr($lng['success'][$success_message], array(
 				'%s' => htmlentities($replacer)
@@ -166,6 +164,23 @@ class Response
 		}
 
 		eval("echo \"" . Template::getTemplate('misc/success', '1') . "\";");
+		exit();
+	}
+
+	public static function dynamic_success($message, $title = null)
+	{
+		if (\Froxlor\CurrentUser::hasSession()) {
+			$alerttpl = 'misc/alert.html.twig';
+		} else {
+			$alerttpl = 'misc/alert_nosession.html.twig';
+		}
+		\Froxlor\Frontend\UI::TwigBuffer($alerttpl, array(
+			'page_title' => $title,
+			'type' => "success",
+			'heading' => $title,
+			'alert_msg' => $message
+		));
+		\Froxlor\Frontend\UI::TwigOutputBuffer();
 		exit();
 	}
 }

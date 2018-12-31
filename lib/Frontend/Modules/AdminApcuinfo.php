@@ -48,7 +48,7 @@ if ($page == 'showinfo') {
 	$cache = apcu_cache_info();
 	$mem = apcu_sma_info();
 	$time = time();
-	$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "viewed admin_apcuinfo");
+	$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "viewed AdminApcuinfo");
 
 	$passtime = $time - $cache['start_time'] > 0 ? $time - $cache['start_time'] : 1; // zero division
 	$mem_size = $mem['num_seg'] * $mem['seg_size'];

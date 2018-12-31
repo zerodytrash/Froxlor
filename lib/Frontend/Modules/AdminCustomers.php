@@ -31,8 +31,6 @@ class AdminCustomers extends FeModule
 			// no customers allowed
 			return;
 		}
-
-		\Froxlor\FroxlorLogger::getLog()->addNotice("viewed AdminCustomers");
 		
 		try {
 			$json_result = Customers::getLocal(\Froxlor\CurrentUser::getData())->listing();
