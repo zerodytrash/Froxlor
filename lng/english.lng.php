@@ -2059,3 +2059,4 @@ $lng['admin']['uptime'] = 'Uptime';
 $lng['admin']['mydata'] = 'My data';
 $lng['panel']['current_user'] = 'Current user';
 $lng['question']['update_now'] = 'Would you like to update now?';
+$lng['error']['noaccess'] = 'Access to "%s" denied';

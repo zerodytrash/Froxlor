@@ -69,6 +69,8 @@ class SslCertificates extends FeModule
 			$result['list'][$index] = $cert;
 		}
 
+		\Froxlor\PhpHelper::sortListBy($result['list'], 'domain');
+
 		\Froxlor\Frontend\UI::TwigBuffer('ssl_certificates/index.html.twig', array(
 			'page_title' => $this->lng['domains']['ssl_certificates'],
 			'certificates' => $result

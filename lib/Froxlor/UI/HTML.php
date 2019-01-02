@@ -41,7 +41,7 @@ class HTML
 			$value = htmlspecialchars($value);
 		}
 
-		$checkbox = '<label class="nobr"><input type="checkbox" name="' . $name . '" value="' . $value . '" ' . $checked . ' />&nbsp;' . $title . '</label>';
+		$checkbox = '<input type="checkbox" name="' . $name . '" value="' . $value . '" ' . $checked . ' />&nbsp;' . $title;
 
 		if ($break) {
 			$checkbox .= '<br />';

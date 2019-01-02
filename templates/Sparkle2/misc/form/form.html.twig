@@ -1,0 +1,53 @@
+{% macro form(form_data, action) %}
+
+<form action="{{ action|default("") }}" method="post"
+	enctype="application/x-www-form-urlencoded" class="form">
+	{% for sections in form_data %}
+	{% for section in sections %}
+	<div class="card mb-2">
+		<div class="card-header">
+			{{ section.title }}
+		</div>
+		<div class="card-body">
+			{% for element in section.elements %}
+			<div class="form-group form-row">
+				<label for="{{ element.fieldname }}" class="col-sm-5 col-form-label">{{ element.label|raw }}
+					{% if element.mandatory %} {{ element.mandatory|raw }} {% endif %}
+					{% if element.desc %}<br> <small>{{ element.desc|raw }}</small>
+				{% endif %}</label>
+				{% if element.type == 'checkbox' %}
+				{{ element.data_field|raw }}
+				{% else %}
+				<div
+					class="col-sm-7{% if element.style %} {{ element.style }}{% endif %}">
+					{{ element.data_field|raw }}
+				</div>
+				{% endif %}
+			</div>
+			{% endfor %}
+		</div>
+		<!-- /card-body -->
+		{% if not nobuttons|default(false) %}
+		<div class="card-footer">
+			<div class="form-group form-row mb-0">
+				<div class="col-sm-12 text-right">
+					<button type="reset" class="btn btn-danger">
+						<i class="fas fa-times"></i>&nbsp;
+						{{ lng('panel.cancel') }}
+					</button>
+					<button type="submit" class="btn btn-success">
+						<i class="fas fa-save"></i>&nbsp;
+						{{ lng('panel.save') }}
+					</button>
+				</div>
+			</div>
+		</div>
+		<!-- /card-footer -->
+		{% endif %}
+	</div>
+	<!-- /card -->
+	{% endfor %}
+	{% endfor %}
+</form>
+
+{% endmacro %}

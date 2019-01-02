@@ -112,8 +112,8 @@ return array(
 						'label' => $lng['admin']['domain_hsts_maxage']['title'],
 						'desc' => $lng['admin']['domain_hsts_maxage']['description'],
 						'type' => 'int',
-						'int_min' => 0,
-						'int_max' => 94608000, // 3-years
+						'min' => 0,
+						'max' => 94608000, // 3-years
 						'value' => 0
 					),
 					'hsts_sub' => array(

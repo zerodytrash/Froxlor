@@ -1701,3 +1701,5 @@ $lng['panel']['ihave_configured'] = 'Ich habe die Dienste konfiguriert';
 $lng['panel']['system_is_configured'] = 'Das System ist bereits konfiguriert';
 $lng['panel']['settings_before_configuration'] = 'Stelle sicher, dass die Einstellungen angepasst wurden bevor die Dienste konfiguriert werden.';
 $lng['panel']['alternative_cmdline_config'] = 'Alternativ, führe den folgenden Befehl als root-Benutzer auf der Shell aus, um die Dienste automatisch zu konfigurieren.';
+$lng['error']['noaccess'] = 'Zugriff auf "%s" nicht erlaubt';
+

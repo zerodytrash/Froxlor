@@ -28,8 +28,8 @@ class AdminCustomers extends FeModule
 	public function overview()
 	{
 		if (\Froxlor\CurrentUser::getField('customers') > 0) {
-			// no customers allowed
-			return;
+			// no customers - not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __CLASS__ . '::' . __METHOD__);
 		}
 		
 		try {

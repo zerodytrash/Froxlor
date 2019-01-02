@@ -24,7 +24,11 @@ class AdminUpdates extends FeModule
 
 	public function overview()
 	{
-
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __CLASS__ . '::' . __METHOD__);
+		}
+		
 		/**
 		 * this is a dirty hack but syscp 1.4.2.1 does not
 		 * have any version/dbversion in the database (don't know why)

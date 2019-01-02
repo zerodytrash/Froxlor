@@ -29,31 +29,27 @@ class HtmlForm
 
 	public static function genHTMLForm($data = array())
 	{
-		global $lng, $theme;
-		$nob = false;
-
-		self::$form = '';
+		self::$form = array();
 
 		foreach ($data as $fdata) {
 			$sections = $fdata['sections'];
 
-			foreach ($sections as $section) {
-				/*
-				 * here be section title & image
-				 */
-				$title = $section['title'];
-				$image = $section['image'];
+			foreach ($sections as $sindex => $section) {
 
 				if (isset($section['visible']) && $section['visible'] === false) {
 					continue;
 				}
 
-				if (! isset($section['nobuttons']) || $section['nobuttons'] == false) {
-					eval("self::\$form .= \"" . Template::getTemplate("misc/form/table_section", "1") . "\";");
-				} else {
-					$nob = true;
+				if (! isset(self::$form['sections'])) {
+					self::$form['sections'] = array();
 				}
+				self::$form['sections'][$sindex] = array(
+					'title' => $section['title'],
+					'nobuttons' => isset($section['nobuttons']) ? $section['nobuttons'] : false,
+					'elements' => array()
+				);
 
+				$element = array();
 				$nexto = false;
 				foreach ($section['fields'] as $fieldname => $fielddata) {
 					if (isset($fielddata['visible']) && $fielddata['visible'] === false) {
@@ -61,34 +57,34 @@ class HtmlForm
 					}
 
 					if ($nexto === false || (isset($fielddata['next_to']) && $nexto['field'] != $fielddata['next_to'])) {
-						$label = $fielddata['label'];
-						$desc = (isset($fielddata['desc']) ? $fielddata['desc'] : '');
-						$style = (isset($fielddata['style']) ? ' class="' . $fielddata['style'] . '"' : '');
-						$mandatory = self::getMandatoryFlag($fielddata);
-						$data_field = self::parseDataField($fieldname, $fielddata);
+						$element[$fieldname] = array(
+							'label' => $fielddata['label'],
+							'desc' => (isset($fielddata['desc']) ? $fielddata['desc'] : ''),
+							'style' => (isset($fielddata['style']) ? ' class="' . $fielddata['style'] . '"' : ''),
+							'mandatory' => self::getMandatoryFlag($fielddata),
+							'data_field' => self::parseDataField($fieldname, $fielddata),
+							'type' => $fielddata['type'],
+							'fieldname' => $fieldname
+						);
+
 						if (isset($fielddata['has_nextto'])) {
 							$nexto = array(
 								'field' => $fieldname
 							);
-							$data_field .= '{NEXTTOFIELD_' . $fieldname . '}';
+							$element[$fieldname]['data_filed'] .= '{NEXTTOFIELD_' . $fieldname . '}';
 						} else {
 							$nexto = false;
 						}
-						eval("self::\$form .= \"" . Template::getTemplate("misc/form/table_row", "1") . "\";");
+						self::$form['sections'][$sindex]['elements'][$fieldname] = $element[$fieldname];
 					} else {
 						$data_field = self::parseDataField($fieldname, $fielddata);
 						$data_field = str_replace("\t", "", $data_field);
 						$data_field = $fielddata['next_to_prefix'] . $data_field;
-						self::$form = str_replace('{NEXTTOFIELD_' . $fielddata['next_to'] . '}', $data_field, self::$form);
+						self::$form['sections'][$sindex]['elements'][$fielddata['next_to']] = str_replace('{NEXTTOFIELD_' . $fielddata['next_to'] . '}', $data_field, self::$form['sections'][$sindex]['elements'][$fielddata['next_to']]);
 						$nexto = false;
 					}
 				}
 			}
-		}
-
-		// add save/reset buttons at the end of the form
-		if (! $nob) {
-			eval("self::\$form .= \"" . Template::getTemplate("misc/form/table_end", "1") . "\";");
 		}
 
 		return self::$form;
@@ -136,16 +132,31 @@ class HtmlForm
 	private static function getMandatoryFlag($data = array())
 	{
 		if (isset($data['mandatory'])) {
-			return '&nbsp;<span class="red">*</span>';
+			return '&nbsp;<span class="text-danger">*</span>';
 		} elseif (isset($data['mandatory_ex'])) {
-			return '&nbsp;<span class="red">**</span>';
+			return '&nbsp;<span class="text-danger">**</span>';
 		}
 		return '';
 	}
 
 	private static function textBox($fieldname = '', $data = array(), $type = 'text', $unlimited = false)
 	{
-		$return = '';
+		// add support to save reloaded forms
+		$value = '';
+		if (isset($data['value'])) {
+			$value = $data['value'];
+		} elseif (isset($_SESSION['requestData'][$fieldname])) {
+			$value = $_SESSION['requestData'][$fieldname];
+		}
+		unset($data['value']);
+
+		$ulfield = ($unlimited == true ? $data['ul_field'] : '');
+		unset($data['ul_field']);
+		if (isset($data['display']) && $data['display'] != '') {
+			$ulfield = $data['display'];
+			unset($data['display']);
+		}
+
 		$extras = '';
 		if (isset($data['maxlength'])) {
 			$extras .= ' maxlength="' . $data['maxlength'] . '"';
@@ -156,28 +167,39 @@ class HtmlForm
 		if (isset($data['autocomplete'])) {
 			$extras .= ' autocomplete="' . $data['autocomplete'] . '"';
 		}
-
-		// add support to save reloaded forms
-		if (isset($data['value'])) {
-			$value = $data['value'];
-		} elseif (isset($_SESSION['requestData'][$fieldname])) {
-			$value = $_SESSION['requestData'][$fieldname];
-		} else {
-			$value = '';
+		if (isset($data['min'])) {
+			$extras .= ' min="' . $data['min'] . '"';
+		}
+		if (isset($data['max'])) {
+			$extras .= ' max="' . $data['max'] . '"';
 		}
 
-		$ulfield = ($unlimited == true ? '&nbsp;' . $data['ul_field'] : '');
-		if (isset($data['display']) && $data['display'] != '') {
-			$ulfield = '<strong>' . $data['display'] . '</strong>';
-		}
-
-		eval("\$return = \"" . Template::getTemplate("misc/form/input_text", "1") . "\";");
-		return $return;
+		$tpl = self::getFormTpl('input');
+		return \Froxlor\Frontend\UI::Twig()->render($tpl, array(
+			'fieldname' => $fieldname,
+			'type' => $type,
+			'extras' => $extras,
+			'value' => $value,
+			'ulfield' => $ulfield
+		));
+	}
+	
+	private static function int($fieldname = '', $data = array())
+	{
+		return self::textBox($fieldname, $data, 'number');
 	}
 
 	private static function textArea($fieldname = '', $data = array())
 	{
-		$return = '';
+		// add support to save reloaded forms
+		$value = '';
+		if (isset($data['value'])) {
+			$value = $data['value'];
+		} elseif (isset($_SESSION['requestData'][$fieldname])) {
+			$value = $_SESSION['requestData'][$fieldname];
+		}
+		trim($value);
+
 		$extras = '';
 		if (isset($data['cols'])) {
 			$extras .= ' cols="' . $data['cols'] . '"';
@@ -186,18 +208,12 @@ class HtmlForm
 			$extras .= ' rows="' . $data['rows'] . '"';
 		}
 
-		// add support to save reloaded forms
-		if (isset($data['value'])) {
-			$value = $data['value'];
-		} elseif (isset($_SESSION['requestData'][$fieldname])) {
-			$value = $_SESSION['requestData'][$fieldname];
-		} else {
-			$value = '';
-		}
-		trim($value);
-
-		eval("\$return = \"" . Template::getTemplate("misc/form/input_textarea", "1") . "\";");
-		return $return;
+		$tpl = self::getFormTpl('textarea');
+		return \Froxlor\Frontend\UI::Twig()->render($tpl, array(
+			'fieldname' => $fieldname,
+			'extras' => $extras,
+			'value' => $value
+		));
 	}
 
 	private static function yesnoBox($data = array())
@@ -221,11 +237,18 @@ class HtmlForm
 			$select_var = '';
 		}
 
-		return '<select
-				id="' . $fieldname . '"
-						name="' . $fieldname . '"
-								' . (isset($data['class']) ? ' class="' . $data['class'] . '" ' : '') . '
-										>' . $select_var . '</select>';
+		$extras = '';
+		if (isset($data['multiple'])) {
+			$extras .= ' multiple';
+		}
+
+		$tpl = self::getFormTpl('select');
+		return \Froxlor\Frontend\UI::Twig()->render($tpl, array(
+			'fieldname' => $fieldname,
+			'select_var' => $select_var,
+			'extras' => $extras,
+			'class' => isset($data['class']) ? $data['class'] : ""
+		));
 	}
 
 	/**
@@ -275,8 +298,8 @@ class HtmlForm
 
 		// will contain the output
 		$output = "";
+		$tpl = self::getFormTpl('checkbox');
 		foreach ($data['values'] as $val) {
-			$key = $val['label'];
 			// is this box checked?
 			$isChecked = '';
 			if (is_array($checked) && count($checked) > 0) {
@@ -287,12 +310,14 @@ class HtmlForm
 					}
 				}
 			}
-			$output .= '<label>';
-			if (empty($isArray)) {
-				$output .= '<input type="hidden" name="' . $fieldname . '" value="0" />';
-			}
-			$output .= '<input type="checkbox" name="' . $fieldname . $isArray . '" value="' . $val['value'] . '" ' . $isChecked . '/>';
-			$output .= $key . '</label>';
+
+			$output .= \Froxlor\Frontend\UI::Twig()->render($tpl, array(
+				'fieldname' => $fieldname . $isArray,
+				'need_default' => empty($isArray),
+				'value' => $val['value'],
+				'checked' => $isChecked,
+				'label' => $val['label']
+			));
 		}
 
 		return $output;
@@ -323,29 +348,12 @@ class HtmlForm
 		return $return;
 	}
 
-	private static function int($fieldname = '', $data = array())
+	private static function getFormTpl($form_element = '')
 	{
-		$return = '';
-		$extras = '';
-		if (isset($data['int_min'])) {
-			$extras .= ' min="' . $data['int_min'] . '"';
+		$tpl = \Froxlor\Frontend\UI::getTheme() . '/misc/form/elements/' . $form_element . '.html.twig';
+		if (! file_exists(\Froxlor\Froxlor::getInstallDir() . '/templates/' . $tpl)) {
+			$tpl = 'Sparkle2/misc/form/elements/' . $form_element . '.html.twig';
 		}
-		if (isset($data['int_max'])) {
-			$extras .= ' max="' . $data['int_max'] . '"';
-		}
-
-		// add support to save reloaded forms
-		if (isset($data['value'])) {
-			$value = $data['value'];
-		} elseif (isset($_SESSION['requestData'][$fieldname])) {
-			$value = $_SESSION['requestData'][$fieldname];
-		} else {
-			$value = '';
-		}
-
-		$type = 'number';
-		$ulfield = '';
-		eval("\$return = \"" . Template::getTemplate("misc/form/input_text", "1") . "\";");
-		return $return;
+		return $tpl;
 	}
 }
