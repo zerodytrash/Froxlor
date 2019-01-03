@@ -1,5 +1,5 @@
-<li class="nav-item"><a
-	class="nav-link {% if module[-5:]|lower == 'index' %}disabled" href="#"
+<li class="nav-item d-block"><a
+	class="nav-link {% if module[-5:]|lower == 'index' %}active" href="#"
 	{% else %}" href="index.php?module={% if call_static('\\Froxlor\\CurrentUser', 'isAdmin') %}Admin{% else %}Customer{% endif %}Index"
 	{% endif %}> <i class="fas fa-tachometer-alt"></i> Dashboard
 </a></li>
@@ -10,7 +10,7 @@
     ((call_static('\\Froxlor\\CurrentUser', 'getField', [box.required_resources]) > 0 or call_static('\\Froxlor\\CurrentUser', 'getField', [box.required_resources]) == -1)
     )) %}
 {% if box.elements|length > 0 %}
-<li class="nav-item dropdown"><a
+<li class="nav-item dropdown d-block"><a
 	class="nav-link dropdown-toggle{% if module[modlen:]|lower == mod %} active{% endif %}"
 	href="#" id="navbarDropdown{{ mod }}" data-toggle="dropdown"
 	aria-haspopup="true" aria-expanded="false"><i
@@ -32,8 +32,8 @@
 		{% endfor %}
 	</div></li>
 {% elseif box.url is defined %}
-<li class="nav-item"><a
-	class="nav-link {% if module[modlen:]|lower == mod %}disabled" href="#"
+<li class="nav-item d-block"><a
+	class="nav-link {% if module[modlen:]|lower == mod %}active" href="#"
 	{% else %}" href="{{ box.url }}" {% endif %} {% if box.new_window %}
 	rel="external" {% endif %}> <i
 		class="fas fa-{% if box.icon is defined %}{{ box.icon }}{% else %}asterisk{% endif %}"></i>

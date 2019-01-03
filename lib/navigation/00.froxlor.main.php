@@ -169,7 +169,7 @@ return array(
 		)
 	),
 	'admin' => array(
-		'index' => array(
+		'mydata' => array(
 			'icon' => 'user',
 			'label' => $lng['admin']['mydata'],
 			'elements' => array(

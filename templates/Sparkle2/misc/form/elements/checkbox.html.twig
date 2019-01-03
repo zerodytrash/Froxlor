@@ -3,5 +3,5 @@
     <input type="hidden" name="{{ fieldname }}" value="0" />
     {% endif %}
     <input class="form-check-input" type="checkbox" value="{{ value }}" name="{{ fieldname }}"{{ checked }}>
-    <label class="form-check-label" for="{{ fieldname }}">{{ label }}</label>
+    <label class="form-check-label" for="{{ fieldname }}">{{ label|raw }}</label>
 </div>

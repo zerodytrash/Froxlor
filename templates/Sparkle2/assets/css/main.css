@@ -45,7 +45,7 @@ body {
 	border-bottom-left-radius: 0;
 }
 
-.form-signin input[type="password"] {
+.form-signin input[type="password"], .form-signin input[type="email"] {
 	margin-bottom: 10px;
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
@@ -56,6 +56,10 @@ body {
  */
 [role="main"] {
 	padding-top: 12px; /* Space for navbar */
+}
+
+.form-signin img, .topper img {
+	height: 80px;
 }
 
 /*
@@ -73,6 +77,13 @@ body {
 	padding: .75rem 1rem;
 	border-width: 0;
 	border-radius: 0;
+}
+
+@media ( max-width : 991px) {
+	.navbar a, .navbar.btn {
+		font-size: 1.25rem;
+		text-align: center;
+	}
 }
 
 /*

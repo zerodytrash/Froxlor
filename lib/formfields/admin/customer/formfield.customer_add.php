@@ -16,23 +16,23 @@
  */
 return array(
 	'customer_add' => array(
-		'title' => $lng['admin']['customer_add'],
+		'title' => \Froxlor\Frontend\UI::getLng('admin.customer_add'),
 		'image' => 'icons/user_add.png',
 		'sections' => array(
 			'section_a' => array(
-				'title' => $lng['admin']['accountdata'],
+				'title' => \Froxlor\Frontend\UI::getLng('admin.accountdata'),
 				'image' => 'icons/user_add.png',
 				'fields' => array(
 					'new_loginname' => array(
-						'label' => $lng['login']['username'],
+						'label' => \Froxlor\Frontend\UI::getLng('login.username'),
 						'type' => 'text'
 					),
 					'createstdsubdomain' => array(
-						'label' => $lng['admin']['stdsubdomain_add'] . '?',
+						'label' => \Froxlor\Frontend\UI::getLng('admin.stdsubdomain_add') . '?',
 						'type' => 'checkbox',
 						'values' => array(
 							array(
-								'label' => $lng['panel']['yes'],
+								'label' => \Froxlor\Frontend\UI::getLng('panel.yes'),
 								'value' => '1'
 							)
 						),
@@ -41,11 +41,11 @@ return array(
 						)
 					),
 					'store_defaultindex' => array(
-						'label' => $lng['admin']['store_defaultindex'] . '?',
+						'label' => \Froxlor\Frontend\UI::getLng('admin.store_defaultindex') . '?',
 						'type' => 'checkbox',
 						'values' => array(
 							array(
-								'label' => $lng['panel']['yes'],
+								'label' => \Froxlor\Frontend\UI::getLng('panel.yes'),
 								'value' => '1'
 							)
 						),
@@ -54,22 +54,22 @@ return array(
 						)
 					),
 					'new_customer_password' => array(
-						'label' => $lng['login']['password'],
+						'label' => \Froxlor\Frontend\UI::getLng('login.password'),
 						'type' => 'password',
 						'autocomplete' => 'off'
 					),
 					'new_customer_password_suggestion' => array(
-						'label' => $lng['customer']['generated_pwd'],
+						'label' => \Froxlor\Frontend\UI::getLng('customer.generated_pwd'),
 						'type' => 'text',
 						'visible' => (\Froxlor\Settings::Get('panel.password_regex') == ''),
 						'value' => \Froxlor\System\Crypt::generatePassword()
 					),
 					'sendpassword' => array(
-						'label' => $lng['admin']['sendpassword'],
+						'label' => \Froxlor\Frontend\UI::getLng('admin.sendpassword'),
 						'type' => 'checkbox',
 						'values' => array(
 							array(
-								'label' => $lng['panel']['yes'],
+								'label' => \Froxlor\Frontend\UI::getLng('panel.yes'),
 								'value' => '1'
 							)
 						),
@@ -78,79 +78,79 @@ return array(
 						)
 					),
 					'def_language' => array(
-						'label' => $lng['login']['language'],
+						'label' => \Froxlor\Frontend\UI::getLng('login.language'),
 						'type' => 'select',
 						'select_var' => $language_options
 					)
 				)
 			),
 			'section_b' => array(
-				'title' => $lng['admin']['contactdata'],
+				'title' => \Froxlor\Frontend\UI::getLng('admin.contactdata'),
 				'image' => 'icons/user_add.png',
 				'fields' => array(
 					'name' => array(
-						'label' => $lng['customer']['name'],
+						'label' => \Froxlor\Frontend\UI::getLng('customer.name'),
 						'type' => 'text',
 						'mandatory_ex' => true
 					),
 					'firstname' => array(
-						'label' => $lng['customer']['firstname'],
+						'label' => \Froxlor\Frontend\UI::getLng('customer.firstname'),
 						'type' => 'text',
 						'mandatory_ex' => true
 					),
 					'gender' => array(
-						'label' => $lng['gender']['title'],
+						'label' => \Froxlor\Frontend\UI::getLng('gender.title'),
 						'type' => 'select',
 						'select_var' => $gender_options
 					),
 					'company' => array(
-						'label' => $lng['customer']['company'],
+						'label' => \Froxlor\Frontend\UI::getLng('customer.company'),
 						'type' => 'text',
 						'mandatory_ex' => true
 					),
 					'street' => array(
-						'label' => $lng['customer']['street'],
+						'label' => \Froxlor\Frontend\UI::getLng('customer.street'),
 						'type' => 'text'
 					),
 					'zipcode' => array(
-						'label' => $lng['customer']['zipcode'],
+						'label' => \Froxlor\Frontend\UI::getLng('customer.zipcode'),
 						'type' => 'text'
 					),
 					'city' => array(
-						'label' => $lng['customer']['city'],
+						'label' => \Froxlor\Frontend\UI::getLng('customer.city'),
 						'type' => 'text'
 					),
 					'phone' => array(
-						'label' => $lng['customer']['phone'],
+						'label' => \Froxlor\Frontend\UI::getLng('customer.phone'),
 						'type' => 'text'
 					),
 					'fax' => array(
-						'label' => $lng['customer']['fax'],
+						'label' => \Froxlor\Frontend\UI::getLng('customer.fax'),
 						'type' => 'text'
 					),
 					'email' => array(
-						'label' => $lng['customer']['email'],
+						'label' => \Froxlor\Frontend\UI::getLng('customer.email'),
 						'type' => 'text',
 						'mandatory' => true
 					),
 					'customernumber' => array(
-						'label' => $lng['customer']['customernumber'],
+						'label' => \Froxlor\Frontend\UI::getLng('customer.customernumber'),
 						'type' => 'text'
 					),
 					'custom_notes' => array(
 						'style' => 'align-top',
-						'label' => $lng['usersettings']['custom_notes']['title'],
-						'desc' => $lng['usersettings']['custom_notes']['description'],
+						'label' => \Froxlor\Frontend\UI::getLng('usersettings.custom_notes.title'),
+						'desc' => \Froxlor\Frontend\UI::getLng('usersettings.custom_notes.description'),
 						'type' => 'textarea',
 						'cols' => 60,
 						'rows' => 12
 					),
 					'custom_notes_show' => array(
-						'label' => $lng['usersettings']['custom_notes']['show'],
+						'label' => \Froxlor\Frontend\UI::getLng('usersettings.custom_notes.show'),
 						'type' => 'checkbox',
 						'values' => array(
 							array(
-								'label' => $lng['panel']['yes'],
+								'label' => \Froxlor\Frontend\UI::getLng('panel.yes'),
 								'value' => '1'
 							)
 						),
@@ -160,22 +160,22 @@ return array(
 			),
 			'section_cpre' => array(
 				'visible' => ! empty($hosting_plans),
-				'title' => $lng['admin']['plans']['use_plan'],
+				'title' => \Froxlor\Frontend\UI::getLng('admin.plans.use_plan'),
 				'image' => 'icons/user_add.png',
 				'fields' => array(
 					'use_plan' => array(
-						'label' => $lng['admin']['plans']['use_plan'],
+						'label' => \Froxlor\Frontend\UI::getLng('admin.plans.use_plan'),
 						'type' => 'select',
 						'select_var' => $hosting_plans
 					)
 				)
 			),
 			'section_c' => array(
-				'title' => $lng['admin']['servicedata'],
+				'title' => \Froxlor\Frontend\UI::getLng('admin.servicedata'),
 				'image' => 'icons/user_add.png',
 				'fields' => array(
 					'diskspace' => array(
-						'label' => $lng['customer']['diskspace'],
+						'label' => \Froxlor\Frontend\UI::getLng('panel.diskspace'),
 						'type' => 'textul',
 						'value' => 0,
 						'maxlength' => 16,
@@ -183,7 +183,7 @@ return array(
 						'ul_field' => $diskspace_ul
 					),
 					'traffic' => array(
-						'label' => $lng['customer']['traffic'],
+						'label' => \Froxlor\Frontend\UI::getLng('panel.traffic'),
 						'type' => 'textul',
 						'value' => 0,
 						'maxlength' => 14,
@@ -191,7 +191,7 @@ return array(
 						'ul_field' => $traffic_ul
 					),
 					'subdomains' => array(
-						'label' => $lng['customer']['subdomains'],
+						'label' => \Froxlor\Frontend\UI::getLng('panel.subdomains'),
 						'type' => 'textul',
 						'value' => 0,
 						'maxlength' => 9,
@@ -199,7 +199,7 @@ return array(
 						'ul_field' => $subdomains_ul
 					),
 					'emails' => array(
-						'label' => $lng['customer']['emails'],
+						'label' => \Froxlor\Frontend\UI::getLng('panel.emails'),
 						'type' => 'textul',
 						'value' => 0,
 						'maxlength' => 9,
@@ -207,7 +207,7 @@ return array(
 						'ul_field' => $emails_ul
 					),
 					'email_accounts' => array(
-						'label' => $lng['customer']['accounts'],
+						'label' => \Froxlor\Frontend\UI::getLng('panel.email_accounts'),
 						'type' => 'textul',
 						'value' => 0,
 						'maxlength' => 9,
@@ -215,7 +215,7 @@ return array(
 						'ul_field' => $email_accounts_ul
 					),
 					'email_forwarders' => array(
-						'label' => $lng['customer']['forwarders'],
+						'label' => \Froxlor\Frontend\UI::getLng('panel.email_forwarders'),
 						'type' => 'textul',
 						'value' => 0,
 						'maxlength' => 9,
@@ -223,7 +223,7 @@ return array(
 						'ul_field' => $email_forwarders_ul
 					),
 					'email_quota' => array(
-						'label' => $lng['customer']['email_quota'],
+						'label' => \Froxlor\Frontend\UI::getLng('panel.email_quota'),
 						'type' => 'textul',
 						'value' => 0,
 						'maxlength' => 9,
@@ -232,11 +232,11 @@ return array(
 						'ul_field' => $email_quota_ul
 					),
 					'email_imap' => array(
-						'label' => $lng['customer']['email_imap'],
+						'label' => \Froxlor\Frontend\UI::getLng('customer.email_imap'),
 						'type' => 'checkbox',
 						'values' => array(
 							array(
-								'label' => $lng['panel']['yes'],
+								'label' => \Froxlor\Frontend\UI::getLng('panel.yes'),
 								'value' => '1'
 							)
 						),
@@ -246,11 +246,11 @@ return array(
 						'mandatory' => true
 					),
 					'email_pop3' => array(
-						'label' => $lng['customer']['email_pop3'],
+						'label' => \Froxlor\Frontend\UI::getLng('customer.email_pop3'),
 						'type' => 'checkbox',
 						'values' => array(
 							array(
-								'label' => $lng['panel']['yes'],
+								'label' => \Froxlor\Frontend\UI::getLng('panel.yes'),
 								'value' => '1'
 							)
 						),
@@ -260,14 +260,14 @@ return array(
 						'mandatory' => true
 					),
 					'ftps' => array(
-						'label' => $lng['customer']['ftps'],
+						'label' => \Froxlor\Frontend\UI::getLng('panel.ftps'),
 						'type' => 'textul',
 						'value' => 0,
 						'maxlength' => 9,
 						'ul_field' => $ftps_ul
 					),
 					'mysqls' => array(
-						'label' => $lng['customer']['mysqls'],
+						'label' => \Froxlor\Frontend\UI::getLng('panel.mysqls'),
 						'type' => 'textul',
 						'value' => 0,
 						'maxlength' => 9,
@@ -275,11 +275,11 @@ return array(
 						'ul_field' => $mysqls_ul
 					),
 					'phpenabled' => array(
-						'label' => $lng['admin']['phpenabled'] . '?',
+						'label' => \Froxlor\Frontend\UI::getLng('admin.phpenabled') . '?',
 						'type' => 'checkbox',
 						'values' => array(
 							array(
-								'label' => $lng['panel']['yes'],
+								'label' => \Froxlor\Frontend\UI::getLng('panel.yes'),
 								'value' => '1'
 							)
 						),
@@ -289,7 +289,7 @@ return array(
 					),
 					'allowed_phpconfigs' => array(
 						'visible' => (((int) \Froxlor\Settings::Get('system.mod_fcgid') == 1 || (int) \Froxlor\Settings::Get('phpfpm.enabled') == 1) ? true : false),
-						'label' => $lng['admin']['phpsettings']['title'],
+						'label' => \Froxlor\Frontend\UI::getLng('admin.phpsettings.title'),
 						'type' => 'checkbox',
 						'values' => $phpconfigs,
 						'value' => ((int) \Froxlor\Settings::Get('system.mod_fcgid') == 1 ? array(
@@ -300,32 +300,32 @@ return array(
 						'is_array' => 1
 					),
 					'perlenabled' => array(
-						'label' => $lng['admin']['perlenabled'] . '?',
+						'label' => \Froxlor\Frontend\UI::getLng('admin.perlenabled') . '?',
 						'type' => 'checkbox',
 						'values' => array(
 							array(
-								'label' => $lng['panel']['yes'],
+								'label' => \Froxlor\Frontend\UI::getLng('panel.yes'),
 								'value' => '1'
 							)
 						)
 					),
 					'dnsenabled' => array(
-						'label' => $lng['admin']['dnsenabled'] . '?',
+						'label' => \Froxlor\Frontend\UI::getLng('admin.dnsenabled') . '?',
 						'type' => 'checkbox',
 						'values' => array(
 							array(
-								'label' => $lng['panel']['yes'],
+								'label' => \Froxlor\Frontend\UI::getLng('panel.yes'),
 								'value' => '1'
 							)
 						),
 						'visible' => (\Froxlor\Settings::Get('system.dnsenabled') == '1' ? true : false)
 					),
 					'logviewenabled' => array(
-						'label' => $lng['admin']['logviewenabled'] . '?',
+						'label' => \Froxlor\Frontend\UI::getLng('admin.logviewenabled') . '?',
 						'type' => 'checkbox',
 						'values' => array(
 							array(
-								'label' => $lng['panel']['yes'],
+								'label' => \Froxlor\Frontend\UI::getLng('panel.yes'),
 								'value' => '1'
 							)
 						)

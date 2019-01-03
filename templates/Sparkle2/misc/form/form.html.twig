@@ -14,15 +14,11 @@
 				<label for="{{ element.fieldname }}" class="col-sm-5 col-form-label">{{ element.label|raw }}
 					{% if element.mandatory %} {{ element.mandatory|raw }} {% endif %}
 					{% if element.desc %}<br> <small>{{ element.desc|raw }}</small>
-				{% endif %}</label>
-				{% if element.type == 'checkbox' %}
-				{{ element.data_field|raw }}
-				{% else %}
+					{% endif %}</label>
 				<div
 					class="col-sm-7{% if element.style %} {{ element.style }}{% endif %}">
 					{{ element.data_field|raw }}
 				</div>
-				{% endif %}
 			</div>
 			{% endfor %}
 		</div>

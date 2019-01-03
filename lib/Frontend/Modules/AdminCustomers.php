@@ -17,6 +17,7 @@ namespace Froxlor\Frontend\Modules;
  * @package Panel
  *         
  */
+use Froxlor\Api\Commands\PhpSettings;
 use Froxlor\Database\Database;
 use Froxlor\Settings;
 use Froxlor\Api\Commands\Customers as Customers;
@@ -27,7 +28,7 @@ class AdminCustomers extends FeModule
 
 	public function overview()
 	{
-		if (\Froxlor\CurrentUser::getField('customers') > 0) {
+		if (\Froxlor\CurrentUser::getField('customers') == 0) {
 			// no customers - not allowed
 			\Froxlor\UI\Response::standard_error('noaccess', __CLASS__ . '::' . __METHOD__);
 		}
@@ -74,110 +75,73 @@ class AdminCustomers extends FeModule
 			}
 			$result['list'][$index] = $customer;
 		}
-
-		/*
-		$fields = array(
-			'c.loginname' => $lng['login']['username'],
-			'a.loginname' => $lng['admin']['admin'],
-			'c.name' => $lng['customer']['name'],
-			'c.email' => $lng['customer']['email'],
-			'c.firstname' => $lng['customer']['firstname'],
-			'c.company' => $lng['customer']['company'],
-			'c.diskspace' => $lng['customer']['diskspace'],
-			'c.diskspace_used' => $lng['customer']['diskspace'] . ' (' . $lng['panel']['used'] . ')',
-			'c.traffic' => $lng['customer']['traffic'],
-			'c.traffic_used' => $lng['customer']['traffic'] . ' (' . $lng['panel']['used'] . ')'
-		);
-
-		$paging = new \Froxlor\UI\Paging($userinfo, TABLE_PANEL_CUSTOMERS, $fields);
-		$customers = '';
-		$result_stmt = Database::prepare("
-			SELECT `c`.*, `a`.`loginname` AS `adminname`
-			FROM `" . TABLE_PANEL_CUSTOMERS . "` `c`, `" . TABLE_PANEL_ADMINS . "` `a`
-			WHERE " . ($userinfo['customers_see_all'] ? '' : " `c`.`adminid` = :adminid AND ") . "
-			`c`.`adminid` = `a`.`adminid` " . $paging->getSqlWhere(true) . " " . $paging->getSqlOrderBy() . " " . $paging->getSqlLimit());
-		Database::pexecute($result_stmt, array(
-			'adminid' => $userinfo['adminid']
-		));
-		$num_rows = Database::num_rows();
-		$paging->setEntries($num_rows);
-		$sortcode = $paging->getHtmlSortCode($lng, true);
-		$arrowcode = $paging->getHtmlArrowCode($filename . '?page=' . $page . '&s=' . $s);
-		$searchcode = $paging->getHtmlSearchCode($lng);
-		$pagingcode = $paging->getHtmlPagingCode($filename . '?page=' . $page . '&s=' . $s);
-		$i = 0;
-		$count = 0;
-
-		while ($row = $result_stmt->fetch(PDO::FETCH_ASSOC)) {
-
-			if ($paging->checkDisplay($i)) {
-
-				
-				
-				$dec_places = Settings::Get('panel.decimal_places');
-
-				// get disk-space usages for web, mysql and mail
-				$usages_stmt = Database::prepare("SELECT * FROM `" . TABLE_PANEL_DISKSPACE . "` WHERE `customerid` = :cid ORDER BY `stamp` DESC LIMIT 1");
-				$usages = Database::pexecute_first($usages_stmt, array(
-					'cid' => $row['customerid']
-				));
-
-				$row['webspace_used'] = round($usages['webspace'] / 1024, $dec_places);
-				$row['mailspace_used'] = round($usages['mail'] / 1024, $dec_places);
-				$row['dbspace_used'] = round($usages['mysql'] / 1024, $dec_places);
-
-				$row['traffic_used'] = round($row['traffic_used'] / (1024 * 1024), $dec_places);
-				$row['traffic'] = round($row['traffic'] / (1024 * 1024), $dec_places);
-				$row['diskspace_used'] = round($row['diskspace_used'] / 1024, $dec_places);
-				$row['diskspace'] = round($row['diskspace'] / 1024, $dec_places);
-				$last_login = ((int) $row['lastlogin_succ'] == 0) ? $lng['panel']['neverloggedin'] : date('d.m.Y', $row['lastlogin_succ']);
-
-				// percent-values for progressbar
-				// For Disk usage
-				if ($row['diskspace'] > 0) {
-					$disk_percent = round(($row['diskspace_used'] * 100) / $row['diskspace'], 0);
-					$disk_doublepercent = round($disk_percent * 2, 2);
-				} else {
-					$disk_percent = 0;
-					$disk_doublepercent = 0;
-				}
-
-				if ($row['traffic'] > 0) {
-					$traffic_percent = round(($row['traffic_used'] * 100) / $row['traffic'], 0);
-					$traffic_doublepercent = round($traffic_percent * 2, 2);
-				} else {
-					$traffic_percent = 0;
-					$traffic_doublepercent = 0;
-				}
-
-				$row = \Froxlor\PhpHelper::strReplaceArray('-1', 'UL', $row, 'diskspace traffic mysqls emails email_accounts email_forwarders ftps subdomains');
-				$row = \Froxlor\PhpHelper::htmlentitiesArray($row);
-
-				// fix progress-bars if value is >100%
-				if ($disk_percent > 100) {
-					$disk_percent = 100;
-				}
-				if ($traffic_percent > 100) {
-					$traffic_percent = 100;
-				}
-
-				$row['custom_notes'] = ($row['custom_notes'] != '') ? nl2br($row['custom_notes']) : '';
-
-				eval("\$customers.=\"" . \Froxlor\UI\Template::getTemplate("customers/customers_customer") . "\";");
-				$count ++;
-			}
-
-			$i ++;
-		}
-
-		$customercount = $num_rows;
-		eval("echo \"" . \Froxlor\UI\Template::getTemplate("customers/customers") . "\";");
-		*/
+		
 		\Froxlor\PhpHelper::sortListBy($result['list'], 'loginname');
+
+		// customer add form
+		$languages = \Froxlor\User::getLanguages();
+		$language_options = '';
+		foreach ($languages as $language_file => $language_name) {
+			$language_options .= \Froxlor\UI\HTML::makeoption($language_name, $language_file, Settings::Get('panel.standardlanguage'), true);
+		}
+		
+		$diskspace_ul = \Froxlor\UI\HTML::makecheckbox('diskspace_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
+		$traffic_ul = \Froxlor\UI\HTML::makecheckbox('traffic_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
+		$subdomains_ul = \Froxlor\UI\HTML::makecheckbox('subdomains_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
+		$emails_ul = \Froxlor\UI\HTML::makecheckbox('emails_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
+		$email_accounts_ul = \Froxlor\UI\HTML::makecheckbox('email_accounts_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
+		$email_forwarders_ul = \Froxlor\UI\HTML::makecheckbox('email_forwarders_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
+		$email_quota_ul = \Froxlor\UI\HTML::makecheckbox('email_quota_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
+		$ftps_ul = \Froxlor\UI\HTML::makecheckbox('ftps_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
+		$mysqls_ul = \Froxlor\UI\HTML::makecheckbox('mysqls_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
+		
+		$gender_options = \Froxlor\UI\HTML::makeoption($this->lng['gender']['undef'], 0, true, true, true);
+		$gender_options .= \Froxlor\UI\HTML::makeoption($this->lng['gender']['male'], 1, null, true, true);
+		$gender_options .= \Froxlor\UI\HTML::makeoption($this->lng['gender']['female'], 2, null, true, true);
+		
+		$phpconfigs = array();
+		try {
+			$json_result = PhpSettings::getLocal(\Froxlor\CurrentUser::getData())->listing();
+		} catch (\Exception $e) {
+			\Froxlor\UI\Response::dynamic_error($e->getMessage());
+		}
+		$php_result = json_decode($json_result, true)['data'];
+		foreach ($php_result['list'] as $row) {
+			if ((int) Settings::Get('phpfpm.enabled') == 1) {
+				$phpconfigs[] = array(
+					'label' => $row['description'] . " [" . $row['fpmdesc'] . "]",
+					'value' => $row['id']
+				);
+			} else {
+				$phpconfigs[] = array(
+					'label' => $row['description'],
+					'value' => $row['id']
+				);
+			}
+		}
+		
+		// hosting plans
+		$hosting_plans = "";
+		/*
+		$plans = Database::query("
+				SELECT *
+				FROM `" . TABLE_PANEL_PLANS . "`
+				ORDER BY name ASC
+			");
+		if (Database::num_rows() > 0) {
+			$hosting_plans .= \Froxlor\UI\HTML::makeoption("---", 0, 0, true, true);
+		}
+		while ($row = $plans->fetch(PDO::FETCH_ASSOC)) {
+			$hosting_plans .= \Froxlor\UI\HTML::makeoption($row['name'], $row['id'], 0, true, true);
+		}
+		*/
+		$customer_add_data = include_once \Froxlor\Froxlor::getInstallDir() . '/lib/formfields/admin/customer/formfield.customer_add.php';
+		$customer_add_form = \Froxlor\UI\HtmlForm::genHTMLForm($customer_add_data);
 
 		\Froxlor\Frontend\UI::TwigBuffer('admin/customers/index.html.twig', array(
 			'page_title' => $this->lng['panel']['customers'],
-			'accounts' => $result
+			'accounts' => $result,
+			'form_data' => $customer_add_form
 		));
 	}
 }
