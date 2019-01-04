@@ -28,7 +28,7 @@
 					{% for user in accounts.list %}
 					<tr class="d-flex{% if user.deactivated > 0 %} text-muted{% endif %}">
 						<td class="col-sm-3"><strong>{% if user.deactivated > 0 %}<span class="text-danger"><i class="fas fa-ban"></i></span>&nbsp;{% endif %}{{ call_static('\\Froxlor\\User', 'getCorrectUserSalutation', [user]) }}</strong></td>
-						<td class="col-sm-2"><a href="#">{{ user.loginname }}</a></td>
+						<td class="col-sm-2"><a href="index.php?module=AdminCustomers&view=su&id={{ user.customerid }}">{{ user.loginname }}</a></td>
 						<td class="col-sm-1">{{ user.adminname }}</td>
 						<td class="col-sm-3">
 							<div class="row">

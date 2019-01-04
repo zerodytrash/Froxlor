@@ -78,11 +78,10 @@ class AdminIndex extends FeModule
 
 		$overview['domains'] = $number_domains['number_domains'];
 
-		if (\Froxlor\Settings::Get('system.mail_quota_enabled') == 0)
-		{
+		if (\Froxlor\Settings::Get('system.mail_quota_enabled') == 0) {
 			unset($overview['email_quota']);
 		}
-		
+
 		// calculate percentage
 		$overview_data = array();
 		foreach ($overview as $entity => $used) {
@@ -92,18 +91,18 @@ class AdminIndex extends FeModule
 				'perc' => (\Froxlor\CurrentUser::getField($entity) >= 0) ? floor($used / \Froxlor\CurrentUser::getField($entity)) : 0
 			);
 		}
-		//ksort($overview_data);
+		// ksort($overview_data);
 
 		/*
 		 * @fixme
-		 $dec_places = Settings::Get('panel.decimal_places');
-		 $userinfo['diskspace'] = round($userinfo['diskspace'] / 1024, $dec_places);
-		 $userinfo['diskspace_used'] = round($userinfo['diskspace_used'] / 1024, $dec_places);
-		 $userinfo['traffic'] = round($userinfo['traffic'] / (1024 * 1024), $dec_places);
-		 $userinfo['traffic_used'] = round($userinfo['traffic_used'] / (1024 * 1024), $dec_places);
-		 $userinfo = \Froxlor\PhpHelper::strReplaceArray('-1', $this->lng['customer']['unlimited'], $userinfo, 'customers domains diskspace traffic mysqls emails email_accounts email_forwarders email_quota ftps subdomains');
-		 
-		 $userinfo['custom_notes'] = ($userinfo['custom_notes'] != '') ? nl2br($userinfo['custom_notes']) : '';
+		 * $dec_places = Settings::Get('panel.decimal_places');
+		 * $userinfo['diskspace'] = round($userinfo['diskspace'] / 1024, $dec_places);
+		 * $userinfo['diskspace_used'] = round($userinfo['diskspace_used'] / 1024, $dec_places);
+		 * $userinfo['traffic'] = round($userinfo['traffic'] / (1024 * 1024), $dec_places);
+		 * $userinfo['traffic_used'] = round($userinfo['traffic_used'] / (1024 * 1024), $dec_places);
+		 * $userinfo = \Froxlor\PhpHelper::strReplaceArray('-1', $this->lng['customer']['unlimited'], $userinfo, 'customers domains diskspace traffic mysqls emails email_accounts email_forwarders email_quota ftps subdomains');
+		 *
+		 * $userinfo['custom_notes'] = ($userinfo['custom_notes'] != '') ? nl2br($userinfo['custom_notes']) : '';
 		 */
 
 		$sysinfo = array();
@@ -158,7 +157,7 @@ class AdminIndex extends FeModule
 			// Just cleanup
 			unset($uptime_array, $seconds, $minutes, $hours, $days);
 		}
-		
+
 		// update check
 		try {
 			$json_result = Froxlor::getLocal(\Froxlor\CurrentUser::getData())->checkUpdate();

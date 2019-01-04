@@ -199,5 +199,10 @@ if (\Froxlor\Froxlor::isDatabaseVersion('201812190')) {
 	\Froxlor\CurrentUser::setField('theme', 'Sparkle2');
 	Updates::lastStepStatus(0);
 
+	Updates::showUpdateStep("Removing DKIM-ADSP support");
+	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsp');");
+	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsppolicy');");
+	Updates::lastStepStatus(0);
+
 	\Froxlor\Froxlor::updateToDbVersion('201812300');
 }

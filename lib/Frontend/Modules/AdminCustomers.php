@@ -32,14 +32,14 @@ class AdminCustomers extends FeModule
 			// no customers - not allowed
 			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
 		}
-		
+
 		try {
 			$json_result = Customers::getLocal(\Froxlor\CurrentUser::getData())->listing();
 		} catch (\Exception $e) {
 			\Froxlor\UI\Response::dynamic_error($e->getMessage());
 		}
 		$result = json_decode($json_result, true)['data'];
-		
+
 		$domains_stmt = Database::prepare("
 			SELECT COUNT(`id`) AS `domains`
 			FROM `" . TABLE_PANEL_DOMAINS . "`
@@ -47,7 +47,7 @@ class AdminCustomers extends FeModule
 			AND `parentdomainid` = '0'
 			AND `id`<> :stdd
 		");
-		
+
 		$customers = $result['list'];
 		foreach ($customers as $index => $customer) {
 			// count domains
@@ -75,7 +75,7 @@ class AdminCustomers extends FeModule
 			}
 			$result['list'][$index] = $customer;
 		}
-		
+
 		\Froxlor\PhpHelper::sortListBy($result['list'], 'loginname');
 
 		// customer add form
@@ -87,14 +87,15 @@ class AdminCustomers extends FeModule
 			'form_data' => $customer_add_form
 		));
 	}
-	
-	private function customersAddForm() {
+
+	private function customersAddForm()
+	{
 		$languages = \Froxlor\User::getLanguages();
 		$language_options = '';
 		foreach ($languages as $language_file => $language_name) {
 			$language_options .= \Froxlor\UI\HTML::makeoption($language_name, $language_file, Settings::Get('panel.standardlanguage'), true);
 		}
-		
+
 		$diskspace_ul = \Froxlor\UI\HTML::makecheckbox('diskspace_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
 		$traffic_ul = \Froxlor\UI\HTML::makecheckbox('traffic_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
 		$subdomains_ul = \Froxlor\UI\HTML::makecheckbox('subdomains_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
@@ -104,11 +105,11 @@ class AdminCustomers extends FeModule
 		$email_quota_ul = \Froxlor\UI\HTML::makecheckbox('email_quota_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
 		$ftps_ul = \Froxlor\UI\HTML::makecheckbox('ftps_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
 		$mysqls_ul = \Froxlor\UI\HTML::makecheckbox('mysqls_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
-		
+
 		$gender_options = \Froxlor\UI\HTML::makeoption($this->lng['gender']['undef'], 0, true, true, true);
 		$gender_options .= \Froxlor\UI\HTML::makeoption($this->lng['gender']['male'], 1, null, true, true);
 		$gender_options .= \Froxlor\UI\HTML::makeoption($this->lng['gender']['female'], 2, null, true, true);
-		
+
 		$phpconfigs = array();
 		try {
 			$json_result = PhpSettings::getLocal(\Froxlor\CurrentUser::getData())->listing();
@@ -129,26 +130,71 @@ class AdminCustomers extends FeModule
 				);
 			}
 		}
-		
+
 		// hosting plans
 		$hosting_plans = "";
 		/*
-		 $plans = Database::query("
-		 SELECT *
-		 FROM `" . TABLE_PANEL_PLANS . "`
-		 ORDER BY name ASC
-		 ");
-		 if (Database::num_rows() > 0) {
-		 $hosting_plans .= \Froxlor\UI\HTML::makeoption("---", 0, 0, true, true);
-		 }
-		 while ($row = $plans->fetch(PDO::FETCH_ASSOC)) {
-		 $hosting_plans .= \Froxlor\UI\HTML::makeoption($row['name'], $row['id'], 0, true, true);
-		 }
+		 * $plans = Database::query("
+		 * SELECT *
+		 * FROM `" . TABLE_PANEL_PLANS . "`
+		 * ORDER BY name ASC
+		 * ");
+		 * if (Database::num_rows() > 0) {
+		 * $hosting_plans .= \Froxlor\UI\HTML::makeoption("---", 0, 0, true, true);
+		 * }
+		 * while ($row = $plans->fetch(PDO::FETCH_ASSOC)) {
+		 * $hosting_plans .= \Froxlor\UI\HTML::makeoption($row['name'], $row['id'], 0, true, true);
+		 * }
 		 */
 		$customer_add_data = include_once \Froxlor\Froxlor::getInstallDir() . '/lib/formfields/admin/customer/formfield.customer_add.php';
 		$customer_add_form = \Froxlor\UI\HtmlForm::genHTMLForm($customer_add_data);
-		
+
 		return $customer_add_form;
+	}
+
+	public function su()
+	{
+		$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+
+		try {
+			$json_result = Customers::getLocal(\Froxlor\CurrentUser::getData(), array(
+				'id' => $id
+			))->get();
+		} catch (\Exception $e) {
+			\Froxlor\UI\Response::dynamic_error($e->getMessage());
+		}
+		$result = json_decode($json_result, true)['data'];
+
+		if ($result) {
+			$result['switched_user'] = \Froxlor\CurrentUser::getData();
+			$result['adminsession'] = 0;
+			\Froxlor\CurrentUser::setData($result);
+
+			\Froxlor\FroxlorLogger::getLog()->addInfo("switched user and is now '" . $result['loginname'] . "'");
+
+			$target = (isset($_GET['target']) ? $_GET['target'] : 'Index');
+			$redirect = "index.php?module=Customer" . $target;
+			\Froxlor\UI\Response::redirectTo($redirect);
+		} else {
+			\Froxlor\UI\Response::dynamic_error("something went wrong when reading the customer data");
+		}
+	}
+
+	public function suBack()
+	{
+		if (is_array(\Froxlor\CurrentUser::getField('switched_user')))
+		{
+			$result = \Froxlor\CurrentUser::getData();
+			$result = $result['switched_user'];
+			unset($result['switched_user']);
+			\Froxlor\CurrentUser::setData($result);
+
+			$target = (isset($_GET['target']) ? $_GET['target'] : 'Index');
+			$redirect = "index.php?module=Admin" . $target;
+			\Froxlor\UI\Response::redirectTo($redirect);
+		} else {
+			\Froxlor\UI\Response::dynamic_error("Cannot change back - I've never switched to another user :-)");
+		}
 	}
 }
 /*

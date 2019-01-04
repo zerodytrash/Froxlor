@@ -1,9 +1,6 @@
 <?php
 namespace Froxlor\Frontend\Modules;
 
-use Froxlor\Database\Database;
-use Froxlor\Frontend\FeModule;
-
 /**
  * This file is part of the Froxlor project.
  * Copyright (c) 2003-2009 the SysCP Team (see authors).
@@ -20,7 +17,11 @@ use Froxlor\Frontend\FeModule;
  * @package Panel
  *         
  */
-class AdminAdmins extends FeModule
+
+use Froxlor\Database\Database;
+use Froxlor\Frontend\FeModule;
+
+class AdminLogger extends FeModule
 {
 
 	public function overview()
@@ -121,20 +122,15 @@ class AdminAdmins extends FeModule
 		if (isset($_POST['send']) && $_POST['send'] == 'send') {
 			$truncatedate = time() - (60 * 10);
 			$trunc_stmt = Database::prepare("
-				DELETE FROM `" . TABLE_PANEL_LOG . "` WHERE `date` < :trunc");
+				DELETE FROM `" . TABLE_PANEL_LOG . "` WHERE `date` < :trunc
+			");
 			Database::pexecute($trunc_stmt, array(
 				'trunc' => $truncatedate
 			));
-			$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_WARNING, 'truncated the system-log (mysql)');
-			\Froxlor\UI\Response::redirectTo($filename, array(
-				'page' => $page,
-				's' => $s
-			));
+			\Froxlor\FroxlorLogger::getLog()->addWarning('truncated the system-log (mysql)');
+			\Froxlor\UI\Response::redirectTo('index.php?module=AdminLogger');
 		} else {
-			\Froxlor\UI\HTML::askYesNo('logger_reallytruncate', $filename, array(
-				'page' => $page,
-				'action' => $action
-			), TABLE_PANEL_LOG);
+			\Froxlor\UI\HTML::askYesNo('logger_reallytruncate', 'index.php?module=AdminLogger&view=' . __FUNCTION__, array(), TABLE_PANEL_LOG);
 		}
 	}
 }

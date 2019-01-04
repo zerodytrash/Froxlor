@@ -25,6 +25,12 @@
 			{{ include('Sparkle2/topmenu.html.twig') }}
 		</ul>
 		<ul class="navbar-nav navbar-right">
+		{% if call_static('\\Froxlor\\CurrentUser', 'getField', ['switched_user']) is not empty and call_static('\\Froxlor\\CurrentUser', 'getField', ['switched_user']) is iterable %}
+			<li class="nav-item text-nowrap d-block mr-2"><a
+				class="btn btn-info btn-sm d-block"
+				href="index.php?module=AdminCustomers&view=suBack"><i
+					class="fas fa-undo"></i> Switch back</a></li>
+		{% endif %}
 			<li class="nav-item text-nowrap d-block"><a
 				class="btn btn-danger btn-sm d-block"
 				href="index.php?module={% if call_static('\\Froxlor\\CurrentUser', 'isAdmin') %}Admin{% else %}Customer{% endif %}Index&view=logout"><i

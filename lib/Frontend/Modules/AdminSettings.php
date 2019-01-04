@@ -127,7 +127,76 @@ class AdminSettings extends FeModule
 			\Froxlor\UI\HTML::askYesNo('admin_counters_reallyupdate', 'index.php?module=AdminSettings&view=' . __FUNCTION__);
 		}
 	}
-} 
+
+	public function rebuildconfigs()
+	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
+		}
+
+		if (isset($_POST['send']) && $_POST['send'] == 'send') {
+
+			\Froxlor\FroxlorLogger::getLog()->addInfo("rebuild configfiles");
+			\Froxlor\System\Cronjob::inserttask('1');
+			\Froxlor\System\Cronjob::inserttask('10');
+			// Using nameserver, insert a task which rebuilds the server config
+			\Froxlor\System\Cronjob::inserttask('4');
+			// cron.d file
+			\Froxlor\System\Cronjob::inserttask('99');
+
+			\Froxlor\UI\Response::standard_success('rebuildingconfigs', '', array(
+				'filename' => 'index.php?module=AdminIndex'
+			));
+		} else {
+			\Froxlor\UI\HTML::askYesNo('admin_configs_reallyrebuild', 'index.php?module=AdminSettings&view=' . __FUNCTION__);
+		}
+	}
+
+	public function wipecleartextmailpws()
+	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
+		}
+
+		if (isset($_POST['send']) && $_POST['send'] == 'send') {
+
+			\Froxlor\FroxlorLogger::getLog()->addWarning("wiped all cleartext mail passwords");
+			Database::query("UPDATE `" . TABLE_MAIL_USERS . "` SET `password` = '';");
+			Database::query("UPDATE `" . TABLE_PANEL_SETTINGS . "` SET `value` = '0' WHERE `settinggroup` = 'system' AND `varname` = 'mailpwcleartext'");
+
+			\Froxlor\UI\Response::standard_success('wipecleartextmailpws', '', array(
+				'filename' => 'index.php?module=AdminIndex'
+			));
+		} else {
+			\Froxlor\UI\HTML::askYesNo('admin_cleartextmailpws_reallywipe', 'index.php?module=AdminSettings&view=' . __FUNCTION__);
+		}
+	}
+
+	/**
+	 * @fixme get that back to the top-menu
+	 */
+	public function wipequotas()
+	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
+		}
+		if (isset($_POST['send']) && $_POST['send'] == 'send') {
+
+			\Froxlor\FroxlorLogger::getLog()->addWarning("wiped all mailquotas");
+			// Set the quota to 0 which means unlimited
+			Database::query("UPDATE `" . TABLE_MAIL_USERS . "` SET `quota` = '0';");
+			Database::query("UPDATE `" . TABLE_PANEL_CUSTOMERS . "` SET `email_quota_used` = '0'");
+			\Froxlor\UI\Response::standard_success('wipequotas', '', array(
+				'filename' => 'index.php?module=AdminIndex'
+			));
+		} else {
+			\Froxlor\UI\HTML::askYesNo('admin_quotas_reallywipe', 'index.php?module=AdminSettings&view=' . __FUNCTION__);
+		}
+	}
+}
 /*
 elseif ($page == 'phpinfo' && $userinfo['change_serversettings'] == '1') {
 	ob_start();
@@ -173,79 +242,9 @@ elseif ($page == 'phpinfo' && $userinfo['change_serversettings'] == '1') {
 		\Froxlor\UI\Response::standard_error($lng['error']['no_phpinfo']);
 	}
 	eval("echo \"" . \Froxlor\UI\Template::getTemplate("settings/phpinfo") . "\";");
-} elseif ($page == 'rebuildconfigs' && $userinfo['change_serversettings'] == '1') {
-	if (isset($_POST['send']) && $_POST['send'] == 'send') {
 
-		$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_INFO, "rebuild configfiles");
-		\Froxlor\System\Cronjob::inserttask('1');
-		\Froxlor\System\Cronjob::inserttask('10');
-		// Using nameserver, insert a task which rebuilds the server config
-		\Froxlor\System\Cronjob::inserttask('4');
-		// cron.d file
-		\Froxlor\System\Cronjob::inserttask('99');
 
-		\Froxlor\UI\Response::standard_success('rebuildingconfigs', '', array(
-			'filename' => 'admin_index.php'
-		));
-	} else {
-		\Froxlor\UI\HTML::askYesNo('admin_configs_reallyrebuild', $filename, array(
-			'page' => $page
-		));
-	}
-} elseif ($page == 'updatecounters' && $userinfo['change_serversettings'] == '1') {
 
-	if (isset($_POST['send']) && $_POST['send'] == 'send') {
-
-		$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_INFO, "updated resource-counters");
-		$updatecounters = \Froxlor\User::updateCounters(true);
-		$customers = '';
-		foreach ($updatecounters['customers'] as $customerid => $customer) {
-			eval("\$customers.=\"" . \Froxlor\UI\Template::getTemplate("settings/updatecounters_row_customer") . "\";");
-		}
-
-		$admins = '';
-		foreach ($updatecounters['admins'] as $adminid => $admin) {
-			eval("\$admins.=\"" . \Froxlor\UI\Template::getTemplate("settings/updatecounters_row_admin") . "\";");
-		}
-
-		eval("echo \"" . \Froxlor\UI\Template::getTemplate("settings/updatecounters") . "\";");
-	} else {
-		\Froxlor\UI\HTML::askYesNo('admin_counters_reallyupdate', $filename, array(
-			'page' => $page
-		));
-	}
-} elseif ($page == 'wipecleartextmailpws' && $userinfo['change_serversettings'] == '1') {
-
-	if (isset($_POST['send']) && $_POST['send'] == 'send') {
-
-		$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_WARNING, "wiped all cleartext mail passwords");
-		Database::query("UPDATE `" . TABLE_MAIL_USERS . "` SET `password` = '';");
-		Database::query("UPDATE `" . TABLE_PANEL_SETTINGS . "` SET `value` = '0' WHERE `settinggroup` = 'system' AND `varname` = 'mailpwcleartext'");
-		\Froxlor\UI\Response::redirectTo($filename, array(
-			's' => $s
-		));
-	} else {
-		\Froxlor\UI\HTML::askYesNo('admin_cleartextmailpws_reallywipe', $filename, array(
-			'page' => $page
-		));
-	}
-} elseif ($page == 'wipequotas' && $userinfo['change_serversettings'] == '1') {
-
-	if (isset($_POST['send']) && $_POST['send'] == 'send') {
-
-		$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_WARNING, "wiped all mailquotas");
-
-		// Set the quota to 0 which means unlimited
-		Database::query("UPDATE `" . TABLE_MAIL_USERS . "` SET `quota` = '0';");
-		Database::query("UPDATE `" . TABLE_PANEL_CUSTOMERS . "` SET `email_quota_used` = '0'");
-		\Froxlor\UI\Response::redirectTo($filename, array(
-			's' => $s
-		));
-	} else {
-		\Froxlor\UI\HTML::askYesNo('admin_quotas_reallywipe', $filename, array(
-			'page' => $page
-		));
-	}
 } elseif ($page == 'enforcequotas' && $userinfo['change_serversettings'] == '1') {
 	if (isset($_POST['send']) && $_POST['send'] == 'send') {
 		// Fetch all accounts
