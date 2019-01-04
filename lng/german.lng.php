@@ -1701,5 +1701,10 @@ $lng['panel']['ihave_configured'] = 'Ich habe die Dienste konfiguriert';
 $lng['panel']['system_is_configured'] = 'Das System ist bereits konfiguriert';
 $lng['panel']['settings_before_configuration'] = 'Stelle sicher, dass die Einstellungen angepasst wurden bevor die Dienste konfiguriert werden.';
 $lng['panel']['alternative_cmdline_config'] = 'Alternativ, führe den folgenden Befehl als root-Benutzer auf der Shell aus, um die Dienste automatisch zu konfigurieren.';
+$lng['admin']['kernel'] = 'Kernel';
+$lng['admin']['uptime'] = 'Uptime';
+$lng['admin']['mydata'] = 'Mein Account';
+$lng['panel']['current_user'] = 'Aktueller Benutzer';
+$lng['question']['update_now'] = 'Soll das Update jetzt durchgeführt werden?';
 $lng['error']['noaccess'] = 'Zugriff auf "%s" nicht erlaubt';
-
+$lng['success']['wipecleartextmailpws'] = 'Klartext E-Mail-Konten Passwörter wurden erfolgreich gelöscht.';
