@@ -27,7 +27,7 @@ class AdminAdmins extends FeModule
 	{
 		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
 			// not allowed
-			return;
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
 		}
 
 		$fields = array(

@@ -1,4 +1,5 @@
 <?php
+namespace Froxlor\Frontend\Modules;
 
 /**
  * This file is part of the Froxlor project.
@@ -9,96 +10,126 @@
  * file that was distributed with this source code. You can also view the
  * COPYING file online at http://files.froxlor.org/misc/COPYING.txt
  *
- * @copyright  (c) the authors
- * @author     Florian Lippert <flo@syscp.org> (2003-2009)
- * @author     Froxlor team <team@froxlor.org> (2010-)
- * @license    GPLv2 http://files.froxlor.org/misc/COPYING.txt
- * @package    Panel
- *
+ * @copyright (c) the authors
+ * @author Florian Lippert <flo@syscp.org> (2003-2009)
+ * @author Froxlor team <team@froxlor.org> (2010-)
+ * @license GPLv2 http://files.froxlor.org/misc/COPYING.txt
+ * @package Panel
+ *         
  */
 use Froxlor\Database\Database;
 use Froxlor\Settings;
-use Froxlor\Api\Commands\Froxlor;
+use Froxlor\Frontend\FeModule;
 
-define('AREA', 'admin');
-require './lib/init.php';
+class AdminSettings extends FeModule
+{
 
-// get sql-root access data
-Database::needRoot(true);
-Database::needSqlData();
-$sql_root = Database::getSqlData();
-Database::needRoot(false);
-
-if ($page == 'overview' && $userinfo['change_serversettings'] == '1') {
-	$settings_data = \Froxlor\PhpHelper::loadConfigArrayDir('./actions/admin/settings/');
-	Settings::loadSettingsInto($settings_data);
-
-	if (isset($_POST['send']) && $_POST['send'] == 'send') {
-
-		$_part = isset($_GET['part']) ? $_GET['part'] : '';
-		if ($_part == '') {
-			$_part = isset($_POST['part']) ? $_POST['part'] : '';
+	public function overview()
+	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
 		}
 
-		if ($_part != '') {
-			if ($_part == 'all') {
-				$settings_all = true;
-				$settings_part = false;
+		// get sql-root access data
+		Database::needRoot(true);
+		Database::needSqlData();
+		$sql_root = Database::getSqlData();
+		Database::needRoot(false);
+
+		$settings_data = \Froxlor\PhpHelper::loadConfigArrayDir('./actions/admin/settings/');
+		Settings::loadSettingsInto($settings_data);
+
+		if (isset($_POST['send']) && $_POST['send'] == 'send') {
+
+			$_part = isset($_GET['part']) ? $_GET['part'] : '';
+			if ($_part == '') {
+				$_part = isset($_POST['part']) ? $_POST['part'] : '';
+			}
+
+			if ($_part != '') {
+				if ($_part == 'all') {
+					$settings_all = true;
+					$settings_part = false;
+				} else {
+					$settings_all = false;
+					$settings_part = true;
+				}
+				$only_enabledisable = false;
 			} else {
 				$settings_all = false;
-				$settings_part = true;
+				$settings_part = false;
+				$only_enabledisable = true;
 			}
-			$only_enabledisable = false;
-		} else {
-			$settings_all = false;
-			$settings_part = false;
-			$only_enabledisable = true;
-		}
 
-		// check if the session timeout is too low #815
-		if (isset($_POST['session_sessiontimeout']) && $_POST['session_sessiontimeout'] < 60) {
-			\Froxlor\UI\Response::standard_error($lng['error']['session_timeout'], $lng['error']['session_timeout_desc']);
-		}
+			// check if the session timeout is too low #815
+			if (isset($_POST['session_sessiontimeout']) && $_POST['session_sessiontimeout'] < 60) {
+				\Froxlor\UI\Response::standard_error($lng['error']['session_timeout'], $lng['error']['session_timeout_desc']);
+			}
 
-		if (\Froxlor\UI\Form::processFormEx($settings_data, $_POST, array(
-			'filename' => $filename,
-			'action' => $action,
-			'page' => $page
-		), $_part, $settings_all, $settings_part, $only_enabledisable)) {
-			$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_INFO, "rebuild configfiles due to changed setting");
-			\Froxlor\System\Cronjob::inserttask('1');
-			// Using nameserver, insert a task which rebuilds the server config
-			\Froxlor\System\Cronjob::inserttask('4');
-			// cron.d file
-			\Froxlor\System\Cronjob::inserttask('99');
-
-			\Froxlor\UI\Response::standard_success('settingssaved', '', array(
+			if (\Froxlor\UI\Form::processFormEx($settings_data, $_POST, array(
 				'filename' => $filename,
 				'action' => $action,
 				'page' => $page
-			));
-		}
-	} else {
+			), $_part, $settings_all, $settings_part, $only_enabledisable)) {
+				$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_INFO, "rebuild configfiles due to changed setting");
+				\Froxlor\System\Cronjob::inserttask('1');
+				// Using nameserver, insert a task which rebuilds the server config
+				\Froxlor\System\Cronjob::inserttask('4');
+				// cron.d file
+				\Froxlor\System\Cronjob::inserttask('99');
 
-		$_part = isset($_GET['part']) ? $_GET['part'] : '';
-		if ($_part == '') {
-			$_part = isset($_POST['part']) ? $_POST['part'] : '';
-		}
-
-		$fields = \Froxlor\UI\Form::buildFormEx($settings_data, $_part);
-
-		$settings_page = '';
-		if ($_part == '') {
-			eval("\$settings_page .= \"" . \Froxlor\UI\Template::getTemplate("settings/settings_overview") . "\";");
+				\Froxlor\UI\Response::standard_success('settingssaved', '', array(
+					'filename' => $filename,
+					'action' => $action,
+					'page' => $page
+				));
+			}
 		} else {
-			eval("\$settings_page .= \"" . \Froxlor\UI\Template::getTemplate("settings/settings") . "\";");
+
+			$_part = isset($_GET['part']) ? $_GET['part'] : '';
+			if ($_part == '') {
+				$_part = isset($_POST['part']) ? $_POST['part'] : '';
+			}
+
+			$fields = \Froxlor\UI\Form::buildFormEx($settings_data, $_part);
+
+			$settings_page = '';
+			if ($_part == '') {
+				eval("\$settings_page .= \"" . \Froxlor\UI\Template::getTemplate("settings/settings_overview") . "\";");
+			} else {
+				eval("\$settings_page .= \"" . \Froxlor\UI\Template::getTemplate("settings/settings") . "\";");
+			}
+
+			eval("echo \"" . \Froxlor\UI\Template::getTemplate("settings/settings_form_begin") . "\";");
+			eval("echo \$settings_page;");
+			eval("echo \"" . \Froxlor\UI\Template::getTemplate("settings/settings_form_end") . "\";");
+		}
+	}
+
+	public function updatecounters()
+	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
 		}
 
-		eval("echo \"" . \Froxlor\UI\Template::getTemplate("settings/settings_form_begin") . "\";");
-		eval("echo \$settings_page;");
-		eval("echo \"" . \Froxlor\UI\Template::getTemplate("settings/settings_form_end") . "\";");
+		if (isset($_POST['send']) && $_POST['send'] == 'send') {
+
+			\Froxlor\FroxlorLogger::getLog()->addInfo("updated resource-counters");
+			$updatecounters = \Froxlor\User::updateCounters(true);
+
+			\Froxlor\Frontend\UI::TwigBuffer('admin/settings/updatecounters.html.twig', array(
+				'page_title' => $this->lng['admin']['updatecounters'],
+				'counters' => $updatecounters
+			));
+		} else {
+			\Froxlor\UI\HTML::askYesNo('admin_counters_reallyupdate', 'index.php?module=AdminSettings&view=' . __FUNCTION__);
+		}
 	}
-} elseif ($page == 'phpinfo' && $userinfo['change_serversettings'] == '1') {
+} 
+/*
+elseif ($page == 'phpinfo' && $userinfo['change_serversettings'] == '1') {
 	ob_start();
 	phpinfo();
 	$phpinfo = array(
@@ -318,9 +349,7 @@ if ($page == 'overview' && $userinfo['change_serversettings'] == '1') {
 	if (isset($_POST['send']) && $_POST['send'] == 'send') {
 		$test_addr = isset($_POST['test_addr']) ? $_POST['test_addr'] : null;
 
-		/**
-		 * Initialize the mailingsystem
-		 */
+		// Initialize the mailingsystem
 		$testmail = new \PHPMailer\PHPMailer\PHPMailer(true);
 		$testmail->CharSet = "UTF-8";
 
@@ -382,3 +411,4 @@ if ($page == 'overview' && $userinfo['change_serversettings'] == '1') {
 
 	eval("echo \"" . \Froxlor\UI\Template::getTemplate("settings/testmail") . "\";");
 }
+*/

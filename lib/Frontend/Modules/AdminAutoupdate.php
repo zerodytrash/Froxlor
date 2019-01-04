@@ -31,6 +31,10 @@ class AdminAutoupdate extends FeModule
 
 	public function overview()
 	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
+		}
 
 		// check for archive-stuff
 		if (! extension_loaded('zip')) {
@@ -68,6 +72,11 @@ class AdminAutoupdate extends FeModule
 
 	public function getdownload()
 	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
+		}
+
 		// retrieve the new version from the form
 		$newversion = isset($_POST['newversion']) ? $_POST['newversion'] : null;
 
@@ -129,6 +138,11 @@ class AdminAutoupdate extends FeModule
 	 */
 	public function extract()
 	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
+		}
+
 		$toExtract = isset($_GET['archive']) ? $_GET['archive'] : null;
 		$localArchive = \Froxlor\Froxlor::getInstallDir() . '/updates/' . $toExtract;
 

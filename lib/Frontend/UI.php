@@ -202,6 +202,9 @@ class UI
 		$id = explode(".", $identifier);
 		if (is_null($context)) {
 			$id_first = array_shift($id);
+			if (! isset(self::$lng[$id_first])) {
+				return null;
+			}
 			if (empty($id)) {
 				return self::$lng[$id_first];
 			} else {
@@ -210,7 +213,7 @@ class UI
 		} else {
 			$id_first = array_shift($id);
 			if (empty($id)) {
-				return $context[$id_first];
+				return isset($context[$id_first]) ? $context[$id_first] : null;
 			} else {
 				return self::getLng(implode(".", $id), $context[$id_first]);
 			}

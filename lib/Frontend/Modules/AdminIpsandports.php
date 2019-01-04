@@ -1,4 +1,5 @@
 <?php
+namespace Froxlor\Frontend\Modules;
 
 /**
  * This file is part of the Froxlor project.
@@ -9,66 +10,69 @@
  * file that was distributed with this source code. You can also view the
  * COPYING file online at http://files.froxlor.org/misc/COPYING.txt
  *
- * @copyright  (c) the authors
- * @author     Florian Lippert <flo@syscp.org> (2003-2009)
- * @author     Froxlor team <team@froxlor.org> (2010-)
- * @license    GPLv2 http://files.froxlor.org/misc/COPYING.txt
- * @package    Panel
- *
+ * @copyright (c) the authors
+ * @author Florian Lippert <flo@syscp.org> (2003-2009)
+ * @author Froxlor team <team@froxlor.org> (2010-)
+ * @license GPLv2 http://files.froxlor.org/misc/COPYING.txt
+ * @package Panel
+ *         
  */
-define('AREA', 'admin');
-require './lib/init.php';
-
-use Froxlor\Database\Database;
+use Froxlor\Frontend\FeModule;
 use Froxlor\Settings;
 use Froxlor\Api\Commands\IpsAndPorts as IpsAndPorts;
 
-if (isset($_POST['id'])) {
-	$id = intval($_POST['id']);
-} elseif (isset($_GET['id'])) {
-	$id = intval($_GET['id']);
-}
+class AdminIpsandports extends FeModule
+{
 
-if ($page == 'ipsandports' || $page == 'overview') {
-	// Do not display attributes that are not used by the current webserver
-	$websrv = Settings::Get('system.webserver');
-	$is_nginx = ($websrv == 'nginx');
-	$is_apache = ($websrv == 'apache2');
-	$is_apache24 = $is_apache && (Settings::Get('system.apache24') === '1');
-
-	if ($action == '') {
-
-		$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "viewed admin_ipsandports");
-		$fields = array(
-			'ip' => $lng['admin']['ipsandports']['ip'],
-			'port' => $lng['admin']['ipsandports']['port']
-		);
-		$paging = new \Froxlor\UI\Paging($userinfo, TABLE_PANEL_IPSANDPORTS, $fields);
-		$ipsandports = '';
-		$result_stmt = Database::prepare("SELECT * FROM `" . TABLE_PANEL_IPSANDPORTS . "` " . $paging->getSqlWhere(false) . " " . $paging->getSqlOrderBy() . " " . $paging->getSqlLimit());
-		Database::pexecute($result_stmt);
-		$paging->setEntries(Database::num_rows());
-		$sortcode = $paging->getHtmlSortCode($lng);
-		$arrowcode = $paging->getHtmlArrowCode($filename . '?page=' . $page . '&s=' . $s);
-		$searchcode = $paging->getHtmlSearchCode($lng);
-		$pagingcode = $paging->getHtmlPagingCode($filename . '?page=' . $page . '&s=' . $s);
-		$i = 0;
-		$count = 0;
-
-		while ($row = $result_stmt->fetch(PDO::FETCH_ASSOC)) {
-
-			if ($paging->checkDisplay($i)) {
-				$row = \Froxlor\PhpHelper::htmlentitiesArray($row);
-				if (filter_var($row['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-					$row['ip'] = '[' . $row['ip'] . ']';
-				}
-				eval("\$ipsandports.=\"" . \Froxlor\UI\Template::getTemplate("ipsandports/ipsandports_ipandport") . "\";");
-				$count ++;
-			}
-			$i ++;
+	public function overview()
+	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
 		}
-		eval("echo \"" . \Froxlor\UI\Template::getTemplate("ipsandports/ipsandports") . "\";");
-	} elseif ($action == 'delete' && $id != 0) {
+
+		try {
+			$json_result = IpsAndPorts::getLocal(\Froxlor\CurrentUser::getData())->listing();
+		} catch (\Exception $e) {
+			\Froxlor\UI\Response::dynamic_error($e->getMessage());
+		}
+		$result = json_decode($json_result, true)['data'];
+
+		$ips = $result['list'];
+		foreach ($ips as $index => $ip) {
+			if (filter_var($ip['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+				$ip['ip'] = '[' . $ip['ip'] . ']';
+			}
+			$result['list'][$index] = $ip;
+		}
+
+		\Froxlor\PhpHelper::sortListBy($result['list'], 'ip');
+
+		// add ip/port form
+		$ipsandports_add_form = $this->ipportAddForm();
+
+		\Froxlor\Frontend\UI::TwigBuffer('admin/ipsandports/index.html.twig', array(
+			'page_title' => $this->lng['admin']['ipsandports']['ipsandports'],
+			'ips' => $result,
+			'form_data' => $ipsandports_add_form
+		));
+	}
+
+	private function ipportAddForm()
+	{
+		// Do not display attributes that are not used by the current webserver
+		$websrv = Settings::Get('system.webserver');
+		$is_nginx = ($websrv == 'nginx');
+		$is_apache = ($websrv == 'apache2');
+		$is_apache24 = $is_apache && (Settings::Get('system.apache24') === '1');
+
+		$ipsandports_add_data = include_once \Froxlor\Froxlor::getInstallDir() . '/lib/formfields/admin/ipsandports/formfield.ipsandports_add.php';
+		$ipsandports_add_form = \Froxlor\UI\HtmlForm::genHTMLForm($ipsandports_add_data);
+		return $ipsandports_add_form;
+	}
+}
+/*
+ elseif ($action == 'delete' && $id != 0) {
 		try {
 			$json_result = IpsAndPorts::getLocal($userinfo, array(
 				'id' => $id
@@ -159,3 +163,4 @@ if ($page == 'ipsandports' || $page == 'overview') {
 		}
 	}
 }
+*/

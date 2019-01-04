@@ -153,8 +153,6 @@ class HTML
 	 */
 	public static function askYesNo($text, $yesfile, $params = array(), $targetname = '', $back_nr = 1)
 	{
-		global $userinfo, $s, $header, $footer, $lng, $theme;
-
 		$hiddenparams = '';
 
 		if (is_array($params)) {
@@ -163,15 +161,20 @@ class HTML
 			}
 		}
 
-		if (isset($lng['question'][$text])) {
-			$text = $lng['question'][$text];
+		if (\Froxlor\Frontend\UI::getLng('question.'.$text) != null) {
+			$text = \Froxlor\Frontend\UI::getLng('question.'.$text);
 		}
 
 		$text = strtr($text, array(
 			'%s' => $targetname
 		));
-		eval("echo \"" . Template::getTemplate('misc/question_yesno', '1') . "\";");
-		exit();
+		
+		\Froxlor\Frontend\UI::TwigBuffer('misc/yesno.html.twig', array(
+			'page_title' => \Froxlor\Frontend\UI::getLng('question.question'),
+			'yesno_msg' => $text,
+			'hiddenparams' => $hiddenparams,
+			'yesfile' => $yesfile
+		));
 	}
 
 	public static function askYesNoWithCheckbox($text, $chk_text, $yesfile, $params = array(), $targetname = '', $show_checkbox = true)

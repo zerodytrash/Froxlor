@@ -1,0 +1,78 @@
+{% extends "Sparkle2/userarea.html.twig" %}
+
+{% block content %}
+<div class="card">
+	<div class="card-header">
+		<ul class="nav nav-tabs card-header-tabs" id="subnav-tab"
+			role="tablist">
+			<li class="nav-item"><a class="nav-link active"
+				id="subnav-ips-tab" data-toggle="tab" href="#tab-ips" role="tab"
+				aria-controls="subnav-ips" aria-selected="true">{{ lng('admin.ipsandports.ipsandports') }}&nbsp;<span
+					class="badge badge-pill badge-secondary">{{ ips.count }}</span></a></li>
+			<li class="nav-item"><a class="nav-link" id="subnav-add-tab"
+				data-toggle="tab" href="#tab-add" role="tab"
+				aria-controls="subnav-add" aria-selected="false"><i
+					class="fas fa-user-plus"></i>&nbsp;{{ lng('admin.ipsandports.add') }}</a></li>
+		</ul>
+	</div>
+	<div class="card-body tab-content" id="subnav-tabContent">
+		<div class="tab-pane fade show active" id="tab-ips" role="tabpanel"
+			aria-labelledby="subnav-ips-tab">
+			<div class="card">
+				<div class="card-body" id="ips-list">
+					{% import "Sparkle2/table-listing.html.twig" as t %}
+					{% set content %}
+					{% for ip in ips.list %}
+					<tr class="d-flex">
+						<td class="col-sm-3"><strong>{{ ip.ip }}</strong></td>
+						<td class="col-sm-2">{{ ip.port }}</td>
+						<td class="col-sm-2">{% if ip.vhostcontainer == 1 %}<span class="text-success"><i
+							class="fas fa-check-circle"></i></span>{% else %}<span class="text-danger"><i
+							class="fas fa-times-circle"></i></span>{% endif %}</td>
+						<td class="col-sm-2">{% if ip.specialsettings is not empty %}<span class="text-success"><i
+							class="fas fa-check-circle"></i></span>{% else %}<span class="text-danger"><i
+							class="fas fa-times-circle"></i></span>{% endif %}</td>
+						<td class="col-sm-2">{% if ip.ssl == 1 %}<span class="text-success"><i
+							class="fas fa-check-circle"></i></span>{% else %}<span class="text-danger"><i
+							class="fas fa-times-circle"></i></span>{% endif %}</td>
+						<td class="col-sm-1 text-right">{% if call_static('\\Froxlor\\CurrentUser', 'getField', ['adminid']) == user.adminid %}
+							<span class="text-muted"><i class="fas fa-trash-alt"></i></span>
+							{% else %} <a href="#" class="text-danger delete-btn"
+							data-id="{{ ip.id }}" data-container="body" data-toggle="tooltip"
+							data-placement="left" title="{% trans "IP/Port löschen" %}"><i
+								class="fas fa-trash-alt"></i></a> {% endif %}</td>
+					</tr>
+					{% endfor %}
+					{% endset %}
+					{% if ips|length > 0 %}
+					{{ t.listing("ips-listing", [lng('admin.ipsandports.ip'), lng('admin.ipsandports.port'), "vHost-Container", "Specialsettings", "SSL", "|Optionen"], content, [3,2,2,2,2,1]) }}
+					{% else %}
+					<div class="alert alert-info" role="alert">
+						{% trans "Keine IP/Ports" %}
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+
+		<div class="tab-pane fade" id="tab-add" role="tabpanel"
+			aria-labelledby="subnav-add-tab">
+			<div class="row">
+				<div class="col-sm-12 col-md-6 offset-md-3">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">
+								<i class="fas fa-plus-circle"></i>&nbsp;
+								{{ lng('admin.ipsandports.add') }}
+							</h5>
+							{% import "Sparkle2/misc/form/form.html.twig" as f %}
+							{{ f.form(form_data) }}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+{% endblock %}
