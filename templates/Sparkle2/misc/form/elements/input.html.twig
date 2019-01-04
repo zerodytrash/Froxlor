@@ -7,7 +7,7 @@
   </div>
 {% endif %}
 <input type="{{ type }}" name="{{ fieldname }}" id="{{ fieldname }}"
-	class="form-control" value="{{ value }}"{{ extras }} />
+	class="form-control" value="{{ value }}"{{ extras|raw }} />
 {% if ulfield %}
 </div>
 {% endif %}
