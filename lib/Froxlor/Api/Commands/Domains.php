@@ -32,6 +32,7 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 	public function listing()
 	{
 		if ($this->isAdmin()) {
+			$extended = self::getBoolParam('extended', true, false);
 			$this->logger()->addNotice("[API] list domains");
 			$result_stmt = Database::prepare("
 				SELECT
@@ -46,8 +47,20 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 				$params['adminid'] = $this->getUserDetail('adminid');
 			}
 			Database::pexecute($result_stmt, $params);
+			// IP query
+			$ip_sel_stmt = Database::prepare("
+				SELECT iap.id, iap.ip, iap.port, iap.ssl
+				FROM `" . TABLE_PANEL_IPSANDPORTS . "` iap
+				LEFT JOIN `" . TABLE_DOMAINTOIP . "` dti ON dti.`id_domain` = :domainid AND dti.`id_ipandports` = iap.`id`
+			");
 			$result = array();
 			while ($row = $result_stmt->fetch(\PDO::FETCH_ASSOC)) {
+				if ($extended) {
+					Database::pexecute($ip_sel_stmt, array(
+						'domainid' => $row['id']
+					));
+					$row['ips'] = $ip_sel_stmt->fetchAll(\PDO::FETCH_ASSOC);
+				}
 				$result[] = $row;
 			}
 			return $this->response(200, "successfull", array(

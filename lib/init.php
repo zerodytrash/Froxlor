@@ -72,6 +72,7 @@ require \Froxlor\Froxlor::getInstallDir() . '/lib/tables.inc.php';
 
 // init template engine
 \Froxlor\Frontend\UI::initTwig();
+\Froxlor\Frontend\UI::Twig()->addGlobal('global_errors', '');
 
 define('AREA', 'login');
 

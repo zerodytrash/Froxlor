@@ -1,0 +1,77 @@
+{% extends "Sparkle2/userarea.html.twig" %}
+
+{% block content %}
+{% set userinfo = call_static('\\Froxlor\\CurrentUser', 'getData') %}
+<div class="card">
+	<div class="card-header">
+		<ul class="nav nav-tabs card-header-tabs" id="subnav-tab"
+			role="tablist">
+			<li class="nav-item"><a class="nav-link active"
+				id="subnav-dom-tab" data-toggle="tab" href="#tab-dom" role="tab"
+				aria-controls="subnav-dom" aria-selected="true">{{ lng('panel.domains') }}&nbsp;<span
+					class="badge badge-pill badge-secondary">{{ domains.count }}</span></a></li>
+			{% if userinfo.domains != 0 %}
+			<li class="nav-item"><a class="nav-link" id="subnav-add-tab"
+				data-toggle="tab" href="#tab-add" role="tab"
+				aria-controls="subnav-add" aria-selected="false"><i
+					class="fas fa-plus-circle"></i>&nbsp;{{ lng('admin.domain_add') }}</a></li>
+			{% endif %}
+		</ul>
+	</div>
+	<div class="card-body tab-content" id="subnav-tabContent">
+		<div class="tab-pane fade show active" id="tab-dom" role="tabpanel"
+			aria-labelledby="subnav-dom-tab">
+			<div class="card">
+				<div class="card-body" id="domains-list">
+					{% import "Sparkle2/table-listing.html.twig" as t %}
+					{% set content %}
+					{% for domain in domains.list %}
+					<tr
+						class="d-flex{% if user.deactivated > 0 %} text-muted{% endif %}">
+						<td class="col-sm-3"><strong>{{ domain.domain }}</strong></td>
+						<td class="col-sm-3">{% for ip in domain.ips %}<a
+							href="index.php?module=AdminIpsandports&view=edit&id={{ ip.id }}">{{ ip.ip }}:{{ ip.port }}</a><br>
+						{% endfor %}</a></td>
+						<td class="col-sm-3">{{ domain.customername }}</td>
+						<td class="col-sm-3 text-right"><a href="#"
+							class="text-danger delete-btn" data-id="{{ domain.id }}"
+							data-container="body" data-toggle="tooltip" data-placement="left"
+							title="{% trans "Domain löschen" %}"><i
+								class="fas fa-trash-alt"></i></a></td>
+					</tr>
+					{% endfor %}
+					{% endset %}
+					{% if domains|length > 0 %}
+					{{ t.listing("domains-listing", [lng('domains.domainname'), lng('admin.ipsandports.ip'), lng('admin.customer'), "|" ~ lng('panel.options')], content, [3,3,3,3]) }}
+					{% else %}
+					<div class="alert alert-info" role="alert">
+						{% trans "Keine Domains" %}
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+
+		{% if userinfo.domains != 0 %}
+		<div class="tab-pane fade" id="tab-add" role="tabpanel"
+			aria-labelledby="subnav-add-tab">
+			<div class="row">
+				<div class="col-sm-12 col-md-6 offset-md-3">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">
+								<i class="fas fa-plus-circle"></i>&nbsp;
+								{{ lng('admin.domain_add') }}
+							</h5>
+							{% import "Sparkle2/misc/form/form.html.twig" as f %}
+							{{ f.form(form_data) }}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+
+	</div>
+</div>
+{% endblock %}

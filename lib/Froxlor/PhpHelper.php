@@ -123,9 +123,17 @@ class PhpHelper
 			// prevent possible file-path-disclosure
 			$errfile = str_replace(\Froxlor\Froxlor::getInstallDir(), "", $errfile);
 
-			$err_display = '<div class="alert alert-danger" role="alert">';
+			$err_display = '<div class="alert alert-danger my-1" role="alert">';
 			$err_display .= '<strong>#' . $errno . ' ' . $errstr . '</strong><br>';
 			$err_display .= $errfile . ':' . $errline;
+			if (\Froxlor\CurrentUser::hasSession() && \Froxlor\CurrentUser::isAdmin()) {
+				$err_display .= '<br><p><pre>';
+				$debug = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+				foreach ($debug as $dline) {
+					$err_display .= $dline['function'] . '() called at [' . str_replace(\Froxlor\Froxlor::getInstallDir(), '', $dline['file']) . ':' . $dline['line'] . ']<br>';
+				}
+				$err_display .= '</pre></p>';
+			}
 			$err_display .= '</div>';
 			// check for more existing errors
 			$errors = isset(\Froxlor\Frontend\UI::Twig()->getGlobals()['global_errors']) ? \Froxlor\Frontend\UI::Twig()->getGlobals()['global_errors'] : "";
@@ -140,9 +148,6 @@ class PhpHelper
 
 	public static function loadConfigArrayDir()
 	{
-		// Workaround until we use gettext
-		global $lng, $theme;
-
 		// we now use dynamic function parameters
 		// so we can read from more than one directory
 		// and still be valid for old calls

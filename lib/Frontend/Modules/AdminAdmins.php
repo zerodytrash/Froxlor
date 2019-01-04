@@ -57,12 +57,23 @@ class AdminAdmins extends FeModule
 		\Froxlor\PhpHelper::sortListBy($result['list'], 'loginname');
 
 		// add admin form
+		$admin_add_form = $this->adminAddForm();
+
+		\Froxlor\Frontend\UI::TwigBuffer('admin/admins/index.html.twig', array(
+			'page_title' => $this->lng['admin']['admins'],
+			'accounts' => $result,
+			'form_data' => $admin_add_form
+		));
+	}
+
+	private function adminAddForm()
+	{
 		$languages = \Froxlor\User::getLanguages();
 		$language_options = '';
 		foreach ($languages as $language_file => $language_name) {
 			$language_options .= \Froxlor\UI\HTML::makeoption($language_name, $language_file, \Froxlor\CurrentUser::getField('language'), true);
 		}
-
+		
 		try {
 			$json_result = IpsAndPorts::getLocal(\Froxlor\CurrentUser::getData())->listing();
 		} catch (\Exception $e) {
@@ -73,7 +84,7 @@ class AdminAdmins extends FeModule
 		if (\Froxlor\CurrentUser::getField('ip') == '-1') {
 			$ipaddress .= \Froxlor\UI\HTML::makeoption($this->lng['admin']['allips'], "-1");
 		}
-
+		
 		$known_ips = array();
 		foreach ($ips_result['list'] as $row) {
 			if (! in_array($row['ip'], $known_ips)) {
@@ -81,7 +92,7 @@ class AdminAdmins extends FeModule
 				$known_ips[] = $row['ip'];
 			}
 		}
-
+		
 		$customers_ul = \Froxlor\UI\HTML::makecheckbox('customers_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
 		$diskspace_ul = \Froxlor\UI\HTML::makecheckbox('diskspace_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
 		$traffic_ul = \Froxlor\UI\HTML::makecheckbox('traffic_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
@@ -93,15 +104,11 @@ class AdminAdmins extends FeModule
 		$email_quota_ul = \Froxlor\UI\HTML::makecheckbox('email_quota_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
 		$ftps_ul = \Froxlor\UI\HTML::makecheckbox('ftps_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
 		$mysqls_ul = \Froxlor\UI\HTML::makecheckbox('mysqls_ul', $this->lng['customer']['unlimited'], '-1', false, '0', true, true);
-
+		
 		$admin_add_data = include_once \Froxlor\Froxlor::getInstallDir() . '/lib/formfields/admin/admin/formfield.admin_add.php';
 		$admin_add_form = \Froxlor\UI\HtmlForm::genHTMLForm($admin_add_data);
-
-		\Froxlor\Frontend\UI::TwigBuffer('admin/admins/index.html.twig', array(
-			'page_title' => $this->lng['admin']['admins'],
-			'accounts' => $result,
-			'form_data' => $admin_add_form
-		));
+		
+		return $admin_add_form;
 	}
 
 	public function add()

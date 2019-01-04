@@ -79,6 +79,16 @@ class AdminCustomers extends FeModule
 		\Froxlor\PhpHelper::sortListBy($result['list'], 'loginname');
 
 		// customer add form
+		$customer_add_form = $this->customersAddForm();
+
+		\Froxlor\Frontend\UI::TwigBuffer('admin/customers/index.html.twig', array(
+			'page_title' => $this->lng['panel']['customers'],
+			'accounts' => $result,
+			'form_data' => $customer_add_form
+		));
+	}
+	
+	private function customersAddForm() {
 		$languages = \Froxlor\User::getLanguages();
 		$language_options = '';
 		foreach ($languages as $language_file => $language_name) {
@@ -123,26 +133,22 @@ class AdminCustomers extends FeModule
 		// hosting plans
 		$hosting_plans = "";
 		/*
-		$plans = Database::query("
-				SELECT *
-				FROM `" . TABLE_PANEL_PLANS . "`
-				ORDER BY name ASC
-			");
-		if (Database::num_rows() > 0) {
-			$hosting_plans .= \Froxlor\UI\HTML::makeoption("---", 0, 0, true, true);
-		}
-		while ($row = $plans->fetch(PDO::FETCH_ASSOC)) {
-			$hosting_plans .= \Froxlor\UI\HTML::makeoption($row['name'], $row['id'], 0, true, true);
-		}
-		*/
+		 $plans = Database::query("
+		 SELECT *
+		 FROM `" . TABLE_PANEL_PLANS . "`
+		 ORDER BY name ASC
+		 ");
+		 if (Database::num_rows() > 0) {
+		 $hosting_plans .= \Froxlor\UI\HTML::makeoption("---", 0, 0, true, true);
+		 }
+		 while ($row = $plans->fetch(PDO::FETCH_ASSOC)) {
+		 $hosting_plans .= \Froxlor\UI\HTML::makeoption($row['name'], $row['id'], 0, true, true);
+		 }
+		 */
 		$customer_add_data = include_once \Froxlor\Froxlor::getInstallDir() . '/lib/formfields/admin/customer/formfield.customer_add.php';
 		$customer_add_form = \Froxlor\UI\HtmlForm::genHTMLForm($customer_add_data);
-
-		\Froxlor\Frontend\UI::TwigBuffer('admin/customers/index.html.twig', array(
-			'page_title' => $this->lng['panel']['customers'],
-			'accounts' => $result,
-			'form_data' => $customer_add_form
-		));
+		
+		return $customer_add_form;
 	}
 }
 /*
