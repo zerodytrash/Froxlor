@@ -89,7 +89,12 @@ class Fields
 
 	public static function getFormFieldOutputHiddenString($fieldname, $fielddata, $do_show = true)
 	{
-		return self::getFormFieldOutputHidden($fieldname, $fielddata, $do_show);
+		$tpl = self::getFormTpl('input');
+		return \Froxlor\Frontend\UI::Twig()->render($tpl, array(
+			'fieldname' => $fieldname,
+			'type' => 'password',
+			'value' => $fielddata['value']
+		));
 	}
 
 	public static function getFormFieldOutputHidden($fieldname, $fielddata)
@@ -104,10 +109,11 @@ class Fields
 
 	public static function getFormFieldOutputFile($fieldname, $fielddata, $do_show = true)
 	{
-		$label = $fielddata['label'];
-		$value = htmlentities($fielddata['value']);
-		eval("\$returnvalue = \"" . \Froxlor\UI\Template::getTemplate("formfields/text", true) . "\";");
-		return $returnvalue;
+		$tpl = self::getFormTpl('textarea');
+		return \Froxlor\Frontend\UI::Twig()->render($tpl, array(
+			'fieldname' => $fieldname,
+			'value' => $fielddata['value']
+		));
 	}
 
 	public static function getFormFieldOutputDate($fieldname, $fielddata, $do_show = true)
@@ -121,6 +127,7 @@ class Fields
 
 	public static function getFormFieldOutputBool($fieldname, $fielddata, $do_show = true)
 	{
-		return \Froxlor\UI\HTML::makeyesno($fieldname, '1', '0', $fielddata['value']);
+		$disabled = isset($fielddata['visible']) ? ! $fielddata['visible'] : false;
+		return \Froxlor\UI\HTML::makeyesno($fieldname, '1', '0', $fielddata['value'], $disabled);
 	}
 }

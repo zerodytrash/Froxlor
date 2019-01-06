@@ -198,6 +198,7 @@ return array(
 					)
 				),
 				'system_backupenabled' => array(
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.backupenabled'),
 					'settinggroup' => 'system',
 					'varname' => 'backupenabled',
 					'type' => 'bool',

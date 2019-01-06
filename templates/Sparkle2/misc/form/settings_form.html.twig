@@ -7,15 +7,15 @@
 		<div class="card-body">
 			{% for sections in form_data %}
 			{% for sectionname, section in sections %}
-			<div class="form-group form-row border-bottom">
+			<div class="form-group form-row border-bottom pb-3">
 				<label for="{{ sectionname }}" class="col-sm-4 col-form-label">{{ section.title|raw }}</label>
 				<div class="col-sm-5">
 					{% for element in section.elements %}
 					<div class="row">
-						<div class="col-sm-5 text-right">
+						<div class="col-sm-5 text-right pt-2">
 							<small>{{ element.title }}:</small>
 						</div>
-						<div class="col-sm-7">
+						<div class="col-sm-7 pt-1">
 							{% if element.type == 'select' %}
 							<select class="form-control form-control-sm"
 								name="{{ sectionname }}" id="{{ sectionname }}">
@@ -29,9 +29,11 @@
 					{% endfor %}
 				</div>
 				<div class="col-sm-3 text-right">
+					{% if section.activated %}
 					<a
 						href="index.php?module=AdminSettings&view=overview&part={{ sectionname }}"
 						class="btn btn-sm btn-primary">{{ lng('admin.serversettings') }}</a>
+					{% endif %}
 				</div>
 			</div>
 			{% endfor %}
@@ -64,19 +66,23 @@
 		<div class="card-header">
 			<div class="row">
 				<div class="col-sm-10 mt-1"><h5 class="mb-0">{{ section.title }}</h5></div>
-				<div class="col-sm-2 text-right"><a href="index.php?module=AdminSettings" class="btn btn-sm btn-primary">{{ lng('panel.back') }}</a></div>
+				<div class="col-sm-2 text-right"><a href="index.php?module=AdminSettings" class="btn btn-sm btn-primary"><i class="fas fa-chevron-circle-left"></i>&nbsp;{{ lng('panel.back') }}</a></div>
 			</div>
 		</div>
 		<div class="card-body">
 			{% for element in section.elements %}
+			{% if element.type != 'hidden' %}
 			<div class="form-group form-row border-bottom pb-3">
-				<label for="{{ element.fieldname }}" class="col-sm-7 col-form-label">{{ element.label|raw }}
+				<label for="{{ element.fieldname }}" class="col-sm-7 col-form-label"><strong>{{ element.label|raw }}</strong>
 					{% if element.desc %}<br> <small>{{ element.desc|raw }}</small>{% endif %}</label>
 				<div
 					class="col-sm-5 text-right{% if element.style %} {{ element.style }}{% endif %}">
 					{{ element.data_field|raw }}
 				</div>
 			</div>
+			{% else %}
+			{{ element.data_field|raw }}
+			{% endif %}
 			{% endfor %}
 		</div>
 		<!-- /card-body -->

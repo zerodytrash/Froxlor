@@ -129,8 +129,16 @@ class HTML
 			$yesselected = $yesselected & $_SESSION['requestData'][$name];
 		}
 
-		return '<select class="form-control'.$extra_css.'" id="' . $name . '" name="' . $name . '"' . $d . '>
-	<option value="' . $yesvalue . '"' . ($yesselected ? ' selected="selected"' : '') . '>' . \Froxlor\Frontend\UI::getLng('panel.yes') . '</option><option value="' . $novalue . '"' . ($yesselected ? '' : ' selected="selected"') . '>' . \Froxlor\Frontend\UI::getLng('panel.no') . '</option></select>';
+		$s = '';
+		if ($yesselected == $yesvalue) {
+			$s = ' checked="checked"';
+		}
+
+		return '<label class="switch switch-left-right mb-0">
+			<input type="hidden" name="' . $name . '" value="' . $novalue . '">
+			<input class="switch-input' . $extra_css . '" type="checkbox" id="' . $name . '" name="' . $name . '"' . $d . ' value="' . $yesvalue . '"' . $s . '>
+			<span class="switch-label" data-on="' . \Froxlor\Frontend\UI::getLng('panel.yes') . '" data-off="' . \Froxlor\Frontend\UI::getLng('panel.no') . '"></span> <span class="switch-handle"></span>
+			</label>';
 	}
 
 	/**

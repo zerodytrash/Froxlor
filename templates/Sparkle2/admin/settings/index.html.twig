@@ -1,5 +1,10 @@
 {% extends "Sparkle2/userarea.html.twig" %}
 
+{% block custom_css %}
+<link href="../templates/Sparkle2/assets/css/switch.css"
+	rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 <div class="card">
 	<div class="card-header">
@@ -18,7 +23,11 @@
 		<div class="tab-pane fade show active" id="tab-set" role="tabpanel"
 			aria-labelledby="subnav-set-tab">
 			<div class="row">
+				{% if part is empty %}
 				<div class="col-sm-12 col-md-6 offset-md-3">
+				{% else %}
+				<div class="col-12">
+				{% endif %}
 					<h5 class="mb-3">
 						<i class="fas fa-wrench"></i>&nbsp;
 						{{ lng('admin.serversettings') }}

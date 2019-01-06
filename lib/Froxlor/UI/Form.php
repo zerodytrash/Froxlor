@@ -232,6 +232,7 @@ class Form
 		self::$fields['sections'][$groupname] = array(
 			'title' => $groupdetails['title'],
 			'nobuttons' => false,
+			'activated' => true,
 			'elements' => array()
 		);
 
@@ -259,6 +260,7 @@ class Form
 							'type' => 'yesno',
 							'select' => \Froxlor\UI\HTML::makeyesno($fieldname, '1', '0', Settings::Get($fielddetails['settinggroup'] . '.' . $fielddetails['varname']), false, ' form-control-sm')
 						);
+						self::$fields['sections'][$groupname]['activated'] = (int) Settings::Get($fielddetails['settinggroup'] . '.' . $fielddetails['varname']);
 					}
 				}
 			}
@@ -282,12 +284,12 @@ class Form
 	public static function getFormFieldOutput($groupname, $fieldname, $fielddata)
 	{
 		if (is_array($fielddata) && isset($fielddata['type']) && $fielddata['type'] != '' && method_exists('\\Froxlor\\UI\\Fields', 'getFormFieldOutput' . ucfirst($fielddata['type']))) {
+			$fielddata['desc'] = '';
 			if (isset($fielddata['label']) && is_array($fielddata['label'])) {
 				if (isset($fielddata['label']['title']) && isset($fielddata['label']['description'])) {
 					$fielddata['desc'] = $fielddata['label']['description'];
 					$fielddata['label'] = $fielddata['label']['title'];
 				} else {
-					$fielddata['desc'] = '';
 					$fielddata['label'] = implode(' ', $fielddata['label']);
 				}
 			}
