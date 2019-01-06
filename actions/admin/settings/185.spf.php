@@ -17,10 +17,10 @@
 return array(
 	'groups' => array(
 		'spf' => array(
-			'title' => $lng['admin']['spfsettings'],
+			'title' => \Froxlor\Frontend\UI::getLng('admin.spfsettings'),
 			'fields' => array(
 				'spf_enabled' => array(
-					'label' => $lng['spf']['use_spf'],
+					'label' => \Froxlor\Frontend\UI::getLng('spf.use_spf'),
 					'settinggroup' => 'spf',
 					'varname' => 'use_spf',
 					'type' => 'bool',
@@ -29,7 +29,7 @@ return array(
 					'overview_option' => true
 				),
 				'spf_entry' => array(
-					'label' => $lng['spf']['spf_entry'],
+					'label' => \Froxlor\Frontend\UI::getLng('spf.spf_entry'),
 					'settinggroup' => 'spf',
 					'varname' => 'spf_entry',
 					'type' => 'string',
@@ -40,5 +40,3 @@ return array(
 		)
 	)
 );
-
-?>

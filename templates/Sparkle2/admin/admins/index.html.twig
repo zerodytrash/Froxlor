@@ -28,8 +28,9 @@
 						<td class="col-sm-3"><strong>{{ user.name }}</strong> {% if call_static('\\Froxlor\\CurrentUser', 'getField', ['adminid']) == user.adminid %}
 							&nbsp;<i class="fas fa-user" data-toggle="tooltip"
 							data-placement="right" title="{{ lng('panel.current_user') }}"></i>
-							{% endif %}</td>
-						<td class="col-sm-2"><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
+							{% endif %}<br> <small><a
+								href="mailto:{{ user.email }}">{{ user.email }}</a></small></td>
+						<td class="col-sm-2">{{ user.loginname }}</td>
 						<td class="col-sm-1">{{ user.customers_used }} / {% if user.customers < 0 %}&infin;{% else %}
 							{{ user.customers }} {% endif %}</span></td>
 						<td class="col-sm-3">
@@ -42,7 +43,7 @@
 										<div class="progress-bar" role="progressbar"
 											id="pb-disk-{{ user.adminid }}"
 											aria-valuenow="{{ user.diskspace_used }}" aria-valuemin="0"
-											aria-valuemax="{{ user.diskspace }}}">
+											aria-valuemax="{{ user.diskspace }}">
 											{% if user.diskspace < 0 %}
 											&infin;
 											{% else %}
@@ -62,7 +63,7 @@
 										<div class="progress-bar" role="progressbar"
 											id="pb-traf-{{ user.adminid }}"
 											aria-valuenow="{{ user.traffic_used }}" aria-valuemin="0"
-											aria-valuemax="{{ user.traffic }}}">
+											aria-valuemax="{{ user.traffic }}">
 											{% if user.traffic < 0 %}
 											&infin;
 											{% else %}
@@ -87,21 +88,34 @@
 					{% endfor %}
 					{% endset %}
 					{% if accounts|length > 0 %}
-					{{ t.listing("accounts-listing", ["Name", "E-Mail", "Kunden", "", "Letzter Login", "|Optionen"], content, [3,2,1,3,2,1]) }}
+					{{ t.listing("accounts-listing", [lng('customer.name'), lng('login.username'), lng('panel.customers'), "", lng('admin.lastlogin_succ'), "|Optionen"], content, [3,2,1,3,2,1]) }}
 					<script>
 					{% for user in accounts.list %}
 						{% if user.diskspace < 0 %}
 							$('#pb-disk-{{ user.adminid }}').css('width', '100%');
-							$('#pb-disk-{{ user.adminid }}').addClass('bg-success');
+							$('#pb-disk-{{ user.adminid }}').addClass('bg-secondary');
 						{% else %}
 							$('#pb-disk-{{ user.adminid }}').css('width', '{{ user.diskspace_perc }}%');
+							{% if user.diskspace_perc < 75 %}
+								$('#pb-disk-{{ user.adminid }}').addClass('bg-success');
+							{% elseif user.diskspace_perc >= 75 and user.diskspace_perc < 90 %}
+								$('#pb-disk-{{ user.adminid }}').addClass('bg-warning');
+							{% else %}
+								$('#pb-disk-{{ user.adminid }}').addClass('bg-danger');
+							{% endif %}
 						{% endif %}
 						{% if user.traffic < 0 %}
     						$('#pb-traf-{{ user.adminid }}').css('width', '100%');
-    						$('#pb-traf-{{ user.adminid }}').addClass('bg-success');
+    						$('#pb-traf-{{ user.adminid }}').addClass('bg-secondary');
     					{% else %}
     						$('#pb-traf-{{ user.adminid }}').css('width', '{{ user.traffic_perc }}%');
-    	    						
+							{% if user.traffic_perc < 75 %}
+    							$('#pb-traf-{{ user.adminid }}').addClass('bg-success');
+    						{% elseif user.traffic_perc >= 75 and user.traffic_perc < 90 %}
+    							$('#pb-traf-{{ user.adminid }}').addClass('bg-warning');
+    						{% else %}
+    							$('#pb-traf-{{ user.adminid }}').addClass('bg-danger');
+    						{% endif %}
     					{% endif %}
 					{% endfor %}
 					</script>
@@ -118,16 +132,12 @@
 			aria-labelledby="subnav-add-tab">
 			<div class="row">
 				<div class="col-sm-12 col-md-6 offset-md-3">
-					<div class="card">
-						<div class="card-body">
-							<h5 class="card-title">
-								<i class="fas fa-user-plus"></i>&nbsp;
-								{{ lng('admin.admin_add') }}
-							</h5>
-							{% import "Sparkle2/misc/form/form.html.twig" as f %}
-							{{ f.form(form_data) }}
-						</div>
-					</div>
+					<h5 class="mb-3">
+						<i class="fas fa-user-plus"></i>&nbsp;
+						{{ lng('admin.admin_add') }}
+					</h5>
+					{% import "Sparkle2/misc/form/form.html.twig" as f %}
+					{{ f.form(form_data) }}
 				</div>
 			</div>
 		</div>

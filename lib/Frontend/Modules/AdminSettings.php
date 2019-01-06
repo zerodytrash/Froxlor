@@ -37,18 +37,18 @@ class AdminSettings extends FeModule
 		$sql_root = Database::getSqlData();
 		Database::needRoot(false);
 
-		$settings_data = \Froxlor\PhpHelper::loadConfigArrayDir('./actions/admin/settings/');
+		$settings_data = \Froxlor\PhpHelper::loadConfigArrayDir(\Froxlor\Froxlor::getInstallDir() . '/actions/admin/settings/');
 		Settings::loadSettingsInto($settings_data);
+
+		$part = isset($_GET['part']) ? $_GET['part'] : '';
+		if ($part == '') {
+			$part = isset($_POST['part']) ? $_POST['part'] : '';
+		}
 
 		if (isset($_POST['send']) && $_POST['send'] == 'send') {
 
-			$_part = isset($_GET['part']) ? $_GET['part'] : '';
-			if ($_part == '') {
-				$_part = isset($_POST['part']) ? $_POST['part'] : '';
-			}
-
-			if ($_part != '') {
-				if ($_part == 'all') {
+			if ($part != '') {
+				if ($part == 'all') {
 					$settings_all = true;
 					$settings_part = false;
 				} else {
@@ -71,7 +71,7 @@ class AdminSettings extends FeModule
 				'filename' => $filename,
 				'action' => $action,
 				'page' => $page
-			), $_part, $settings_all, $settings_part, $only_enabledisable)) {
+			), $part, $settings_all, $settings_part, $only_enabledisable)) {
 				$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_INFO, "rebuild configfiles due to changed setting");
 				\Froxlor\System\Cronjob::inserttask('1');
 				// Using nameserver, insert a task which rebuilds the server config
@@ -87,23 +87,13 @@ class AdminSettings extends FeModule
 			}
 		} else {
 
-			$_part = isset($_GET['part']) ? $_GET['part'] : '';
-			if ($_part == '') {
-				$_part = isset($_POST['part']) ? $_POST['part'] : '';
-			}
+			$fields = \Froxlor\UI\Form::buildFormEx($settings_data, $part);
 
-			$fields = \Froxlor\UI\Form::buildFormEx($settings_data, $_part);
-
-			$settings_page = '';
-			if ($_part == '') {
-				eval("\$settings_page .= \"" . \Froxlor\UI\Template::getTemplate("settings/settings_overview") . "\";");
-			} else {
-				eval("\$settings_page .= \"" . \Froxlor\UI\Template::getTemplate("settings/settings") . "\";");
-			}
-
-			eval("echo \"" . \Froxlor\UI\Template::getTemplate("settings/settings_form_begin") . "\";");
-			eval("echo \$settings_page;");
-			eval("echo \"" . \Froxlor\UI\Template::getTemplate("settings/settings_form_end") . "\";");
+			\Froxlor\Frontend\UI::TwigBuffer('admin/settings/index.html.twig', array(
+				'page_title' => \Froxlor\Frontend\UI::getLng('admin.serversettings'),
+				'form_data' => $fields,
+				'part' => $part
+			));
 		}
 	}
 

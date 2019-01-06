@@ -16,10 +16,10 @@
 return array(
 	'groups' => array(
 		'diskquota' => array(
-			'title' => $lng['diskquota'],
+			'title' => \Froxlor\Frontend\UI::getLng('diskquota'),
 			'fields' => array(
 				'diskquota_enabled' => array(
-					'label' => $lng['serversettings']['diskquota_enabled'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.diskquota_enabled'),
 					'settinggroup' => 'system',
 					'varname' => 'diskquota_enabled',
 					'type' => 'bool',
@@ -28,7 +28,7 @@ return array(
 					'overview_option' => true
 				),
 				'diskquota_repquota_path' => array(
-					'label' => $lng['serversettings']['diskquota_repquota_path']['description'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.diskquota_repquota_path.description'),
 					'settinggroup' => 'system',
 					'varname' => 'diskquota_repquota_path',
 					'type' => 'string',
@@ -36,7 +36,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'diskquota_quotatool_path' => array(
-					'label' => $lng['serversettings']['diskquota_quotatool_path']['description'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.diskquota_quotatool_path.description'),
 					'settinggroup' => 'system',
 					'varname' => 'diskquota_quotatool_path',
 					'type' => 'string',
@@ -44,7 +44,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'diskquota_customer_partition' => array(
-					'label' => $lng['serversettings']['diskquota_customer_partition']['description'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.diskquota_customer_partition.description'),
 					'settinggroup' => 'system',
 					'varname' => 'diskquota_customer_partition',
 					'type' => 'string',
@@ -55,5 +55,3 @@ return array(
 		)
 	)
 );
-
-?>

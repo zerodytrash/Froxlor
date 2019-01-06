@@ -19,10 +19,10 @@
 return array(
 	'groups' => array(
 		'ftpserver' => array(
-			'title' => $lng['admin']['ftpserversettings'],
+			'title' => \Froxlor\Frontend\UI::getLng('admin.ftpserversettings'),
 			'fields' => array(
 				'ftpserver' => array(
-					'label' => $lng['admin']['ftpserver'],
+					'label' => \Froxlor\Frontend\UI::getLng('admin.ftpserver'),
 					'settinggroup' => 'system',
 					'varname' => 'ftpserver',
 					'type' => 'option',
@@ -38,5 +38,3 @@ return array(
 		)
 	)
 );
-
-?>

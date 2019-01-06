@@ -3,6 +3,7 @@ namespace Froxlor\UI;
 
 class HTML
 {
+
 	/**
 	 * Return HTML Code for a checkbox
 	 *
@@ -100,36 +101,36 @@ class HTML
 	/**
 	 * Returns HTML Code for two radio buttons with two choices: yes and no
 	 *
-	 * @param
-	 *        	string Name of HTML-Variable
-	 * @param
-	 *        	string Value which will be returned if user chooses yes
-	 * @param
-	 *        	string Value which will be returned if user chooses no
-	 * @param
-	 *        	string Value which is chosen by default
-	 * @param
-	 *        	bool Whether this element is disabled or not (default: false)
+	 * @param string $name
+	 *        	Name of HTML-Variable
+	 * @param string $yesvalue
+	 *        	Value which will be returned if user chooses yes
+	 * @param string $novalue
+	 *        	Value which will be returned if user chooses no
+	 * @param string $yesselected
+	 *        	Value which is chosen by default
+	 * @param bool $disabled
+	 *        	Whether this element is disabled or not (default: false)
+	 * @param string $extra_css
+	 *        	optional, wether to apply more css classes
+	 *        	
 	 * @return string HTML Code
 	 * @author Florian Lippert <flo@syscp.org> (2003-2009)
 	 * @author Froxlor team <team@froxlor.org> (2010-)
 	 */
-	public static function makeyesno($name, $yesvalue, $novalue = '', $yesselected = '', $disabled = false)
+	public static function makeyesno($name, $yesvalue, $novalue = '', $yesselected = '', $disabled = false, $extra_css = '')
 	{
-		global $lng, $theme;
-
+		$d = '';
 		if ($disabled) {
 			$d = ' disabled="disabled"';
-		} else {
-			$d = '';
 		}
 
 		if (isset($_SESSION['requestData'])) {
 			$yesselected = $yesselected & $_SESSION['requestData'][$name];
 		}
 
-		return '<select class="form-control" id="' . $name . '" name="' . $name . '"' . $d . '>
-	<option value="' . $yesvalue . '"' . ($yesselected ? ' selected="selected"' : '') . '>' . $lng['panel']['yes'] . '</option><option value="' . $novalue . '"' . ($yesselected ? '' : ' selected="selected"') . '>' . $lng['panel']['no'] . '</option></select>';
+		return '<select class="form-control'.$extra_css.'" id="' . $name . '" name="' . $name . '"' . $d . '>
+	<option value="' . $yesvalue . '"' . ($yesselected ? ' selected="selected"' : '') . '>' . \Froxlor\Frontend\UI::getLng('panel.yes') . '</option><option value="' . $novalue . '"' . ($yesselected ? '' : ' selected="selected"') . '>' . \Froxlor\Frontend\UI::getLng('panel.no') . '</option></select>';
 	}
 
 	/**
@@ -161,14 +162,14 @@ class HTML
 			}
 		}
 
-		if (\Froxlor\Frontend\UI::getLng('question.'.$text) != null) {
-			$text = \Froxlor\Frontend\UI::getLng('question.'.$text);
+		if (\Froxlor\Frontend\UI::getLng('question.' . $text) != null) {
+			$text = \Froxlor\Frontend\UI::getLng('question.' . $text);
 		}
 
 		$text = strtr($text, array(
 			'%s' => $targetname
 		));
-		
+
 		\Froxlor\Frontend\UI::TwigBuffer('misc/yesno.html.twig', array(
 			'page_title' => \Froxlor\Frontend\UI::getLng('question.question'),
 			'yesno_msg' => $text,

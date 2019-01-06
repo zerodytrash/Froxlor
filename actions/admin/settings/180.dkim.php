@@ -19,10 +19,10 @@
 return array(
 	'groups' => array(
 		'dkim' => array(
-			'title' => $lng['admin']['dkimsettings'],
+			'title' => \Froxlor\Frontend\UI::getLng('admin.dkimsettings'),
 			'fields' => array(
 				'dkim_enabled' => array(
-					'label' => $lng['dkim']['use_dkim'],
+					'label' => \Froxlor\Frontend\UI::getLng('dkim.use_dkim'),
 					'settinggroup' => 'dkim',
 					'varname' => 'use_dkim',
 					'type' => 'bool',
@@ -31,7 +31,7 @@ return array(
 					'overview_option' => true
 				),
 				'dkim_prefix' => array(
-					'label' => $lng['dkim']['dkim_prefix'],
+					'label' => \Froxlor\Frontend\UI::getLng('dkim.dkim_prefix'),
 					'settinggroup' => 'dkim',
 					'varname' => 'dkim_prefix',
 					'type' => 'string',
@@ -40,7 +40,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'dkim_domains' => array(
-					'label' => $lng['dkim']['dkim_domains'],
+					'label' => \Froxlor\Frontend\UI::getLng('dkim.dkim_domains'),
 					'settinggroup' => 'dkim',
 					'varname' => 'dkim_domains',
 					'type' => 'string',
@@ -49,7 +49,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'dkim_dkimkeys' => array(
-					'label' => $lng['dkim']['dkim_dkimkeys'],
+					'label' => \Froxlor\Frontend\UI::getLng('dkim.dkim_dkimkeys'),
 					'settinggroup' => 'dkim',
 					'varname' => 'dkim_dkimkeys',
 					'type' => 'string',
@@ -58,7 +58,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'dkim_algorithm' => array(
-					'label' => $lng['dkim']['dkim_algorithm'],
+					'label' => \Froxlor\Frontend\UI::getLng('dkim.dkim_algorithm'),
 					'settinggroup' => 'dkim',
 					'varname' => 'dkim_algorithm',
 					'type' => 'option',
@@ -72,7 +72,7 @@ return array(
 					'save_method' => 'storeSettingFieldInsertBindTask'
 				),
 				'dkim_servicetype' => array(
-					'label' => $lng['dkim']['dkim_servicetype'],
+					'label' => \Froxlor\Frontend\UI::getLng('dkim.dkim_servicetype'),
 					'settinggroup' => 'dkim',
 					'varname' => 'dkim_servicetype',
 					'type' => 'option',
@@ -86,8 +86,8 @@ return array(
 				),
 				'dkim_keylength' => array(
 					'label' => array(
-						'title' => $lng['dkim']['dkim_keylength']['title'],
-						'description' => sprintf($lng['dkim']['dkim_keylength']['description'], \Froxlor\Settings::Get('dkim.dkim_prefix'))
+						'title' => \Froxlor\Frontend\UI::getLng('dkim.dkim_keylength.title'),
+						'description' => sprintf(\Froxlor\Frontend\UI::getLng('dkim.dkim_keylength.description'), \Froxlor\Settings::Get('dkim.dkim_prefix'))
 					),
 					'settinggroup' => 'dkim',
 					'varname' => 'dkim_keylength',
@@ -101,7 +101,7 @@ return array(
 					'save_method' => 'storeSettingFieldInsertBindTask'
 				),
 				'dkim_notes' => array(
-					'label' => $lng['dkim']['dkim_notes'],
+					'label' => \Froxlor\Frontend\UI::getLng('dkim.dkim_notes'),
 					'settinggroup' => 'dkim',
 					'varname' => 'dkim_notes',
 					'type' => 'string',
@@ -110,7 +110,7 @@ return array(
 					'save_method' => 'storeSettingFieldInsertBindTask'
 				),
 				'dkimrestart_command' => array(
-					'label' => $lng['dkim']['dkimrestart_command'],
+					'label' => \Froxlor\Frontend\UI::getLng('dkim.dkimrestart_command'),
 					'settinggroup' => 'dkim',
 					'varname' => 'dkimrestart_command',
 					'type' => 'string',
@@ -121,5 +121,3 @@ return array(
 		)
 	)
 );
-
-?>

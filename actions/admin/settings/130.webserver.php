@@ -19,10 +19,10 @@
 return array(
 	'groups' => array(
 		'webserver' => array(
-			'title' => $lng['admin']['webserversettings'],
+			'title' => \Froxlor\Frontend\UI::getLng('admin.webserversettings'),
 			'fields' => array(
 				'system_webserver' => array(
-					'label' => $lng['admin']['webserver'],
+					'label' => \Froxlor\Frontend\UI::getLng('admin.webserver'),
 					'settinggroup' => 'system',
 					'varname' => 'webserver',
 					'type' => 'option',
@@ -41,7 +41,7 @@ return array(
 					'overview_option' => true
 				),
 				'system_apache_24' => array(
-					'label' => $lng['serversettings']['apache_24'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.apache_24'),
 					'settinggroup' => 'system',
 					'varname' => 'apache24',
 					'type' => 'bool',
@@ -52,7 +52,7 @@ return array(
 					)
 				),
 				'system_apache_itksupport' => array(
-					'label' => $lng['serversettings']['apache_itksupport'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.apache_itksupport'),
 					'settinggroup' => 'system',
 					'varname' => 'apacheitksupport',
 					'type' => 'bool',
@@ -64,7 +64,7 @@ return array(
 					)
 				),
 				'system_http2_support' => array(
-					'label' => $lng['serversettings']['http2_support'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.http2_support'),
 					'settinggroup' => 'system',
 					'varname' => 'http2_support',
 					'type' => 'bool',
@@ -77,7 +77,7 @@ return array(
 					'visible' => \Froxlor\Settings::Get('system.use_ssl')
 				),
 				'system_dhparams_file' => array(
-					'label' => $lng['serversettings']['dhparams_file'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.dhparams_file'),
 					'settinggroup' => 'system',
 					'varname' => 'dhparams_file',
 					'type' => 'string',
@@ -88,7 +88,7 @@ return array(
 					'visible' => \Froxlor\Settings::Get('system.use_ssl')
 				),
 				'system_httpuser' => array(
-					'label' => $lng['admin']['webserver_user'],
+					'label' => \Froxlor\Frontend\UI::getLng('admin.webserver_user'),
 					'settinggroup' => 'system',
 					'varname' => 'httpuser',
 					'type' => 'string',
@@ -96,7 +96,7 @@ return array(
 					'save_method' => 'storeSettingWebserverFcgidFpmUser'
 				),
 				'system_httpgroup' => array(
-					'label' => $lng['admin']['webserver_group'],
+					'label' => \Froxlor\Frontend\UI::getLng('admin.webserver_group'),
 					'settinggroup' => 'system',
 					'varname' => 'httpgroup',
 					'type' => 'string',
@@ -104,7 +104,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_apacheconf_vhost' => array(
-					'label' => $lng['serversettings']['apacheconf_vhost'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.apacheconf_vhost'),
 					'settinggroup' => 'system',
 					'varname' => 'apacheconf_vhost',
 					'type' => 'string',
@@ -113,7 +113,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_apacheconf_diroptions' => array(
-					'label' => $lng['serversettings']['apacheconf_diroptions'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.apacheconf_diroptions'),
 					'settinggroup' => 'system',
 					'varname' => 'apacheconf_diroptions',
 					'type' => 'string',
@@ -122,7 +122,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_apacheconf_htpasswddir' => array(
-					'label' => $lng['serversettings']['apacheconf_htpasswddir'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.apacheconf_htpasswddir'),
 					'settinggroup' => 'system',
 					'varname' => 'apacheconf_htpasswddir',
 					'type' => 'string',
@@ -131,7 +131,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_logfiles_directory' => array(
-					'label' => $lng['serversettings']['logfiles_directory'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.logfiles_directory'),
 					'settinggroup' => 'system',
 					'varname' => 'logfiles_directory',
 					'type' => 'string',
@@ -140,7 +140,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_logfiles_script' => array(
-					'label' => $lng['serversettings']['logfiles_script'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.logfiles_script'),
 					'settinggroup' => 'system',
 					'varname' => 'logfiles_script',
 					'type' => 'string',
@@ -152,7 +152,7 @@ return array(
 					)
 				),
 				'system_logfiles_piped' => array(
-					'label' => $lng['serversettings']['logfiles_piped'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.logfiles_piped'),
 					'settinggroup' => 'system',
 					'varname' => 'logfiles_piped',
 					'type' => 'bool',
@@ -163,7 +163,7 @@ return array(
 					)
 				),
 				'system_logfiles_format' => array(
-					'label' => $lng['serversettings']['logfiles_format'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.logfiles_format'),
 					'settinggroup' => 'system',
 					'varname' => 'logfiles_format',
 					'type' => 'string',
@@ -176,7 +176,7 @@ return array(
 					)
 				),
 				'system_logfiles_type' => array(
-					'label' => $lng['serversettings']['logfiles_type'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.logfiles_type'),
 					'settinggroup' => 'system',
 					'varname' => 'logfiles_type',
 					'type' => 'option',
@@ -192,7 +192,7 @@ return array(
 					)
 				),
 				'system_customersslpath' => array(
-					'label' => $lng['serversettings']['customerssl_directory'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.customerssl_directory'),
 					'settinggroup' => 'system',
 					'varname' => 'customer_ssl_path',
 					'type' => 'string',
@@ -201,7 +201,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_phpappendopenbasedir' => array(
-					'label' => $lng['serversettings']['phpappendopenbasedir'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.phpappendopenbasedir'),
 					'settinggroup' => 'system',
 					'varname' => 'phpappendopenbasedir',
 					'type' => 'string',
@@ -210,7 +210,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_deactivateddocroot' => array(
-					'label' => $lng['serversettings']['deactivateddocroot'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.deactivateddocroot'),
 					'settinggroup' => 'system',
 					'varname' => 'deactivateddocroot',
 					'type' => 'string',
@@ -220,7 +220,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_default_vhostconf' => array(
-					'label' => $lng['serversettings']['default_vhostconf'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.default_vhostconf'),
 					'settinggroup' => 'system',
 					'varname' => 'default_vhostconf',
 					'type' => 'text',
@@ -228,7 +228,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_apache_globaldiropt' => array(
-					'label' => $lng['serversettings']['apache_globaldiropt'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.apache_globaldiropt'),
 					'settinggroup' => 'system',
 					'varname' => 'apacheglobaldiropt',
 					'type' => 'text',
@@ -240,7 +240,7 @@ return array(
 					)
 				),
 				'system_apachereload_command' => array(
-					'label' => $lng['serversettings']['apachereload_command'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.apachereload_command'),
 					'settinggroup' => 'system',
 					'varname' => 'apachereload_command',
 					'type' => 'string',
@@ -248,7 +248,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_phpreload_command' => array(
-					'label' => $lng['serversettings']['phpreload_command'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.phpreload_command'),
 					'settinggroup' => 'system',
 					'varname' => 'phpreload_command',
 					'type' => 'string',
@@ -259,7 +259,7 @@ return array(
 					)
 				),
 				'system_nginx_php_backend' => array(
-					'label' => $lng['serversettings']['nginx_php_backend'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.nginx_php_backend'),
 					'settinggroup' => 'system',
 					'varname' => 'nginx_php_backend',
 					'type' => 'string',
@@ -270,7 +270,7 @@ return array(
 					)
 				),
 				'nginx_fastcgiparams' => array(
-					'label' => $lng['serversettings']['nginx_fastcgiparams'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.nginx_fastcgiparams'),
 					'settinggroup' => 'nginx',
 					'varname' => 'fastcgiparams',
 					'type' => 'string',
@@ -282,7 +282,7 @@ return array(
 					)
 				),
 				'defaultwebsrverrhandler_enabled' => array(
-					'label' => $lng['serversettings']['defaultwebsrverrhandler_enabled'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.defaultwebsrverrhandler_enabled'),
 					'settinggroup' => 'defaultwebsrverrhandler',
 					'varname' => 'enabled',
 					'type' => 'bool',
@@ -290,7 +290,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'defaultwebsrverrhandler_err401' => array(
-					'label' => $lng['serversettings']['defaultwebsrverrhandler_err401'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.defaultwebsrverrhandler_err401'),
 					'settinggroup' => 'defaultwebsrverrhandler',
 					'varname' => 'err401',
 					'type' => 'string',
@@ -302,7 +302,7 @@ return array(
 					)
 				),
 				'defaultwebsrverrhandler_err403' => array(
-					'label' => $lng['serversettings']['defaultwebsrverrhandler_err403'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.defaultwebsrverrhandler_err403'),
 					'settinggroup' => 'defaultwebsrverrhandler',
 					'varname' => 'err403',
 					'type' => 'string',
@@ -314,7 +314,7 @@ return array(
 					)
 				),
 				'defaultwebsrverrhandler_err404' => array(
-					'label' => $lng['serversettings']['defaultwebsrverrhandler_err404'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.defaultwebsrverrhandler_err404'),
 					'settinggroup' => 'defaultwebsrverrhandler',
 					'varname' => 'err404',
 					'type' => 'string',
@@ -322,7 +322,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'defaultwebsrverrhandler_err500' => array(
-					'label' => $lng['serversettings']['defaultwebsrverrhandler_err500'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.defaultwebsrverrhandler_err500'),
 					'settinggroup' => 'defaultwebsrverrhandler',
 					'varname' => 'err500',
 					'type' => 'string',
@@ -334,7 +334,7 @@ return array(
 					)
 				),
 				'customredirect_enabled' => array(
-					'label' => $lng['serversettings']['customredirect_enabled'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.customredirect_enabled'),
 					'settinggroup' => 'customredirect',
 					'varname' => 'enabled',
 					'type' => 'bool',
@@ -342,13 +342,16 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'customredirect_default' => array(
-					'label' => $lng['serversettings']['customredirect_default'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.customredirect_default'),
 					'settinggroup' => 'customredirect',
 					'varname' => 'default',
 					'type' => 'option',
 					'default' => '1',
 					'option_mode' => 'one',
-					'option_options_method' => array('\\Froxlor\\Domain\\Domain', 'getRedirectCodes'),
+					'option_options_method' => array(
+						'\\Froxlor\\Domain\\Domain',
+						'getRedirectCodes'
+					),
 					'save_method' => 'storeSettingField'
 				)
 			)

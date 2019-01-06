@@ -1,0 +1,43 @@
+{% extends "Sparkle2/userarea.html.twig" %}
+
+{% block content %}
+<div class="card">
+	<div class="card-header">
+		<ul class="nav nav-tabs card-header-tabs" id="subnav-tab"
+			role="tablist">
+			<li class="nav-item"><a class="nav-link active"
+				id="subnav-set-tab" data-toggle="tab" href="#tab-set" role="tab"
+				aria-controls="subnav-set" aria-selected="true">{{ lng('admin.serversettings') }}</a></li>
+			<li class="nav-item"><a class="nav-link" id="subnav-iex-tab"
+				data-toggle="tab" href="#tab-iex" role="tab"
+				aria-controls="subnav-iex" aria-selected="false"><i
+					class="fas fa-file-export"></i>&nbsp;{{ lng('admin.configfiles.importexport') }}</a></li>
+		</ul>
+	</div>
+	<div class="card-body tab-content" id="subnav-tabContent">
+		<div class="tab-pane fade show active" id="tab-set" role="tabpanel"
+			aria-labelledby="subnav-set-tab">
+			<div class="row">
+				<div class="col-sm-12 col-md-6 offset-md-3">
+					<h5 class="mb-3">
+						<i class="fas fa-wrench"></i>&nbsp;
+						{{ lng('admin.serversettings') }}
+					</h5>
+					{% import "Sparkle2/misc/form/settings_form.html.twig" as f %}
+					{{ f.form(form_data, part) }}
+				</div>
+			</div>
+		</div>
+
+		<div class="tab-pane fade" id="tab-iex" role="tabpanel"
+			aria-labelledby="subnav-iex-tab">
+			<div class="row">
+				<div class="col-sm-12 col-md-6 offset-md-3">
+					<div class="card">@todo</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+{% endblock %}

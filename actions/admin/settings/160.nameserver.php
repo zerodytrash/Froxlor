@@ -19,10 +19,10 @@
 return array(
 	'groups' => array(
 		'nameserver' => array(
-			'title' => $lng['admin']['nameserversettings'],
+			'title' => \Froxlor\Frontend\UI::getLng('admin.nameserversettings'),
 			'fields' => array(
 				'nameserver_enable' => array(
-					'label' => $lng['serversettings']['bindenable'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.bindenable'),
 					'settinggroup' => 'system',
 					'varname' => 'bind_enable',
 					'type' => 'bool',
@@ -31,7 +31,7 @@ return array(
 					'overview_option' => true
 				),
 				'system_dnsenabled' => array(
-					'label' => $lng['serversettings']['dnseditorenable'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.dnseditorenable'),
 					'settinggroup' => 'system',
 					'varname' => 'dnsenabled',
 					'type' => 'bool',
@@ -39,7 +39,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_dns_server' => array(
-					'label' => $lng['serversettings']['dns_server'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.dns_server'),
 					'settinggroup' => 'system',
 					'varname' => 'dns_server',
 					'type' => 'option',
@@ -52,7 +52,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_bindconf_directory' => array(
-					'label' => $lng['serversettings']['bindconf_directory'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.bindconf_directory'),
 					'settinggroup' => 'system',
 					'varname' => 'bindconf_directory',
 					'type' => 'string',
@@ -61,7 +61,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_bindreload_command' => array(
-					'label' => $lng['serversettings']['bindreload_command'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.bindreload_command'),
 					'settinggroup' => 'system',
 					'varname' => 'bindreload_command',
 					'type' => 'string',
@@ -69,7 +69,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_nameservers' => array(
-					'label' => $lng['serversettings']['nameservers'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.nameservers'),
 					'settinggroup' => 'system',
 					'varname' => 'nameservers',
 					'type' => 'string',
@@ -79,7 +79,7 @@ return array(
 					'save_method' => 'storeSettingFieldInsertBindTask'
 				),
 				'system_mxservers' => array(
-					'label' => $lng['serversettings']['mxservers'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.mxservers'),
 					'settinggroup' => 'system',
 					'varname' => 'mxservers',
 					'type' => 'string',
@@ -89,7 +89,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_axfrservers' => array(
-					'label' => $lng['serversettings']['axfrservers'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.axfrservers'),
 					'settinggroup' => 'system',
 					'varname' => 'axfrservers',
 					'type' => 'string',
@@ -100,7 +100,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_dns_createmailentry' => array(
-					'label' => $lng['serversettings']['mail_also_with_mxservers'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.mail_also_with_mxservers'),
 					'settinggroup' => 'system',
 					'varname' => 'dns_createmailentry',
 					'type' => 'bool',
@@ -108,7 +108,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_defaultttl' => array(
-					'label' => $lng['serversettings']['defaultttl'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.defaultttl'),
 					'settinggroup' => 'system',
 					'varname' => 'defaultttl',
 					'type' => 'int',

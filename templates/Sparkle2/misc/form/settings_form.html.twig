@@ -1,0 +1,107 @@
+{% macro form(form_data, part, action) %}
+
+<form action="{{ action|default("") }}" method="post"
+	enctype="application/x-www-form-urlencoded" class="form">
+	{% if part is empty %}
+	<div class="card mb-2">
+		<div class="card-body">
+			{% for sections in form_data %}
+			{% for sectionname, section in sections %}
+			<div class="form-group form-row border-bottom">
+				<label for="{{ sectionname }}" class="col-sm-4 col-form-label">{{ section.title|raw }}</label>
+				<div class="col-sm-5">
+					{% for element in section.elements %}
+					<div class="row">
+						<div class="col-sm-5 text-right">
+							<small>{{ element.title }}:</small>
+						</div>
+						<div class="col-sm-7">
+							{% if element.type == 'select' %}
+							<select class="form-control form-control-sm"
+								name="{{ sectionname }}" id="{{ sectionname }}">
+								{{ element.select_var|raw }}
+							</select>
+							{% elseif element.type == 'yesno' %}
+							{{ element.select|raw }}
+							{% endif %}
+						</div>
+					</div>
+					{% endfor %}
+				</div>
+				<div class="col-sm-3 text-right">
+					<a
+						href="index.php?module=AdminSettings&view=overview&part={{ sectionname }}"
+						class="btn btn-sm btn-primary">{{ lng('admin.serversettings') }}</a>
+				</div>
+			</div>
+			{% endfor %}
+			{% endfor %}
+		</div>
+		<!-- /card-body -->
+		{% if not nobuttons|default(false) %}
+		<div class="card-footer">
+			<div class="form-group form-row mb-0">
+				<div class="col-sm-12 text-right">
+					<button type="reset" class="btn btn-danger">
+						<i class="fas fa-times"></i>&nbsp;
+						{{ lng('panel.cancel') }}
+					</button>
+					<button type="submit" class="btn btn-success">
+						<i class="fas fa-save"></i>&nbsp;
+						{{ lng('panel.save') }}
+					</button>
+				</div>
+			</div>
+		</div>
+		<!-- /card-footer -->
+		{% endif %}
+	</div>
+	<!-- /card -->
+	{% else %}
+	{% for sections in form_data %}
+	{% for sectionname, section in sections %}
+	<div class="card mb-2">
+		<div class="card-header">
+			<div class="row">
+				<div class="col-sm-10 mt-1"><h5 class="mb-0">{{ section.title }}</h5></div>
+				<div class="col-sm-2 text-right"><a href="index.php?module=AdminSettings" class="btn btn-sm btn-primary">{{ lng('panel.back') }}</a></div>
+			</div>
+		</div>
+		<div class="card-body">
+			{% for element in section.elements %}
+			<div class="form-group form-row border-bottom pb-3">
+				<label for="{{ element.fieldname }}" class="col-sm-7 col-form-label">{{ element.label|raw }}
+					{% if element.desc %}<br> <small>{{ element.desc|raw }}</small>{% endif %}</label>
+				<div
+					class="col-sm-5 text-right{% if element.style %} {{ element.style }}{% endif %}">
+					{{ element.data_field|raw }}
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+		<!-- /card-body -->
+		{% if not nobuttons|default(false) %}
+		<div class="card-footer">
+			<div class="form-group form-row mb-0">
+				<div class="col-sm-12 text-right">
+					<button type="reset" class="btn btn-danger">
+						<i class="fas fa-times"></i>&nbsp;
+						{{ lng('panel.cancel') }}
+					</button>
+					<button type="submit" class="btn btn-success">
+						<i class="fas fa-save"></i>&nbsp;
+						{{ lng('panel.save') }}
+					</button>
+				</div>
+			</div>
+		</div>
+		<!-- /card-footer -->
+		{% endif %}
+	</div>
+	<!-- /card -->
+	{% endfor %}
+	{% endfor %}
+	{% endif %}
+</form>
+
+{% endmacro %}

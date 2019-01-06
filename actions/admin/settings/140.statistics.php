@@ -19,24 +19,24 @@
 return array(
 	'groups' => array(
 		'statistics' => array(
-			'title' => $lng['admin']['statisticsettings'],
+			'title' => \Froxlor\Frontend\UI::getLng('admin.statisticsettings'),
 			'fields' => array(
 				'system_webalizer_quiet' => array(
-					'label' => $lng['serversettings']['webalizer_quiet'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.webalizer_quiet'),
 					'settinggroup' => 'system',
 					'varname' => 'webalizer_quiet',
 					'type' => 'option',
 					'default' => 2,
 					'option_mode' => 'one',
 					'option_options' => array(
-						0 => $lng['admin']['webalizer']['normal'],
-						1 => $lng['admin']['webalizer']['quiet'],
-						2 => $lng['admin']['webalizer']['veryquiet']
+						0 => \Froxlor\Frontend\UI::getLng('admin.webalizer.normal'),
+						1 => \Froxlor\Frontend\UI::getLng('admin.webalizer.quiet'),
+						2 => \Froxlor\Frontend\UI::getLng('admin.webalizer.veryquiet')
 					),
 					'save_method' => 'storeSettingField'
 				),
 				'system_awstats_enabled' => array(
-					'label' => $lng['serversettings']['awstats_enabled'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.awstats_enabled'),
 					'settinggroup' => 'system',
 					'varname' => 'awstats_enabled',
 					'type' => 'bool',
@@ -44,7 +44,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_awstats_path' => array(
-					'label' => $lng['serversettings']['awstats_path'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.awstats_path'),
 					'settinggroup' => 'system',
 					'varname' => 'awstats_path',
 					'type' => 'string',
@@ -53,7 +53,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_awstats_awstatspath' => array(
-					'label' => $lng['serversettings']['awstats_awstatspath'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.awstats_awstatspath'),
 					'settinggroup' => 'system',
 					'varname' => 'awstats_awstatspath',
 					'type' => 'string',
@@ -62,7 +62,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_awstats_conf' => array(
-					'label' => $lng['serversettings']['awstats_conf'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.awstats_conf'),
 					'settinggroup' => 'system',
 					'varname' => 'awstats_conf',
 					'type' => 'string',
@@ -71,7 +71,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_awstats_icons' => array(
-					'label' => $lng['serversettings']['awstats_icons'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.awstats_icons'),
 					'settinggroup' => 'system',
 					'varname' => 'awstats_icons',
 					'type' => 'string',
@@ -83,5 +83,3 @@ return array(
 		)
 	)
 );
-
-?>

@@ -33,6 +33,7 @@
 		</tbody>
 	</table>
 </div>
+{% if not nosearch|default(false) %}
 <script>
 	$(document).ready(function() {
 		$("#{{ tablename }}-input").on("keyup", function() {
@@ -49,4 +50,5 @@
 		});
 	});
 </script>
+{% endif %}
 {% endmacro %}

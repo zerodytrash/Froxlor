@@ -21,9 +21,9 @@ class HtmlForm
 	/**
 	 * internal tmp-variable to store form
 	 *
-	 * @var string
+	 * @var array
 	 */
-	private static $form = '';
+	private static $form = null;
 
 	private static $filename = '';
 
