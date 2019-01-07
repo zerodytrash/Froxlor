@@ -339,7 +339,7 @@ return array(
 					'icon' => 'cogs'
 				),
 				array(
-					'url' => 'index.php?module=AdminSettings&view=phpinfo',
+					'url' => 'index.php?module=AdminPhpSettings&view=phpinfo',
 					'label' => \Froxlor\Frontend\UI::getLng('admin.phpinfo'),
 					'required_resources' => 'change_serversettings',
 					'icon' => 'info-circle'

@@ -170,4 +170,42 @@ class AdminPhpSettings extends FeModule
 			\Froxlor\UI\Response::standard_error('nopermissionsorinvalidid');
 		}
 	}
+
+	public function phpinfo()
+	{
+		ob_start();
+		phpinfo();
+		$phpinforesult = ob_get_clean();
+
+		$phpinfo = array(
+			'phpinfo' => array()
+		);
+
+		$matches = null;
+		if (preg_match_all('#(?:<h2>(?:<a name=".*?">)?(.*?)(?:</a>)?</h2>)|(?:<tr(?: class=".*?")?><t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>)?)?</tr>)#s', $phpinforesult, $matches, PREG_SET_ORDER)) {
+			foreach ($matches as $match) {
+				$end = array_keys($phpinfo);
+				$end = end($end);
+				if (strlen($match[1])) {
+					$phpinfo[$match[1]] = array();
+				} elseif (isset($match[3])) {
+					$phpinfo[$end][$match[2]] = isset($match[4]) ? array(
+						$match[3],
+						$match[4]
+					) : $match[3];
+				} else {
+					$phpinfo[$end][] = $match[2];
+				}
+			}
+			$phpinfo;
+		} else {
+			\Froxlor\UI\Response::standard_error(\Froxlor\Frontend\UI::getLng('error.no_phpinfo'));
+		}
+
+		\Froxlor\Frontend\UI::TwigBuffer('admin/phpconfigs/phpinfo.html.twig', array(
+			'page_title' => \Froxlor\Frontend\UI::getLng('admin.phpinfo'),
+			'phpinfo' => $phpinfo,
+			'phpversion' => PHP_VERSION
+		));
+	}
 }

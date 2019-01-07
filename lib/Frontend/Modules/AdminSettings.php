@@ -245,53 +245,6 @@ class AdminSettings extends FeModule
 	}
 }
 /*
-elseif ($page == 'phpinfo' && $userinfo['change_serversettings'] == '1') {
-	ob_start();
-	phpinfo();
-	$phpinfo = array(
-		'phpinfo' => array()
-	);
-	if (preg_match_all('#(?:<h2>(?:<a name=".*?">)?(.*?)(?:</a>)?</h2>)|(?:<tr(?: class=".*?")?><t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>)?)?</tr>)#s', ob_get_clean(), $matches, PREG_SET_ORDER)) {
-		foreach ($matches as $match) {
-			$end = array_keys($phpinfo);
-			$end = end($end);
-			if (strlen($match[1])) {
-				$phpinfo[$match[1]] = array();
-			} elseif (isset($match[3])) {
-				$phpinfo[$end][$match[2]] = isset($match[4]) ? array(
-					$match[3],
-					$match[4]
-				) : $match[3];
-			} else {
-				$phpinfo[$end][] = $match[2];
-			}
-		}
-		$phpinfohtml = '';
-		foreach ($phpinfo as $name => $section) {
-			$phpinfoentries = "";
-			foreach ($section as $key => $val) {
-				if (is_array($val)) {
-					eval("\$phpinfoentries .= \"" . \Froxlor\UI\Template::getTemplate("settings/phpinfo/phpinfo_3") . "\";");
-				} elseif (is_string($key)) {
-					eval("\$phpinfoentries .= \"" . \Froxlor\UI\Template::getTemplate("settings/phpinfo/phpinfo_2") . "\";");
-				} else {
-					eval("\$phpinfoentries .= \"" . \Froxlor\UI\Template::getTemplate("settings/phpinfo/phpinfo_1") . "\";");
-				}
-			}
-			// first header -> show actual php version
-			if (strtolower($name) == "phpinfo") {
-				$name = "PHP " . PHP_VERSION;
-			}
-			eval("\$phpinfohtml .= \"" . \Froxlor\UI\Template::getTemplate("settings/phpinfo/phpinfo_table") . "\";");
-		}
-		$phpinfo = $phpinfohtml;
-	} else {
-		\Froxlor\UI\Response::standard_error($lng['error']['no_phpinfo']);
-	}
-	eval("echo \"" . \Froxlor\UI\Template::getTemplate("settings/phpinfo") . "\";");
-
-
-
 } elseif ($page == 'enforcequotas' && $userinfo['change_serversettings'] == '1') {
 	if (isset($_POST['send']) && $_POST['send'] == 'send') {
 		// Fetch all accounts

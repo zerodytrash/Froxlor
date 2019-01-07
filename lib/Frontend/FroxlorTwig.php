@@ -18,6 +18,15 @@ class FroxlorTwig extends \Twig_Extension
 		);
 	}
 
+	public function getTests()
+	{
+		return array(
+			new \Twig_Test('numeric', function ($value) {
+				return is_numeric($value);
+			})
+		);
+	}
+
 	public function formatBytesFilter($size, $suffix = "B", $factor = 1)
 	{
 		$size = $size * $factor;

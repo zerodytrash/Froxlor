@@ -1,0 +1,44 @@
+{% extends "Sparkle2/userarea.html.twig" %}
+
+{% block content %}
+<div class="row">
+	<div class="col-sm-12 col-md-6 offset-md-3">
+		<h5 class="mb-3">
+			<i class="fas fa-info-circle"></i>&nbsp;
+			{{ lng('admin.phpinfo') }}
+		</h5>
+
+		{% for title,section in phpinfo %}
+		<div class="card mb-2">
+			<div class="card-header">
+				{% if title == 'phpinfo' %}
+				{{ phpversion }}
+				{% else %}
+				{{ title }}
+				{% endif %}
+			</div>
+			<div class="card-body">
+				{% for key,value in section %}
+				<div class="form-group form-row">
+					{% if key is numeric %}
+					<div class="col-sm-12 text-center">{{ value|raw }}</div>
+					{% else %}
+					<label class="col-sm-5 col-form-label">{{ key|raw }}</label>
+					<div class="col-sm-7">
+						{% if value is iterable %}
+							{% for mastloc in value %}
+								<small>{{ mastloc|raw }}</small><br>
+							{% endfor %}
+						{% else %}
+						{{ value|raw }}
+						{% endif %}
+					</div>
+					{% endif %}
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</div>
+{% endblock %}
