@@ -1,0 +1,80 @@
+{% extends "Sparkle2/userarea.html.twig" %}
+
+{% block content %}
+<div class="card">
+	<div class="card-header">
+		<ul class="nav nav-tabs card-header-tabs" id="subnav-tab"
+			role="tablist">
+			<li class="nav-item"><a class="nav-link active"
+				id="subnav-fda-tab" data-toggle="tab" href="#tab-fda" role="tab"
+				aria-controls="subnav-fda" aria-selected="true">{{ lng('menue.phpsettings.fpmdaemons') }}&nbsp;<span
+					class="badge badge-pill badge-secondary">{{ fpmdaemons.count }}</span></a></li>
+			{% if call_static('\\Froxlor\\CurrentUser', 'getField', ['change_serversettings']) == 1 %}
+			<li class="nav-item"><a class="nav-link" id="subnav-add-tab"
+				data-toggle="tab" href="#tab-add" role="tab"
+				aria-controls="subnav-add" aria-selected="false"><i
+					class="fas fa-plus-circle"></i>&nbsp;{{ lng('admin.phpsettings.addnew') }}</a></li>
+			{% endif %}
+		</ul>
+	</div>
+	<div class="card-body tab-content" id="subnav-tabContent">
+		<div class="tab-pane fade show active" id="tab-fda" role="tabpanel"
+			aria-labelledby="subnav-fda-tab">
+			<div class="card">
+				<div class="card-body" id="phpconfigs-list">
+					{% import "Sparkle2/table-listing.html.twig" as t %}
+					{% set content %}
+					{% for fpmdaemon in fpmdaemons.list %}
+					<tr class="d-flex">
+						<td class="col-sm-2"><strong>{{ fpmdaemon.description|raw }}</strong>
+						{% if phpconfig.is_default %}&nbsp;<i class="fas fa-check-circle"
+							data-toggle="tooltip" data-placement="right"
+							title="{{ lng('panel.default') }}"></i> {% endif %}</td>
+						<td class="col-sm-2">{% if fpmdaemon.configs|length > 0 %}
+							<ul class="list-unstyled">
+								{% for config in fpmdaemon.configs %}
+								<li>{{ config }}</li>
+								{% endfor %}
+							</ul>{% else %} {{ lng('admin.phpsettings.notused') }}
+							{% endif %}</td>
+						<td class="col-sm-3">{{ fpmdaemon.reload_cmd }}	</td>
+						<td class="col-sm-3">{{ fpmdaemon.config_dir }}</td>
+						<td class="col-sm-1">{{ fpmdaemon.pm }}</td>
+						<td class="col-sm-1 text-right"><a href="#"
+							class="text-danger delete-btn" data-id="{{ phpconfig.id }}"
+							data-container="body" data-toggle="tooltip" data-placement="left"
+							title="{% trans "PhpConfig löschen" %}"><i
+								class="fas fa-trash-alt"></i></a></td>
+					</tr>
+					{% endfor %}
+					{% endset %}
+					{% if fpmdaemons.count > 0 %}
+					{{ t.listing("phpconfigs-listing", [lng('admin.phpsettings.description'), lng('admin.phpsettings.activephpconfigs'), lng('serversettings.phpfpm_settings.reload'), lng('serversettings.phpfpm_settings.configdir'), lng('serversettings.phpfpm_settings.pm'), "|" ~ lng('panel.options')], content, [2,2,3,3,1,1]) }}
+					{% else %}
+					<div class="alert alert-info" role="alert">
+						{% trans "Keine FpmDaemons" %}
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+
+		{% if call_static('\\Froxlor\\CurrentUser', 'getField', ['change_serversettings']) == 1 %}
+		<div class="tab-pane fade" id="tab-add" role="tabpanel"
+			aria-labelledby="subnav-add-tab">
+			<div class="row">
+				<div class="col-sm-12 col-md-6 offset-md-3">
+					<h5 class="mb-3">
+						<i class="fas fa-plus-circle"></i>&nbsp;
+						{{ lng('admin.phpsettings.addnew') }}
+					</h5>
+					{% import "Sparkle2/misc/form/form.html.twig" as f %}
+					{{ f.form(form_data) }}
+				</div>
+			</div>
+		</div>
+		{% endif %}
+
+	</div>
+</div>
+{% endblock %}

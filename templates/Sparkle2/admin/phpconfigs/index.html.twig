@@ -1,0 +1,92 @@
+{% extends "Sparkle2/userarea.html.twig" %}
+
+{% block content %}
+<div class="card">
+	<div class="card-header">
+		<ul class="nav nav-tabs card-header-tabs" id="subnav-tab"
+			role="tablist">
+			<li class="nav-item"><a class="nav-link active"
+				id="subnav-pcf-tab" data-toggle="tab" href="#tab-pcf" role="tab"
+				aria-controls="subnav-pcf" aria-selected="true">{{ lng('menue.phpsettings.maintitle') }}&nbsp;<span
+					class="badge badge-pill badge-secondary">{{ phpconfigs.count }}</span></a></li>
+			{% if call_static('\\Froxlor\\CurrentUser', 'getField', ['change_serversettings']) == 1 %}
+			<li class="nav-item"><a class="nav-link" id="subnav-add-tab"
+				data-toggle="tab" href="#tab-add" role="tab"
+				aria-controls="subnav-add" aria-selected="false"><i
+					class="fas fa-plus-circle"></i>&nbsp;{{ lng('admin.phpsettings.addnew') }}</a></li>
+			{% endif %}
+		</ul>
+	</div>
+	<div class="card-body tab-content" id="subnav-tabContent">
+		<div class="tab-pane fade show active" id="tab-pcf" role="tabpanel"
+			aria-labelledby="subnav-pcf-tab">
+			<div class="card">
+				<div class="card-body" id="phpconfigs-list">
+					{% import "Sparkle2/table-listing.html.twig" as t %}
+					{% set content %}
+					{% for phpconfig in phpconfigs.list %}
+					<tr class="d-flex">
+						<td class="col-sm-3"><strong>{{ phpconfig.description|raw }}</strong>
+						{% if phpconfig.is_default %}&nbsp;<i class="fas fa-check-circle"
+							data-toggle="tooltip" data-placement="right"
+							title="{{ lng('panel.default') }}"></i> {% endif %}</td>
+						<td class="col-sm-3">{% if phpconfig.domains|length > 0 %}
+							<ul class="list-unstyled">
+								{% for domain in phpconfig.domains %}
+								<li>{{ domain }}</li>
+								{% endfor %}
+								{% if phpconfig.subdomains|length > 0 %}
+								+ <span class="badge badge-secondary">{{ phpconfig.subdomains|length }}</span>
+								{{ lng('panel.subdomains') }}
+								</li>
+								{% endif %}
+							</ul> {% elseif phpconfig.subdomains|length > 0 %} <span
+							class="badge badge-secondary">{{ phpconfig.subdomains|length }}</span>
+							{{ lng('panel.subdomains') }} {% else %} {{ lng('admin.phpsettings.notused') }}
+							{% endif %}</td>
+						<td class="col-sm-3">{% if get_setting('phpfpm.enabled') == 1 %}
+							{{ phpconfig.fpmdesc }} {% else %} {{ phpconfig.binary }} {% endif %}
+						</td>
+						<td class="col-sm-1">{{ phpconfig.file_extensions }}</td>
+						<td class="col-sm-2 text-right"><a href="#"
+							class="text-danger delete-btn" data-id="{{ phpconfig.id }}"
+							data-container="body" data-toggle="tooltip" data-placement="left"
+							title="{% trans "PhpConfig löschen" %}"><i
+								class="fas fa-trash-alt"></i></a></td>
+					</tr>
+					{% endfor %}
+					{% endset %}
+					{% if phpconfigs.count > 0 %}
+					{% if get_setting('phpfpm.enabled') == 1 %}
+					{{ t.listing("phpconfigs-listing", [lng('admin.phpsettings.description'), lng('admin.phpsettings.activedomains'), lng('admin.phpsettings.fpmdesc'), lng('admin.phpsettings.file_extensions'), "|" ~ lng('panel.options')], content, [3,3,3,1,2]) }}
+					{% else %}
+					{{ t.listing("phpconfigs-listing", [lng('admin.phpsettings.description'), lng('admin.phpsettings.activedomains'), lng('admin.phpsettings.binary'), lng('admin.phpsettings.file_extensions'), "|" ~ lng('panel.options')], content, [3,3,3,1,2]) }}
+					{% endif %}
+					{% else %}
+					<div class="alert alert-info" role="alert">
+						{% trans "Keine PhpConfigs" %}
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+
+		{% if call_static('\\Froxlor\\CurrentUser', 'getField', ['change_serversettings']) == 1 %}
+		<div class="tab-pane fade" id="tab-add" role="tabpanel"
+			aria-labelledby="subnav-add-tab">
+			<div class="row">
+				<div class="col-sm-12 col-md-6 offset-md-3">
+					<h5 class="mb-3">
+						<i class="fas fa-plus-circle"></i>&nbsp;
+						{{ lng('admin.phpsettings.addnew') }}
+					</h5>
+					{% import "Sparkle2/misc/form/form.html.twig" as f %}
+					{{ f.form(form_data) }}
+				</div>
+			</div>
+		</div>
+		{% endif %}
+
+	</div>
+</div>
+{% endblock %}

@@ -332,7 +332,7 @@ return array(
 					'icon' => 'cogs'
 				),
 				array(
-					'url' => 'index.php?module=AdminPhpSettings&view=fpmdaemons',
+					'url' => 'index.php?module=AdminFpmDaemons',
 					'label' => \Froxlor\Frontend\UI::getLng('menue.phpsettings.fpmdaemons'),
 					'required_resources' => 'change_serversettings',
 					'show_element' => \Froxlor\Settings::Get('phpfpm.enabled') == true,

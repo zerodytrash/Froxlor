@@ -41,7 +41,7 @@
 					</tr>
 					{% endfor %}
 					{% endset %}
-					{% if domains|length > 0 %}
+					{% if domains.count > 0 %}
 					{{ t.listing("domains-listing", [lng('domains.domainname'), lng('admin.ipsandports.ip'), lng('admin.customer'), "|" ~ lng('panel.options')], content, [3,3,3,3]) }}
 					{% else %}
 					<div class="alert alert-info" role="alert">
