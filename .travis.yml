@@ -10,7 +10,7 @@ php:
 branches:
   only:
   - master
-  - namespaces
+  - fc
 
 matrix:
   include:
