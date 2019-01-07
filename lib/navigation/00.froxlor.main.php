@@ -18,39 +18,40 @@
  */
 return array(
 	'customer' => array(
-		'index' => array(
-			'url' => 'customer_index.php',
+		'mydata' => array(
+			'icon' => 'user',
 			'label' => \Froxlor\Frontend\UI::getLng('admin.mydata'),
 			'elements' => array(
 				array(
 					'label' => \Froxlor\Frontend\UI::getLng('menue.main.username') . \Froxlor\CurrentUser::getField('loginname')
 				),
 				array(
-					'url' => 'customer_index.php?page=change_password',
-					'label' => \Froxlor\Frontend\UI::getLng('menue.main.changepassword')
+					'url' => 'index.php?module=CustomerIndex&view=change_password',
+					'label' => \Froxlor\Frontend\UI::getLng('menue.main.changepassword'),
+					'icon' => 'user-lock'
 				),
 				array(
-					'url' => 'customer_index.php?page=change_language',
-					'label' => \Froxlor\Frontend\UI::getLng('menue.main.changelanguage')
+					'url' => 'index.php?module=CustomerIndex&view=change_language',
+					'label' => \Froxlor\Frontend\UI::getLng('menue.main.changelanguage'),
+					'icon' => 'flag'
 				),
 				array(
-					'url' => 'customer_index.php?page=change_theme',
+					'url' => 'index.php?module=CustomerIndex&view=change_theme',
 					'label' => \Froxlor\Frontend\UI::getLng('menue.main.changetheme'),
-					'show_element' => (\Froxlor\Settings::Get('panel.allow_theme_change_customer') == true)
+					'show_element' => (\Froxlor\Settings::Get('panel.allow_theme_change_customer') == true),
+					'icon' => 'images'
 				),
 				array(
-					'url' => 'customer_index.php?page=apikeys',
+					'url' => 'index.php?module=ApiKeys',
 					'label' => \Froxlor\Frontend\UI::getLng('menue.main.apikeys'),
-					'show_element' => (\Froxlor\Settings::Get('api.enabled') == true)
+					'show_element' => (\Froxlor\Settings::Get('api.enabled') == true),
+					'icon' => 'key'
 				),
 				array(
-					'url' => 'customer_index.php?page=apihelp',
+					'url' => 'index.php?module=ApiKeys&view=apihelp',
 					'label' => \Froxlor\Frontend\UI::getLng('menue.main.apihelp'),
-					'show_element' => (\Froxlor\Settings::Get('api.enabled') == true)
-				),
-				array(
-					'url' => 'customer_index.php?action=logout',
-					'label' => \Froxlor\Frontend\UI::getLng('login.logout')
+					'show_element' => (\Froxlor\Settings::Get('api.enabled') == true),
+					'icon' => 'question-circle'
 				)
 			)
 		),
@@ -157,15 +158,10 @@ return array(
 			)
 		),
 		'traffic' => array(
-			'url' => 'customer_traffic.php',
 			'label' => \Froxlor\Frontend\UI::getLng('menue.traffic.traffic'),
+			'url' => 'index.php?module=CustomerTraffic',
 			'show_element' => (! \Froxlor\Settings::IsInList('panel.customer_hide_options', 'traffic')),
-			'elements' => array(
-				array(
-					'url' => 'customer_traffic.php?page=current',
-					'label' => \Froxlor\Frontend\UI::getLng('menue.traffic.current')
-				)
-			)
+			'icon' => 'chart-bar'
 		)
 	),
 	'admin' => array(

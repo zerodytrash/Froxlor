@@ -64,25 +64,26 @@ class AdminSettings extends FeModule
 
 			// check if the session timeout is too low #815
 			if (isset($_POST['session_sessiontimeout']) && $_POST['session_sessiontimeout'] < 60) {
-				\Froxlor\UI\Response::standard_error($lng['error']['session_timeout'], $lng['error']['session_timeout_desc']);
+				\Froxlor\UI\Response::standard_error(array(
+					\Froxlor\Frontend\UI::getLng('error.session_timeout'),
+					\Froxlor\Frontend\UI::getLng('error.session_timeout_desc')
+				));
 			}
 
 			if (\Froxlor\UI\Form::processFormEx($settings_data, $_POST, array(
-				'filename' => $filename,
-				'action' => $action,
-				'page' => $page
+				'filename' => 'index.php?module=AdminSettings&part=' . $part
 			), $part, $settings_all, $settings_part, $only_enabledisable)) {
-				$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_INFO, "rebuild configfiles due to changed setting");
+				\Froxlor\FroxlorLogger::getLog()->addInfo("rebuild configfiles due to changed setting");
 				\Froxlor\System\Cronjob::inserttask('1');
 				// Using nameserver, insert a task which rebuilds the server config
 				\Froxlor\System\Cronjob::inserttask('4');
+				// set quotas (if enabled)
+				\Froxlor\System\Cronjob::inserttask('10');
 				// cron.d file
 				\Froxlor\System\Cronjob::inserttask('99');
 
 				\Froxlor\UI\Response::standard_success('settingssaved', '', array(
-					'filename' => $filename,
-					'action' => $action,
-					'page' => $page
+					'filename' => 'index.php?module=AdminSettings&part=' . $part
 				));
 			}
 		} else {
@@ -165,6 +166,7 @@ class AdminSettings extends FeModule
 	}
 
 	/**
+	 *
 	 * @fixme get that back to the top-menu
 	 */
 	public function wipequotas()
@@ -267,7 +269,7 @@ elseif ($page == 'phpinfo' && $userinfo['change_serversettings'] == '1') {
 
 		// Update the Customer, if the used quota is bigger than the allowed quota
 		Database::query("UPDATE `" . TABLE_PANEL_CUSTOMERS . "` SET `email_quota` = `email_quota_used` WHERE `email_quota` < `email_quota_used`");
-		$log->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_WARNING, 'enforcing mailquota to all customers: ' . Settings::Get('system.mail_quota') . ' MB');
+		\Froxlor\FroxlorLogger::getLog()->addWarning('enforcing mailquota to all customers: ' . Settings::Get('system.mail_quota') . ' MB');
 		\Froxlor\UI\Response::redirectTo($filename, array(
 			's' => $s
 		));
