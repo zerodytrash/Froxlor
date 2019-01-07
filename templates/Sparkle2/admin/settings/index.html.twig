@@ -23,11 +23,8 @@
 		<div class="tab-pane fade show active" id="tab-set" role="tabpanel"
 			aria-labelledby="subnav-set-tab">
 			<div class="row">
-				{% if part is empty %}
-				<div class="col-sm-12 col-md-6 offset-md-3">
-				{% else %}
-				<div class="col-12">
-				{% endif %}
+				<div
+					class="{% if part is empty %}col-sm-12 col-md-6 offset-md-3{% else %}col-12{% endif %}">
 					<h5 class="mb-3">
 						<i class="fas fa-wrench"></i>&nbsp;
 						{{ lng('admin.serversettings') }}
@@ -42,7 +39,54 @@
 			aria-labelledby="subnav-iex-tab">
 			<div class="row">
 				<div class="col-sm-12 col-md-6 offset-md-3">
-					<div class="card">@todo</div>
+					<div class="card mb-2">
+						<div class="card-header">Import</div>
+						<div class="card-body">
+							<div class="form-group form-row mb-0">
+								<div class="col">
+									<form action="index.php?module=AdminSettings&view=import"
+										method="post" enctype="multipart/form-data"
+										class="form">
+										<div class="input-group mb-3">
+											<div class="custom-file">
+												<input type="file" class="custom-file-input"
+													id="import_file" name="import_file"> <label
+													class="custom-file-label" for="import_file"
+													aria-describedby="import_file">Choose file</label>
+											</div>
+											<div class="input-group-append">
+												<input type="hidden" name="send" value="send" />
+												<button class="btn btn-success" type="submit"
+													id="import_file_up">
+													<i class="fas fa-file-import"></i>&nbsp;Import
+												</button>
+											</div>
+										</div>
+										<script>
+                                            $('#import_file').on('change',function(){
+                                                //get the file name
+                                                var fileName = $(this).val().split('\\').pop();
+                                                //replace the "Choose a file" label
+                                                $(this).next('.custom-file-label').html(fileName);
+                                            })
+                                        </script>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card">
+						<div class="card-header">Export</div>
+						<div class="card-body text-center">
+							<div class="form-group form-row mb-0">
+								<div class="col">
+									<a href="index.php?module=AdminSettings&view=export"
+										class="btn btn-success"><i class="fas fa-file-export"></i>&nbsp;
+										Download/Export {{ lng('admin.serversettings') }} </a>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

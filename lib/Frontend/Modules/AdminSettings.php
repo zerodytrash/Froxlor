@@ -17,6 +17,7 @@ namespace Froxlor\Frontend\Modules;
  * @package Panel
  *         
  */
+use Froxlor\Api\Commands\Froxlor;
 use Froxlor\Database\Database;
 use Froxlor\Settings;
 use Froxlor\Frontend\FeModule;
@@ -188,6 +189,60 @@ class AdminSettings extends FeModule
 			\Froxlor\UI\HTML::askYesNo('admin_quotas_reallywipe', 'index.php?module=AdminSettings&view=' . __FUNCTION__);
 		}
 	}
+
+	public function export()
+	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
+		}
+		// check for json-stuff
+		if (! extension_loaded('json')) {
+			\Froxlor\UI\Response::standard_error('jsonextensionnotfound');
+		}
+		// export
+		try {
+			$json_result = Froxlor::getLocal(\Froxlor\CurrentUser::getData())->exportSettings();
+			$json_export = json_decode($json_result, true)['data'];
+		} catch (\Exception $e) {
+			\Froxlor\UI\Response::dynamic_error($e->getMessage());
+		}
+		header('Content-disposition: attachment; filename=Froxlor_settings-' . \Froxlor\Froxlor::VERSION . '-' . \Froxlor\Froxlor::DBVERSION . '_' . date('d.m.Y') . '.json');
+		header('Content-type: application/json');
+		echo $json_export;
+		exit();
+	}
+
+	public function import()
+	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
+		}
+		// check for json-stuff
+		if (! extension_loaded('json')) {
+			\Froxlor\UI\Response::standard_error('jsonextensionnotfound');
+		}
+		// import
+		if (isset($_POST['send']) && $_POST['send'] == 'send') {
+			// get uploaded file
+			if (isset($_FILES["import_file"]["tmp_name"])) {
+				$imp_content = file_get_contents($_FILES["import_file"]["tmp_name"]);
+				try {
+					Froxlor::getLocal(\Froxlor\CurrentUser::getData(), array(
+						'json_str' => $imp_content
+					))->importSettings();
+				} catch (\Exception $e) {
+					\Froxlor\UI\Response::dynamic_error($e->getMessage());
+				}
+				\Froxlor\UI\Response::standard_success('settingsimported', '', array(
+					'filename' => 'index.php?module=AdminSettings'
+				));
+			}
+			\Froxlor\UI\Response::dynamic_error("Upload failed<br>".var_export($_FILES, true));
+		}
+		\Froxlor\UI\Response::redirectTo("index.php?module=AdminSettings");
+	}
 }
 /*
 elseif ($page == 'phpinfo' && $userinfo['change_serversettings'] == '1') {
@@ -296,46 +351,7 @@ elseif ($page == 'phpinfo' && $userinfo['change_serversettings'] == '1') {
 		eval("\$integritycheck.=\"" . \Froxlor\UI\Template::getTemplate("settings/integritycheck_row") . "\";");
 	}
 	eval("echo \"" . \Froxlor\UI\Template::getTemplate("settings/integritycheck") . "\";");
-} elseif ($page == 'importexport' && $userinfo['change_serversettings'] == '1') {
-	// check for json-stuff
-	if (! extension_loaded('json')) {
-		\Froxlor\UI\Response::standard_error('jsonextensionnotfound');
-	}
 
-	if (isset($_GET['action']) && $_GET['action'] == "export") {
-		// export
-		try {
-			$json_result = Froxlor::getLocal($userinfo)->exportSettings();
-			$json_export = json_decode($json_result, true)['data'];
-		} catch (Exception $e) {
-			\Froxlor\UI\Response::dynamic_error($e->getMessage());
-		}
-		header('Content-disposition: attachment; filename=Froxlor_settings-' . $version . '-' . $dbversion . '_' . date('d.m.Y') . '.json');
-		header('Content-type: application/json');
-		echo $json_export;
-		exit();
-	} elseif (isset($_GET['action']) && $_GET['action'] == "import") {
-		// import
-		if (isset($_POST['send']) && $_POST['send'] == 'send') {
-			// get uploaded file
-			if (isset($_FILES["import_file"]["tmp_name"])) {
-				$imp_content = file_get_contents($_FILES["import_file"]["tmp_name"]);
-				try {
-					Froxlor::getLocal($userinfo, array(
-						'json_str' => $imp_content
-					))->importSettings();
-				} catch (Exception $e) {
-					\Froxlor\UI\Response::dynamic_error($e->getMessage());
-				}
-				\Froxlor\UI\Response::standard_success('settingsimported', '', array(
-					'filename' => 'admin_settings.php'
-				));
-			}
-			\Froxlor\UI\Response::dynamic_error("Upload failed");
-		}
-	} else {
-		eval("echo \"" . \Froxlor\UI\Template::getTemplate("settings/importexport/index") . "\";");
-	}
 } elseif ($page == 'testmail') {
 	if (isset($_POST['send']) && $_POST['send'] == 'send') {
 		$test_addr = isset($_POST['test_addr']) ? $_POST['test_addr'] : null;
