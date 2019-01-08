@@ -31,6 +31,12 @@ return array(
 					'icon' => 'user-lock'
 				),
 				array(
+					'url' => 'index.php?module=Edit2FA',
+					'label' => \Froxlor\Frontend\UI::getLng('2fa.2fa'),
+					'show_element' => (\Froxlor\Settings::Get('2fa.enabled') == true),
+					'icon' => 'shield-alt'
+				),
+				array(
 					'url' => 'index.php?module=CustomerIndex&view=change_language',
 					'label' => \Froxlor\Frontend\UI::getLng('menue.main.changelanguage'),
 					'icon' => 'flag'
@@ -177,6 +183,12 @@ return array(
 					'url' => 'index.php?module=AdminIndex&view=change_password',
 					'label' => \Froxlor\Frontend\UI::getLng('menue.main.changepassword'),
 					'icon' => 'user-lock'
+				),
+				array(
+					'url' => 'index.php?module=Edit2FA',
+					'label' => \Froxlor\Frontend\UI::getLng('2fa.2fa'),
+					'show_element' => (\Froxlor\Settings::Get('2fa.enabled') == true),
+					'icon' => 'shield-alt'
 				),
 				array(
 					'url' => 'index.php?module=AdminIndex&view=change_language',

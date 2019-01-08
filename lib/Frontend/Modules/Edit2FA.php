@@ -1,15 +1,5 @@
 <?php
-if (! defined('AREA')) {
-	header("Location: index.php");
-	exit();
-}
-
-use Froxlor\Database\Database;
-use Froxlor\Settings;
-
-if (Settings::Get('2fa.enabled') != '1') {
-	\Froxlor\UI\Response::dynamic_error("2FA not activated");
-}
+namespace Froxlor\Frontend\Modules;
 
 /**
  * This file is part of the Froxlor project.
@@ -26,65 +16,82 @@ if (Settings::Get('2fa.enabled') != '1') {
  * @since 0.10.0
  *       
  */
+use Froxlor\Database\Database;
+use Froxlor\Settings;
+use Froxlor\Frontend\FeModule;
 
-// This file is being included in admin_index and customer_index
-// and therefore does not need to require lib/init.php
-if (AREA == 'admin') {
-	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_ADMINS . "` SET `type_2fa` = :t2fa, `data_2fa` = :d2fa WHERE adminid = :id");
-	$uid = $userinfo['adminid'];
-} elseif (AREA == 'customer') {
-	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_CUSTOMERS . "` SET `type_2fa` = :t2fa, `data_2fa` = :d2fa WHERE customerid = :id");
-	$uid = $userinfo['customerid'];
-}
-$success_message = "";
+class Edit2FA extends FeModule
+{
 
-$tfa = new \Froxlor\FroxlorTwoFactorAuth('Froxlor');
+	public function overview()
+	{
+		if (Settings::Get('2fa.enabled') != '1') {
+			\Froxlor\UI\Response::dynamic_error("2FA not activated");
+		}
 
-// do the delete and then just show a success-message
-if ($action == 'delete') {
-	Database::pexecute($upd_stmt, array(
-		't2fa' => 0,
-		'd2fa' => "",
-		'id' => $uid
-	));
-	\Froxlor\UI\Response::standard_success($lng['2fa']['2fa_removed']);
-} elseif ($action == 'add') {
-	$type = isset($_POST['type_2fa']) ? $_POST['type_2fa'] : '0';
+		if (\Froxlor\CurrentUser::isAdmin()) {
+			$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_ADMINS . "` SET `type_2fa` = :t2fa, `data_2fa` = :d2fa WHERE adminid = :id");
+			$uid = \Froxlor\CurrentUser::getField('adminid');
+		} else {
+			$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_CUSTOMERS . "` SET `type_2fa` = :t2fa, `data_2fa` = :d2fa WHERE customerid = :id");
+			$uid = \Froxlor\CurrentUser::getField('customerid');
+		}
 
-	if ($type == 0 || $type == 1) {
-		$data = "";
+		$tfa = new \Froxlor\FroxlorTwoFactorAuth('Froxlor');
+
+		$log->logAction(\Froxlor\FroxlorLogger::USR_ACTION, LOG_NOTICE, "viewed Edit2FA::overview");
+
+		if ($userinfo['type_2fa'] == '0') {
+
+			// available types
+			$type_select_values = array(
+				0 => '-',
+				1 => 'E-Mail',
+				2 => 'Authenticator'
+			);
+			asort($type_select_values);
+			$type_select = "";
+			foreach ($type_select_values as $_val => $_type) {
+				$type_select .= \Froxlor\UI\HTML::makeoption($_type, $_val);
+			}
+		} elseif ($userinfo['type_2fa'] == '1') {
+			// email Edit2FA enabled
+		} elseif ($userinfo['type_2fa'] == '2') {
+			// authenticator Edit2FA enabled
+			$ga_qrcode = $tfa->getQRCodeImageAsDataUri($userinfo['loginname'], $userinfo['data_2fa']);
+		}
+		eval("echo \"" . \Froxlor\UI\Template::getTemplate("2fa/overview", true) . "\";");
 	}
-	if ($type == 2) {
-		// generate secret for TOTP
-		$data = $tfa->createSecret();
+
+	/**
+	 * do the delete and then just show a success-message
+	 */
+	public function delete()
+	{
+		Database::pexecute($upd_stmt, array(
+			't2fa' => 0,
+			'd2fa' => "",
+			'id' => $uid
+		));
+		\Froxlor\UI\Response::standard_success($lng['2fa']['2fa_removed']);
 	}
-	Database::pexecute($upd_stmt, array(
-		't2fa' => $type,
-		'd2fa' => $data,
-		'id' => $uid
-	));
-	\Froxlor\UI\Response::standard_success(sprintf($lng['2fa']['2fa_added'], $filename, $s));
-}
 
-$log->logAction(\Froxlor\FroxlorLogger::USR_ACTION, LOG_NOTICE, "viewed 2fa::overview");
+	public function add()
+	{
+		$type = isset($_POST['type_2fa']) ? $_POST['type_2fa'] : '0';
 
-if ($userinfo['type_2fa'] == '0') {
-
-	// available types
-	$type_select_values = array(
-		0 => '-',
-		1 => 'E-Mail',
-		2 => 'Authenticator'
-	);
-	asort($type_select_values);
-	$type_select = "";
-	foreach ($type_select_values as $_val => $_type) {
-		$type_select .= \Froxlor\UI\HTML::makeoption($_type, $_val);
+		if ($type == 0 || $type == 1) {
+			$data = "";
+		}
+		if ($type == 2) {
+			// generate secret for TOTP
+			$data = $tfa->createSecret();
+		}
+		Database::pexecute($upd_stmt, array(
+			't2fa' => $type,
+			'd2fa' => $data,
+			'id' => $uid
+		));
+		\Froxlor\UI\Response::standard_success(sprintf($lng['2fa']['2fa_added'], $filename, $s));
 	}
-} elseif ($userinfo['type_2fa'] == '1') {
-	// email 2fa enabled
-} elseif ($userinfo['type_2fa'] == '2') {
-	// authenticator 2fa enabled
-	$ga_qrcode = $tfa->getQRCodeImageAsDataUri($userinfo['loginname'], $userinfo['data_2fa']);
 }
-eval("echo \"" . \Froxlor\UI\Template::getTemplate("2fa/overview", true) . "\";");
