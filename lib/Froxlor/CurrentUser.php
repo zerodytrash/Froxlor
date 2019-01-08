@@ -48,7 +48,7 @@ class CurrentUser
 	 *
 	 * @return boolean
 	 */
-	public static function setField(string $index, $data)
+	public static function setField($index, $data)
 	{
 		$_SESSION['userinfo'][$index] = $data;
 		return true;
