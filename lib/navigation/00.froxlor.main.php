@@ -62,104 +62,116 @@ return array(
 			)
 		),
 		'email' => array(
-			'url' => 'customer_email.php',
 			'label' => \Froxlor\Frontend\UI::getLng('menue.email.email'),
 			'show_element' => (! \Froxlor\Settings::IsInList('panel.customer_hide_options', 'email')),
+			'icon' => 'envelope',
 			'elements' => array(
 				array(
-					'url' => 'customer_email.php?page=emails',
+					'url' => 'index.php?module=CustomerEmail',
 					'label' => \Froxlor\Frontend\UI::getLng('menue.email.emails'),
-					'required_resources' => 'emails'
+					'required_resources' => 'emails',
+					'icon' => 'envelope'
 				),
 				array(
-					'url' => 'customer_email.php?page=emails&action=add',
+					'url' => 'index.php?module=CustomerEmail#tab-add',
 					'label' => \Froxlor\Frontend\UI::getLng('emails.emails_add'),
-					'required_resources' => 'emails'
+					'required_resources' => 'emails',
+					'icon' => 'folder-plus'
 				),
 				array(
 					'url' => \Froxlor\Settings::Get('panel.webmail_url'),
 					'new_window' => true,
 					'label' => \Froxlor\Frontend\UI::getLng('menue.email.webmail'),
 					'required_resources' => 'emails_used',
-					'show_element' => (\Froxlor\Settings::Get('panel.webmail_url') != '')
+					'show_element' => (\Froxlor\Settings::Get('panel.webmail_url') != ''),
+					'icon' => 'external-link-alt'
 				)
 			)
 		),
 		'mysql' => array(
-			'url' => 'customer_mysql.php',
 			'label' => \Froxlor\Frontend\UI::getLng('menue.mysql.mysql'),
 			'show_element' => (! \Froxlor\Settings::IsInList('panel.customer_hide_options', 'mysql')),
+			'icon' => 'database',
 			'elements' => array(
 				array(
-					'url' => 'customer_mysql.php?page=mysqls',
+					'url' => 'index.php?module=CustomerMysqls',
 					'label' => \Froxlor\Frontend\UI::getLng('menue.mysql.databases'),
-					'required_resources' => 'mysqls'
+					'required_resources' => 'mysqls',
+					'icon' => 'database'
 				),
 				array(
 					'url' => \Froxlor\Settings::Get('panel.phpmyadmin_url'),
 					'new_window' => true,
 					'label' => \Froxlor\Frontend\UI::getLng('menue.mysql.phpmyadmin'),
 					'required_resources' => 'mysqls_used',
-					'show_element' => (\Froxlor\Settings::Get('panel.phpmyadmin_url') != '')
+					'show_element' => (\Froxlor\Settings::Get('panel.phpmyadmin_url') != ''),
+					'icon' => 'external-link-alt'
 				)
 			)
 		),
 		'domains' => array(
-			'url' => 'customer_domains.php',
 			'label' => \Froxlor\Frontend\UI::getLng('menue.domains.domains'),
 			'show_element' => (! \Froxlor\Settings::IsInList('panel.customer_hide_options', 'domains')),
+			'icon' => 'globe',
 			'elements' => array(
 				array(
-					'url' => 'customer_domains.php?page=domains',
-					'label' => \Froxlor\Frontend\UI::getLng('menue.domains.settings')
+					'url' => 'index.php?module=CustomerDomains',
+					'label' => \Froxlor\Frontend\UI::getLng('menue.domains.settings'),
+					'icon' => 'globe'
 				),
 				array(
-					'url' => 'customer_domains.php?page=sslcertificates',
-					'label' => \Froxlor\Frontend\UI::getLng('domains.ssl_certificates')
+					'url' => 'index.php?module=SslCertificates',
+					'label' => \Froxlor\Frontend\UI::getLng('domains.ssl_certificates'),
+					'icon' => 'certificate'
 				)
 			)
 		),
 		'ftp' => array(
-			'url' => 'customer_ftp.php',
 			'label' => \Froxlor\Frontend\UI::getLng('menue.ftp.ftp'),
 			'show_element' => (! \Froxlor\Settings::IsInList('panel.customer_hide_options', 'ftp')),
+			'icon' => 'user-tag',
 			'elements' => array(
 				array(
-					'url' => 'customer_ftp.php?page=accounts',
-					'label' => \Froxlor\Frontend\UI::getLng('menue.ftp.accounts')
+					'url' => 'index.php?module=CustomerFtp',
+					'label' => \Froxlor\Frontend\UI::getLng('menue.ftp.accounts'),
+					'icon' => 'user-tag'
 				),
 				array(
 					'url' => \Froxlor\Settings::Get('panel.webftp_url'),
 					'new_window' => true,
 					'label' => \Froxlor\Frontend\UI::getLng('menue.ftp.webftp'),
-					'show_element' => (\Froxlor\Settings::Get('panel.webftp_url') != '')
+					'show_element' => (\Froxlor\Settings::Get('panel.webftp_url') != ''),
+					'icon' => 'external-link-alt'
 				)
 			)
 		),
 		'extras' => array(
-			'url' => 'customer_extras.php',
 			'label' => \Froxlor\Frontend\UI::getLng('menue.extras.extras'),
 			'show_element' => (! \Froxlor\Settings::IsInList('panel.customer_hide_options', 'extras')),
 			'elements' => array(
 				array(
-					'url' => 'customer_extras.php?page=htpasswds',
+					'url' => 'index.php?module=CustomerExtras&view=htpasswds',
 					'label' => \Froxlor\Frontend\UI::getLng('menue.extras.directoryprotection'),
-					'show_element' => (! \Froxlor\Settings::IsInList('panel.customer_hide_options', 'extras.directoryprotection'))
+					'show_element' => (! \Froxlor\Settings::IsInList('panel.customer_hide_options', 'extras.directoryprotection')),
+					'icon' => 'user-secret'
 				),
 				array(
-					'url' => 'customer_extras.php?page=htaccess',
+					'url' => 'index.php?module=CustomerExtras&view=htaccess',
 					'label' => \Froxlor\Frontend\UI::getLng('menue.extras.pathoptions'),
-					'show_element' => (! \Froxlor\Settings::IsInList('panel.customer_hide_options', 'extras.pathoptions'))
+					'show_element' => (! \Froxlor\Settings::IsInList('panel.customer_hide_options', 'extras.pathoptions')),
+					'icon' => 'lock'
 				),
 				array(
-					'url' => 'customer_logger.php?page=log',
+					'url' => 'index.php?module=CustomerLogger',
 					'label' => \Froxlor\Frontend\UI::getLng('menue.logger.logger'),
-					'show_element' => (\Froxlor\Settings::Get('logger.enabled') == true) && (! \Froxlor\Settings::IsInList('panel.customer_hide_options', 'extras.logger'))
+					'show_element' => (\Froxlor\Settings::Get('logger.enabled') == true) && (! \Froxlor\Settings::IsInList('panel.customer_hide_options', 'extras.logger')),
+					'icon' => 'eye'
 				),
 				array(
-					'url' => 'customer_extras.php?page=backup',
+					'url' => 'index.php?module=CustomerExtras&view=backup',
 					'label' => \Froxlor\Frontend\UI::getLng('menue.extras.backup'),
-					'show_element' => (\Froxlor\Settings::Get('system.backupenabled') == true) && (! \Froxlor\Settings::IsInList('panel.customer_hide_options', 'extras.backup'))
+					'show_element' => (\Froxlor\Settings::Get('system.backupenabled') == true) && (! \Froxlor\Settings::IsInList('panel.customer_hide_options', 'extras.backup')),
+					'icon' => 'hdd'
 				)
 			)
 		),
