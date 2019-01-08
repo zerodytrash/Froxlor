@@ -24,8 +24,12 @@ class SslCertificates extends FeModule
 
 	public function overview()
 	{
+		$page = isset($_GET['page']) ? (int) $_GET['page'] : 0;
 		try {
-			$json_result = Certificates::getLocal(\Froxlor\CurrentUser::getData())->listing();
+			$json_result = Certificates::getLocal(\Froxlor\CurrentUser::getData(), array(
+				'limit' => Settings::Get('panel.paging'),
+				'offset' => ($page * Settings::Get('panel.paging'))
+			))->listing();
 		} catch (\Exception $e) {
 			\Froxlor\UI\Response::dynamic_error($e->getMessage());
 		}
@@ -73,7 +77,8 @@ class SslCertificates extends FeModule
 
 		\Froxlor\Frontend\UI::TwigBuffer('ssl_certificates/index.html.twig', array(
 			'page_title' => $this->lng['domains']['ssl_certificates'],
-			'certificates' => $result
+			'certificates' => $result,
+			'page' => $page
 		));
 	}
 

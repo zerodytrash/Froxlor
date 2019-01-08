@@ -8,7 +8,7 @@
 			<li class="nav-item"><a class="nav-link active"
 				id="subnav-crt-tab" data-toggle="tab" href="#tab-crt" role="tab"
 				aria-controls="subnav-crt" aria-selected="true">{{ lng('domains.ssl_certificates') }}&nbsp;<span
-					class="badge badge-pill badge-secondary">{{ certificates.count }}</span></a></li>
+					class="badge badge-pill badge-secondary">{{ certificates.count }}{% if certificates.countall > certificates.count %} / {{ certificates.countall }}{% endif %}</span></a></li>
 		</ul>
 	</div>
 	<div class="card-body tab-content" id="subnav-tabContent">
@@ -33,15 +33,16 @@
 						<td class="col-sm-1">{% if cert.isValid == false %}<strong
 							class="text-danger">{% endif %} {{ cert.data['validTo_time_t']|date('d.m.Y H:i') }}
 								{% if cert.isValid == false %}</strong> {% endif %}</td>
-						<td class="col-sm-1 text-right"><a href="index.php?module=SslCertificates&view=delete&id={{ cert.id }}"
-							class="text-danger delete-btn"
-							data-container="body" data-toggle="tooltip" data-placement="left"
+						<td class="col-sm-1 text-right"><a
+							href="index.php?module=SslCertificates&view=delete&id={{ cert.id }}"
+							class="text-danger delete-btn" data-container="body"
+							data-toggle="tooltip" data-placement="left"
 							title="{{ lng('panel.delete') }}"><i class="fas fa-trash-alt"></i></a></td>
 					</tr>
 					{% endfor %}
 					{% endset %}
 					{% if certificates.count > 0 %}
-					{{ t.listing("certificates-listing", [lng('domains.domainname'), "Certificate for", "Issuer", "Valid from", "Valid until", "|Optionen"], content, [3,3,3,1,1,1]) }}
+					{{ t.listing("certificates-listing", [lng('domains.domainname'), "Certificate for", "Issuer", "Valid from", "Valid until", "|Optionen"], content, [3,3,3,1,1,1], false, true, page, certificates.countall, 'index.php?module=SslCertificates') }}
 					{% else %}
 					<div class="alert alert-info" role="alert">
 						{{ lng('domains.no_ssl_certificates') }}

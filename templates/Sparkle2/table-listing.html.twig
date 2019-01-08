@@ -1,17 +1,17 @@
 {% macro listing(tablename, header, content, sizes, nosearch, pagination, currentpage, allentries, baseurl) %}
-{% if not nosearch|default(false) and pagination|default(false) %}
+{% if not nosearch|default(false) and pagination|default(false) and allentries > get_setting('panel.paging') %}
 <!-- pagination and search -->
 <div class="row">
 	<div class="col-lg-8 col-md-12">
 		<nav aria-label="table pagination">
 			<ul class="pagination">
-				{% set pages = allentries / get_setting('panel.paging') %}
+				{% set pages = (allentries / get_setting('panel.paging'))|round(0, 'ceil') %}
 				{% if  currentpage >= 10 %}
 					{% set rangestart = max(currentpage - 5, 0) %}
 					{% set rangeend = min(currentpage + 5, pages) %}
 				{% else %}
 				    {% set rangestart = 0 %}
-				    {% set rangeend = min(pages, 10) %}
+				    {% set rangeend = min(pages - 1, 10) %}
 				{% endif %}
 				{% if currentpage == 0 %}
 				<li class="page-item disabled"><span class="page-link">Previous</span></li>
@@ -27,7 +27,7 @@
 					href="{{ baseurl }}&page={{ page }}">{{ page + 1 }}</a></li>
 				{% endif %}
 				{% endfor %}
-				{% if currentpage == pages %}
+				{% if currentpage >= (pages - 1) %}
 				<li class="page-item disabled"><span class="page-link">Next</span></li>
 				{% else %}
 				<li class="page-item"><a class="page-link" href="{{ baseurl }}&page={{ currentpage + 1 }}">Next</a></li>
@@ -48,19 +48,19 @@
 			placeholder="{% trans "Suche..." %}"><br />
 	</div>
 </div>
-{% elseif nosearch|default(false) and paginationn|default(false) %}
+{% elseif nosearch|default(false) and paginationn|default(false) and allentries > get_setting('panel.paging') %}
 <!-- only pagination -->
 <div class="row">
 	<div class="col-12">
 		<nav aria-label="table pagination">
 			<ul class="pagination">
-				{% set pages = allentries / get_setting('panel.paging') %}
+				{% set pages = (allentries / get_setting('panel.paging'))|round(0, 'ceil') %}
 				{% if  currentpage >= 10 %}
 					{% set rangestart = max(currentpage - 5, 0) %}
 					{% set rangeend = min(currentpage + 5, pages) %}
 				{% else %}
 				    {% set rangestart = 0 %}
-				    {% set rangeend = min(pages, 10) %}
+				    {% set rangeend = min(pages - 1, 10) %}
 				{% endif %}
 				{% if currentpage == 0 %}
 				<li class="page-item disabled"><span class="page-link">Previous</span></li>
@@ -76,7 +76,7 @@
 					href="{{ baseurl }}&page={{ page }}">{{ page + 1 }}</a></li>
 				{% endif %}
 				{% endfor %}
-				{% if currentpage == pages %}
+				{% if currentpage >= (pages - 1) %}
 				<li class="page-item disabled"><span class="page-link">Next</span></li>
 				{% else %}
 				<li class="page-item"><a class="page-link" href="{{ baseurl }}&page={{ currentpage + 1 }}">Next</a></li>

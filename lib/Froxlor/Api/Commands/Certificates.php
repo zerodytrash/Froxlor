@@ -162,31 +162,51 @@ class Certificates extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Resou
 	/**
 	 * lists all certificate entries
 	 *
+	 * @param int $limit
+	 *        	optional
+	 * @param int $offset
+	 *        	optional
+	 *        	
 	 * @access admin, customer
 	 * @throws \Exception
-	 * @return array count|list
+	 * @return array count|list|countall
 	 */
 	public function listing()
 	{
+		$limit = self::getParam('limit', true, 0);
+		$offset = self::getParam('offset', true, 0);
 		// select all my (accessable) certificates
 		$certs_stmt_query = "SELECT s.*, d.domain, d.letsencrypt, c.customerid, c.loginname
 			FROM `" . TABLE_PANEL_DOMAIN_SSL_SETTINGS . "` s
 			LEFT JOIN `" . TABLE_PANEL_DOMAINS . "` d ON `d`.`id` = `s`.`domainid`
 			LEFT JOIN `" . TABLE_PANEL_CUSTOMERS . "` c ON `c`.`customerid` = `d`.`customerid`
 			WHERE ";
-
+		$certs_count_stmt_query = "SELECT COUNT(s.id) as entries
+			FROM `" . TABLE_PANEL_DOMAIN_SSL_SETTINGS . "` s
+			LEFT JOIN `" . TABLE_PANEL_DOMAINS . "` d ON `d`.`id` = `s`.`domainid`
+			LEFT JOIN `" . TABLE_PANEL_CUSTOMERS . "` c ON `c`.`customerid` = `d`.`customerid`
+			WHERE ";
 		$qry_params = array();
 
 		if ($this->isAdmin() && $this->getUserDetail('customers_see_all') == '0') {
 			// admin with only customer-specific permissions
 			$certs_stmt_query .= "d.adminid = :adminid ";
+			$certs_count_stmt_query .= "d.adminid = :adminid ";
 			$qry_params['adminid'] = $this->getUserDetail('adminid');
 		} elseif ($this->isAdmin() == false) {
 			// customer-area
 			$certs_stmt_query .= "d.customerid = :cid ";
+			$certs_count_stmt_query .= "d.customerid = :cid ";
 			$qry_params['cid'] = $this->getUserDetail('customerid');
 		} else {
 			$certs_stmt_query .= "1 ";
+			$certs_count_stmt_query .= "1 ";
+		}
+		$certs_stmt_query .= "ORDER BY d.domain ASC ";
+		if ($limit > 0) {
+			$certs_stmt_query .= " LIMIT " . $offset . ", " . $limit;
+			$certs_count_stmt = Database::prepare($certs_count_stmt_query);
+			$countall = Database::pexecute_first($certs_count_stmt, $qry_params, true, true);
 		}
 		$certs_stmt = Database::prepare($certs_stmt_query);
 		Database::pexecute($certs_stmt, $qry_params, true, true);
@@ -202,7 +222,8 @@ class Certificates extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Resou
 		}
 		return $this->response(200, "successfull", array(
 			'count' => count($result),
-			'list' => $result
+			'list' => $result,
+			'countall' => ($limit > 0) ? $countall['entries'] : count($result)
 		));
 	}
 
