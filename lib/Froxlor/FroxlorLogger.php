@@ -42,6 +42,8 @@ class FroxlorLogger
 
 	const USR_ACTION = '10';
 
+	const RES_ACTION = '20';
+
 	const ADM_ACTION = '30';
 
 	const CRON_ACTION = '40';
@@ -174,5 +176,58 @@ class FroxlorLogger
 		self::$crondebug_flag = (bool) $_flag;
 		// force re-init
 		self::$ml = null;
+	}
+
+	public static function getLogLevelDesc($type)
+	{
+		switch ($type) {
+			case LOG_INFO:
+				$resulttype = 'information';
+				break;
+			case LOG_NOTICE:
+				$resulttype = 'notice';
+				break;
+			case LOG_WARNING:
+				$resulttype = 'warning';
+				break;
+			case LOG_ERR:
+				$resulttype = 'error';
+				break;
+			case LOG_CRIT:
+				$resulttype = 'critical';
+				break;
+			case LOG_DEBUG:
+				$resulttype = 'debug';
+				break;
+			default:
+				$resulttype = 'unknown';
+				break;
+		}
+		return $resulttype;
+	}
+
+	public static function getActionTypeDesc($action)
+	{
+		switch ($action) {
+			case \Froxlor\FroxlorLogger::USR_ACTION:
+				$resultaction = 'user';
+				break;
+			case \Froxlor\FroxlorLogger::ADM_ACTION:
+				$resultaction = 'admin';
+				break;
+			case \Froxlor\FroxlorLogger::RES_ACTION:
+				$resultaction = 'reseller';
+				break;
+			case \Froxlor\FroxlorLogger::CRON_ACTION:
+				$resultaction = 'cron';
+				break;
+			case \Froxlor\FroxlorLogger::LOGIN_ACTION:
+				$resultaction = 'login';
+				break;
+			default:
+				$resultaction = 'unknown';
+				break;
+		}
+		return $resultaction;
 	}
 }

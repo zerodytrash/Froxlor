@@ -17,7 +17,7 @@ namespace Froxlor\Frontend\Modules;
  * @package Panel
  *         
  */
-
+use Froxlor\Settings;
 use Froxlor\Database\Database;
 use Froxlor\Frontend\FeModule;
 
@@ -31,90 +31,24 @@ class AdminLogger extends FeModule
 			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
 		}
 
-		$fields = array(
-			'date' => $lng['logger']['date'],
-			'type' => $lng['logger']['type'],
-			'user' => $lng['logger']['user'],
-			'text' => $lng['logger']['action']
-		);
-		$paging = new \Froxlor\UI\Paging($userinfo, TABLE_PANEL_LOG, $fields, null, null, 0, 'desc', 30);
-		$query = 'SELECT * FROM `' . TABLE_PANEL_LOG . '` ' . $paging->getSqlWhere(false) . ' ' . $paging->getSqlOrderBy();
-		$result_stmt = Database::query($query . ' ' . $paging->getSqlLimit());
-		$result_cnt_stmt = Database::query($query);
-		$logs_count = $result_cnt_stmt->rowCount();
-		$paging->setEntries($logs_count);
-		$sortcode = $paging->getHtmlSortCode($lng);
-		$arrowcode = $paging->getHtmlArrowCode($filename . '?page=' . $page . '&s=' . $s);
-		$searchcode = $paging->getHtmlSearchCode($lng);
-		$pagingcode = $paging->getHtmlPagingCode($filename . '?page=' . $page . '&s=' . $s);
-		$clog = array();
+		$page = isset($_GET['page']) ? (int) $_GET['page'] : 0;
+		$result_stmt = Database::query('SELECT * FROM `' . TABLE_PANEL_LOG . '` ORDER BY `date` DESC LIMIT ' . ($page * Settings::Get('panel.paging')) . ', ' . Settings::Get('panel.paging'));
+		$all_entries_stmt = Database::query('SELECT COUNT(*) as entries FROM `' . TABLE_PANEL_LOG . '`');
+		$all_entries = $all_entries_stmt->fetch(\PDO::FETCH_ASSOC);
 
+		$log_entries = array();
 		while ($row = $result_stmt->fetch(\PDO::FETCH_ASSOC)) {
-
-			if (! isset($clog[$row['action']]) || ! is_array($clog[$row['action']])) {
-				$clog[$row['action']] = array();
-			}
-			$clog[$row['action']][$row['logid']] = $row;
+			$row['action'] = \Froxlor\FroxlorLogger::getActionTypeDesc($row['action']);
+			$row['type'] = \Froxlor\FroxlorLogger::getLogLevelDesc($row['type']);
+			$log_entries[] = $row;
 		}
 
-		if ($paging->sortfield == 'date' && $paging->sortorder == 'desc') {
-			krsort($clog);
-		} else {
-			ksort($clog);
-		}
-
-		$i = 0;
-		$count = 0;
-		$log_count = 0;
-		$log = '';
-		foreach ($clog as $action => $logrows) {
-			$_action = 0;
-			foreach ($logrows as $row) {
-				// if ($paging->checkDisplay($i)) {
-				$row = \Froxlor\PhpHelper::htmlentitiesArray($row);
-				$row['date'] = date("d.m.y H:i:s", $row['date']);
-
-				if ($_action != $action) {
-					switch ($action) {
-						case \Froxlor\FroxlorLogger::USR_ACTION:
-							$_action = $lng['admin']['customer'];
-							break;
-						case \Froxlor\FroxlorLogger::RES_ACTION:
-							$_action = $lng['logger']['reseller'];
-							break;
-						case \Froxlor\FroxlorLogger::ADM_ACTION:
-							$_action = $lng['logger']['admin'];
-							break;
-						case \Froxlor\FroxlorLogger::CRON_ACTION:
-							$_action = $lng['logger']['cron'];
-							break;
-						case \Froxlor\FroxlorLogger::LOGIN_ACTION:
-							$_action = $lng['logger']['login'];
-							break;
-						case \Froxlor\FroxlorLogger::LOG_ERROR:
-							$_action = $lng['logger']['intern'];
-							break;
-						default:
-							$_action = $lng['logger']['unknown'];
-							break;
-					}
-
-					$row['action'] = $_action;
-					eval("\$log.=\"" . \Froxlor\UI\Template::getTemplate('logger/logger_action') . "\";");
-				}
-
-				$log_count ++;
-				$row['type'] = \Froxlor\FroxlorLogger::getInstanceOf()->getLogLevelDesc($row['type']);
-				eval("\$log.=\"" . \Froxlor\UI\Template::getTemplate('logger/logger_log') . "\";");
-				$count ++;
-				$_action = $action;
-				// }
-				$i ++;
-			}
-			$i ++;
-		}
-
-		eval("echo \"" . \Froxlor\UI\Template::getTemplate('logger/logger') . "\";");
+		\Froxlor\Frontend\UI::TwigBuffer('admin/logger/index.html.twig', array(
+			'page_title' => \Froxlor\Frontend\UI::getLng('menue.logger.logger'),
+			'logentries' => $log_entries,
+			'page' => $page,
+			'all_entries' => $all_entries['entries']
+		));
 	}
 
 	public function truncate()

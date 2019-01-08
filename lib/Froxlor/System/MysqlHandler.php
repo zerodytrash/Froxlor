@@ -57,7 +57,7 @@ class MysqlHandler extends AbstractProcessingHandler
 	{
 		$this->insert([
 			':message' => $record['message'],
-			':contextUser' => (isset($record['extra']['loginname']) ? $record['extra']['loginname'] : 'unknown'),
+			':contextUser' => (isset($record['extra']['user']) ? $record['extra']['user'] : 'unknown'),
 			':contextAction' => (isset($record['extra']['action']) ? $record['extra']['action'] : '0'),
 			':level' => self::$froxlorLevels[$record['level']],
 			':datetime' => $record['datetime']->format('U')
