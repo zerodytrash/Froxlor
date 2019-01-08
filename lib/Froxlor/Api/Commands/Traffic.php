@@ -62,6 +62,8 @@ class Traffic extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 	 *        	optional, default empty
 	 * @param bool $customer_traffic
 	 *        	optional, admin-only, whether to output ones own traffic or all of ones customers, default is 0 (false)
+	 * @param bool $date_from
+	 *        	optional, if true all entries for given date and newer will be output
 	 * @param int $customerid
 	 *        	optional, admin-only, select traffic of a specific customer by id
 	 * @param string $loginname
@@ -77,22 +79,34 @@ class Traffic extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 		$month = $this->getParam('month', true, "");
 		$day = $this->getParam('day', true, "");
 		$customer_traffic = $this->getBoolParam('customer_traffic', true, 0);
+		$date_from = $this->getBoolParam('date_from', true, 0);
 		$customer_ids = $this->getAllowedCustomerIds();
 		$result = array();
 		$params = array();
 		// check for year/month/day
 		$where_str = "";
-		if (! empty($year) && is_numeric($year)) {
-			$where_str .= " AND `year` = :year";
-			$params['year'] = $year;
-		}
-		if (! empty($month) && is_numeric($month)) {
-			$where_str .= " AND `month` = :month";
-			$params['month'] = $month;
-		}
-		if (! empty($day) && is_numeric($day)) {
-			$where_str .= " AND `day` = :day";
-			$params['day'] = $day;
+		if (! $date_from) {
+			if (! empty($year) && is_numeric($year)) {
+				$where_str .= " AND `year` = :year";
+				$params['year'] = $year;
+			}
+			if (! empty($month) && is_numeric($month)) {
+				$where_str .= " AND `month` = :month";
+				$params['month'] = $month;
+			}
+			if (! empty($day) && is_numeric($day)) {
+				$where_str .= " AND `day` = :day";
+				$params['day'] = $day;
+			}
+		} else {
+			$ts_from = new \DateTime();
+			$ts_year = ! empty($year) && is_numeric($year) ? $year : date('Y');
+			$ts_month = ! empty($month) && is_numeric($month) ? $month : date('n');
+			$ts_day = ! empty($day) && is_numeric($day) ? $day : 1;
+			$ts_from->setDate($ts_year, $ts_month, $ts_day);
+			$ts_from->setTime(0, 0, 1);
+			$where_str .= " AND `stamp` >= :ts";
+			$params['ts'] = $ts_from->format('U');
 		}
 
 		if (! $this->isAdmin() || ($this->isAdmin() && $customer_traffic)) {
