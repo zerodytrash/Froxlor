@@ -239,11 +239,47 @@ class AdminSettings extends FeModule
 					'filename' => 'index.php?module=AdminSettings'
 				));
 			}
-			\Froxlor\UI\Response::dynamic_error("Upload failed<br>".var_export($_FILES, true));
+			\Froxlor\UI\Response::dynamic_error("Upload failed");
 		}
 		\Froxlor\UI\Response::redirectTo("index.php?module=AdminSettings");
 	}
+
+	public function integritycheck()
+	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
+		}
+		$integrity = new \Froxlor\Database\IntegrityCheck();
+		$integritycheck = array();
+		foreach ($integrity->available as $id => $check) {
+			$integritycheck[$id] = array(
+				'result' => $integrity->$check(),
+				'checkdesc' => \Froxlor\Frontend\UI::getLng('integrity_check.' . $check)
+			);
+		}
+
+		\Froxlor\Frontend\UI::TwigBuffer('admin/settings/integritycheck.html.twig', array(
+			'page_title' => \Froxlor\Frontend\UI::getLng('admin.integritycheck'),
+			'checks' => $integritycheck
+		));
+	}
+
+	public function integritycheckFix()
+	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
+		}
+		$integrity = new \Froxlor\Database\IntegrityCheck();
+		if (isset($_POST['send']) && $_POST['send'] == 'send') {
+			$integrity->fixAll();
+			\Froxlor\UI\Response::redirectTo("index.php?module=AdminSettings&view=integritycheck");
+		}
+		\Froxlor\UI\HTML::askYesNo('admin_integritycheck_reallyfix', 'index.php?module=AdminSettings&view=' . __FUNCTION__);
+	}
 }
+
 /*
 } elseif ($page == 'enforcequotas' && $userinfo['change_serversettings'] == '1') {
 	if (isset($_POST['send']) && $_POST['send'] == 'send') {
@@ -286,24 +322,6 @@ class AdminSettings extends FeModule
 			'page' => $page
 		));
 	}
-} elseif ($page == 'integritycheck' && $userinfo['change_serversettings'] == '1') {
-	$integrity = new \Froxlor\Database\IntegrityCheck();
-	if (isset($_POST['send']) && $_POST['send'] == 'send') {
-		$integrity->fixAll();
-	} elseif (isset($_GET['action']) && $_GET['action'] == "fix") {
-		\Froxlor\UI\HTML::askYesNo('admin_integritycheck_reallyfix', $filename, array(
-			'page' => $page
-		));
-	}
-
-	$integritycheck = '';
-	foreach ($integrity->available as $id => $check) {
-		$displayid = $id + 1;
-		$result = $integrity->$check();
-		$checkdesc = $lng['integrity_check'][$check];
-		eval("\$integritycheck.=\"" . \Froxlor\UI\Template::getTemplate("settings/integritycheck_row") . "\";");
-	}
-	eval("echo \"" . \Froxlor\UI\Template::getTemplate("settings/integritycheck") . "\";");
 
 } elseif ($page == 'testmail') {
 	if (isset($_POST['send']) && $_POST['send'] == 'send') {
