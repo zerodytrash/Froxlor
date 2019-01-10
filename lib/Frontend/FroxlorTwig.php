@@ -14,6 +14,10 @@ class FroxlorTwig extends \Twig_Extension
 			new \Twig_SimpleFilter('formatIP', array(
 				$this,
 				'formatIPFilter'
+			)),
+			new \Twig_SimpleFilter('idnDecode', array(
+				$this,
+				'idnDecodeFilter'
 			))
 		);
 	}
@@ -24,6 +28,20 @@ class FroxlorTwig extends \Twig_Extension
 			new \Twig_Test('numeric', function ($value) {
 				return is_numeric($value);
 			})
+		);
+	}
+
+	public function getFunctions()
+	{
+		return array(
+			new \Twig_SimpleFunction('get_setting', [
+				$this,
+				'getSetting'
+			]),
+			new \Twig_SimpleFunction('lng', [
+				$this,
+				'getLang'
+			])
 		);
 	}
 
@@ -54,22 +72,10 @@ class FroxlorTwig extends \Twig_Extension
 		return inet_ntop(inet_pton($addr));
 	}
 
-	/**
-	 *
-	 * {@inheritdoc}
-	 */
-	public function getFunctions()
+	public function idnDecodeFilter($entity)
 	{
-		return array(
-			new \Twig_SimpleFunction('get_setting', [
-				$this,
-				'getSetting'
-			]),
-			new \Twig_SimpleFunction('lng', [
-				$this,
-				'getLang'
-			])
-		);
+		$idna_convert = new \Froxlor\Idna\IdnaWrapper();
+		return $idna_convert->decode($entity);
 	}
 
 	public function getSetting($setting = null)
