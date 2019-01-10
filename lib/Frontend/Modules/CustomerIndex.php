@@ -1,4 +1,5 @@
 <?php
+namespace Froxlor\Frontend\Modules;
 
 /**
  * This file is part of the Froxlor project.
@@ -9,114 +10,118 @@
  * file that was distributed with this source code. You can also view the
  * COPYING file online at http://files.froxlor.org/misc/COPYING.txt
  *
- * @copyright  (c) the authors
- * @author     Florian Lippert <flo@syscp.org> (2003-2009)
- * @author     Froxlor team <team@froxlor.org> (2010-)
- * @license    GPLv2 http://files.froxlor.org/misc/COPYING.txt
- * @package    Panel
- *
+ * @copyright (c) the authors
+ * @author Florian Lippert <flo@syscp.org> (2003-2009)
+ * @author Froxlor team <team@froxlor.org> (2010-)
+ * @license GPLv2 http://files.froxlor.org/misc/COPYING.txt
+ * @package Panel
+ *         
  */
-define('AREA', 'customer');
-require './lib/init.php';
-
 use Froxlor\Database\Database;
 use Froxlor\Settings;
 use Froxlor\Api\Commands\Customers as Customers;
+use Froxlor\Frontend\FeModule;
 
-if ($action == 'logout') {
-	$log->logAction(\Froxlor\FroxlorLogger::USR_ACTION, LOG_NOTICE, 'logged out');
+class CustomerIndex extends FeModule
+{
 
-	$params = array(
-		"customerid" => $userinfo['customerid']
-	);
-	if (Settings::Get('session.allow_multiple_login') == '1') {
-		$stmt = Database::prepare("DELETE FROM `" . TABLE_PANEL_SESSIONS . "`
+	public function logout()
+	{
+		\Froxlor\FroxlorLogger::getLog()->addNotice("logged out");
+
+		$params = array(
+			"customerid" => \Froxlor\CurrentUser::getField('customerid')
+		);
+
+		if (Settings::Get('session.allow_multiple_login') == '1') {
+			$stmt = Database::prepare("DELETE FROM `" . TABLE_PANEL_SESSIONS . "`
 			WHERE `userid` = :customerid
 			AND `adminsession` = '0'
-			AND `hash` = :hash");
-		$params["hash"] = $s;
-	} else {
-		$stmt = Database::prepare("DELETE FROM `" . TABLE_PANEL_SESSIONS . "`
+		");
+		} else {
+			$stmt = Database::prepare("DELETE FROM `" . TABLE_PANEL_SESSIONS . "`
 			WHERE `userid` = :customerid
 			AND `adminsession` = '0'");
+		}
+		Database::pexecute($stmt, $params);
+		unset($_SESSION['userinfo']);
+		\Froxlor\CurrentUser::setData(array());
+
+		\Froxlor\UI\Response::redirectTo('index.php');
 	}
-	Database::pexecute($stmt, $params);
 
-	\Froxlor\UI\Response::redirectTo('index.php');
-}
-
-if ($page == 'overview') {
-	$log->logAction(\Froxlor\FroxlorLogger::USR_ACTION, LOG_NOTICE, "viewed customer_index");
-
-	$domain_stmt = Database::prepare("SELECT `domain` FROM `" . TABLE_PANEL_DOMAINS . "`
+	public function overview()
+	{
+		$domain_stmt = Database::prepare("SELECT `domain` FROM `" . TABLE_PANEL_DOMAINS . "`
 		WHERE `customerid` = :customerid
 		AND `parentdomainid` = '0'
 		AND `id` <> :standardsubdomain
 	");
-	Database::pexecute($domain_stmt, array(
-		"customerid" => $userinfo['customerid'],
-		"standardsubdomain" => $userinfo['standardsubdomain']
-	));
+		Database::pexecute($domain_stmt, array(
+			"customerid" => $userinfo['customerid'],
+			"standardsubdomain" => $userinfo['standardsubdomain']
+		));
 
-	$domains = '';
-	$domainArray = array();
+		$domains = '';
+		$domainArray = array();
 
-	while ($row = $domain_stmt->fetch(PDO::FETCH_ASSOC)) {
-		$domainArray[] = $idna_convert->decode($row['domain']);
-	}
+		while ($row = $domain_stmt->fetch(\PDO::FETCH_ASSOC)) {
+			$domainArray[] = $idna_convert->decode($row['domain']);
+		}
 
-	natsort($domainArray);
-	$domains = implode(',<br />', $domainArray);
+		natsort($domainArray);
+		$domains = implode(',<br />', $domainArray);
 
-	// standard-subdomain
-	$stdsubdomain = '';
-	if ($userinfo['standardsubdomain'] != '0') {
-		$std_domain_stmt = Database::prepare("
+		// standard-subdomain
+		$stdsubdomain = '';
+		if ($userinfo['standardsubdomain'] != '0') {
+			$std_domain_stmt = Database::prepare("
 			SELECT `domain` FROM `" . TABLE_PANEL_DOMAINS . "`
 			WHERE `customerid` = :customerid
 			AND `id` = :standardsubdomain
 		");
-		$std_domain = Database::pexecute_first($std_domain_stmt, array(
-			"customerid" => $userinfo['customerid'],
-			"standardsubdomain" => $userinfo['standardsubdomain']
+			$std_domain = Database::pexecute_first($std_domain_stmt, array(
+				"customerid" => $userinfo['customerid'],
+				"standardsubdomain" => $userinfo['standardsubdomain']
+			));
+			$stdsubdomain = $std_domain['domain'];
+		}
+
+		$userinfo['email'] = $idna_convert->decode($userinfo['email']);
+		$yesterday = time() - (60 * 60 * 24);
+		$month = date('M Y', $yesterday);
+
+		// get disk-space usages for web, mysql and mail
+		$usages_stmt = Database::prepare("SELECT * FROM `" . TABLE_PANEL_DISKSPACE . "` WHERE `customerid` = :cid ORDER BY `stamp` DESC LIMIT 1");
+		$usages = Database::pexecute_first($usages_stmt, array(
+			'cid' => $userinfo['customerid']
 		));
-		$stdsubdomain = $std_domain['domain'];
+
+		$userinfo['diskspace'] = round($userinfo['diskspace'] / 1024, Settings::Get('panel.decimal_places'));
+		$userinfo['diskspace_used'] = round($usages['webspace'] / 1024, Settings::Get('panel.decimal_places'));
+		$userinfo['mailspace_used'] = round($usages['mail'] / 1024, Settings::Get('panel.decimal_places'));
+		$userinfo['dbspace_used'] = round($usages['mysql'] / 1024, Settings::Get('panel.decimal_places'));
+
+		$userinfo['traffic'] = round($userinfo['traffic'] / (1024 * 1024), Settings::Get('panel.decimal_places'));
+		$userinfo['traffic_used'] = round($userinfo['traffic_used'] / (1024 * 1024), Settings::Get('panel.decimal_places'));
+		$userinfo = \Froxlor\PhpHelper::strReplaceArray('-1', $lng['customer']['unlimited'], $userinfo, 'diskspace traffic mysqls emails email_accounts email_forwarders email_quota ftps subdomains');
+
+		$userinfo['custom_notes'] = ($userinfo['custom_notes'] != '') ? nl2br($userinfo['custom_notes']) : '';
+
+		$services_enabled = "";
+		$se = array();
+		if ($userinfo['imap'] == '1')
+			$se[] = "IMAP";
+		if ($userinfo['pop3'] == '1')
+			$se[] = "POP3";
+		if ($userinfo['phpenabled'] == '1')
+			$se[] = "PHP";
+		if ($userinfo['perlenabled'] == '1')
+			$se[] = "Perl/CGI";
+		$services_enabled = implode(", ", $se);
 	}
-
-	$userinfo['email'] = $idna_convert->decode($userinfo['email']);
-	$yesterday = time() - (60 * 60 * 24);
-	$month = date('M Y', $yesterday);
-
-	// get disk-space usages for web, mysql and mail
-	$usages_stmt = Database::prepare("SELECT * FROM `" . TABLE_PANEL_DISKSPACE . "` WHERE `customerid` = :cid ORDER BY `stamp` DESC LIMIT 1");
-	$usages = Database::pexecute_first($usages_stmt, array(
-		'cid' => $userinfo['customerid']
-	));
-
-	$userinfo['diskspace'] = round($userinfo['diskspace'] / 1024, Settings::Get('panel.decimal_places'));
-	$userinfo['diskspace_used'] = round($usages['webspace'] / 1024, Settings::Get('panel.decimal_places'));
-	$userinfo['mailspace_used'] = round($usages['mail'] / 1024, Settings::Get('panel.decimal_places'));
-	$userinfo['dbspace_used'] = round($usages['mysql'] / 1024, Settings::Get('panel.decimal_places'));
-
-	$userinfo['traffic'] = round($userinfo['traffic'] / (1024 * 1024), Settings::Get('panel.decimal_places'));
-	$userinfo['traffic_used'] = round($userinfo['traffic_used'] / (1024 * 1024), Settings::Get('panel.decimal_places'));
-	$userinfo = \Froxlor\PhpHelper::strReplaceArray('-1', $lng['customer']['unlimited'], $userinfo, 'diskspace traffic mysqls emails email_accounts email_forwarders email_quota ftps subdomains');
-
-	$userinfo['custom_notes'] = ($userinfo['custom_notes'] != '') ? nl2br($userinfo['custom_notes']) : '';
-
-	$services_enabled = "";
-	$se = array();
-	if ($userinfo['imap'] == '1')
-		$se[] = "IMAP";
-	if ($userinfo['pop3'] == '1')
-		$se[] = "POP3";
-	if ($userinfo['phpenabled'] == '1')
-		$se[] = "PHP";
-	if ($userinfo['perlenabled'] == '1')
-		$se[] = "Perl/CGI";
-	$services_enabled = implode(", ", $se);
-
-	eval("echo \"" . \Froxlor\UI\Template::getTemplate('index/index') . "\";");
+}
+/*
 } elseif ($page == 'change_password') {
 	if (isset($_POST['send']) && $_POST['send'] == 'send') {
 		$old_password = \Froxlor\Validate\Validate::validate($_POST['old_password'], 'old password');
@@ -351,10 +356,5 @@ if ($page == 'overview') {
 			's' => $s
 		));
 	}
-} elseif ($page == 'apikeys' && Settings::Get('api.enabled') == 1) {
-	require_once __DIR__ . '/api_keys.php';
-} elseif ($page == 'apihelp' && Settings::Get('api.enabled') == 1) {
-	require_once __DIR__ . '/apihelp.php';
-} elseif ($page == '2fa' && Settings::Get('2fa.enabled') == 1) {
-	require_once __DIR__ . '/2fa.php';
 }
+*/
