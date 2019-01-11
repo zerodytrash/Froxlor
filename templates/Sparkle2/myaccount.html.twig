@@ -12,17 +12,116 @@
 		<!-- password and 2fa -->
 		<div class="card mb-2">
 			<div class="card-header">
-				<i class="fas fa-shield-alt"></i>&nbsp;{{ lng('panel.security') }}
+				<i class="fas fa-shield-alt"></i>&nbsp;
+				{{ lng('panel.security') }}
 			</div>
 			<div class="card-body">
-				<h5>{{ lng('menue.main.changepassword') }}</h5>
-				<form action="index.php?module={{ moduleprefix }}Index&view=change_password"
-					method="post" class="form"></form>
+				<h5>
+					{{ lng('menue.main.changepassword') }}
+				</h5>
+				<form
+					action="index.php?module={{ moduleprefix }}Index&view=changePassword"
+					method="post" class="form mb-4">
+					<div class="form-group form-row">
+						<label for="old_password" class="col-sm-5 col-form-label">{{ lng('changepassword.old_password') }}</label>
+						<div class="col-sm-7">
+							<input type="password" id="old_password" name="old_password"
+								class="form-control" />
+						</div>
+					</div>
+					<div class="form-group form-row">
+						<label for="new_password" class="col-sm-5 col-form-label">{{ lng('changepassword.new_password') }}</label>
+						<div class="col-sm-7">
+							<input type="password" id="new_password" name="new_password"
+								class="form-control" />
+						</div>
+					</div>
+					<div class="form-group form-row">
+						<label for="new_password_confirm" class="col-sm-5 col-form-label">{{ lng('changepassword.new_password_confirm') }}</label>
+						<div class="col-sm-7">
+							<input type="password" id="new_password_confirm"
+								name="new_password_confirm" class="form-control" />
+						</div>
+					</div>
+					<div class="form-group form-row mb-0">
+						<div class="col-sm-12 text-right">
+							<input type="hidden" name="send" value="send" />
+							<button type="submit" class="btn btn-success">
+								<i class="fas fa-save"></i>&nbsp;
+								{{ lng('menue.main.changepassword') }}
+							</button>
+						</div>
+					</div>
+				</form>
 
-				<h5>{{ lng('login.2fa') }}</h5>
+				<h5>
+					{{ lng('login.2fa') }}
+				</h5>
+				{% if get_setting('2fa.enabled') == 1 %}
 				<form
 					action="index.php?module=Edit2FA&view={% if userinfo.type_2fa == 0 %}add{% else %}delete{% endif %}"
-					method="post" class="form"></form>
+					method="post" class="form">
+					{% if userinfo.type_2fa == 0 %}
+					<div class="form-group form-row">
+						<p>
+							{{ lng('2fa.2fa_overview_desc')|raw }}
+						</p>
+						<div class="col-sm-12">
+							<select id="type_2fa" name="type_2fa" class="form-control">
+								{{ type_select|raw }}
+							</select>
+						</div>
+					</div>
+					<div class="form-group form-row mb-0">
+						<div class="col-sm-12 text-right">
+							<input type="hidden" name="send" value="send" />
+							<button type="submit" class="btn btn-success">
+								<i class="fas fa-save"></i>&nbsp;
+								{{ lng('2fa.2fa_add') }}
+							</button>
+						</div>
+					</div>
+					{% elseif userinfo.type_2fa == 1 %}
+					<div class="form-group form-row">
+						<p>
+							{{ lng('2fa.2fa_email_desc')|raw }}
+						</p>
+					</div>
+					<div class="form-group form-row mb-0">
+						<div class="col-sm-12 text-right">
+							<input type="hidden" name="send" value="send" />
+							<button type="submit" class="btn btn-danger">
+								<i class="fas fa-times-circle"></i>&nbsp;
+								{{ lng('2fa.2fa_delete') }}
+							</button>
+						</div>
+					</div>
+					{% elseif userinfo.type_2fa == 2 %}
+					<div class="form-group form-row">
+						<p>
+							{{ lng('2fa.2fa_ga_desc')|raw }}
+						</p>
+						<div class="col-sm-12">
+							<img src="{{ ga_qrcode|raw }}" alt="QRCode">
+						</div>
+					</div>
+					<div class="form-group form-row mb-0">
+						<div class="col-sm-12 text-right">
+							<input type="hidden" name="send" value="send" />
+							<button type="submit" class="btn btn-danger">
+								<i class="fas fa-times-circle"></i>&nbsp;
+								{{ lng('2fa.2fa_delete') }}
+							</button>
+						</div>
+					</div>
+					{% endif %}
+				</form>
+				{% else %}
+				<div class="alert alert-secondary" role="alert">
+					{{ lng('login.2fa') }}
+					not activated for system.
+				</div>
+				{% endif %}
 			</div>
 		</div>
 	</div>
@@ -30,16 +129,60 @@
 		<!-- language and theme -->
 		<div class="card mb-2">
 			<div class="card-header">
-				<i class="fas fa-image"></i>&nbsp;{{ lng('panel.lookandfeel') }}
+				<i class="fas fa-image"></i>&nbsp;
+				{{ lng('panel.lookandfeel') }}
 			</div>
 			<div class="card-body">
-				<h5>{{ lng('menue.main.changelanguage') }}</h5>
-				<form action="index.php?module={{ moduleprefix }}Index&view=change_language"
-					method="post" class="form"></form>
+				<h5>
+					{{ lng('menue.main.changelanguage') }}
+				</h5>
+				<form
+					action="index.php?module={{ moduleprefix }}Index&view=changeLanguage"
+					method="post" class="form mb-4">
+					<div class="form-group form-row">
+						<label for="def_language" class="col-sm-5 col-form-label">{{ lng('login.language') }}</label>
+						<div class="col-sm-7">
+							<select id="def_language" name="def_language"
+								class="form-control">
+								{{ languages|raw }}
+							</select>
+						</div>
+					</div>
+					<div class="form-group form-row mb-0">
+						<div class="col-sm-12 text-right">
+							<input type="hidden" name="send" value="send" />
+							<button type="submit" class="btn btn-success">
+								<i class="fas fa-save"></i>&nbsp;
+								{{ lng('menue.main.changelanguage') }}
+							</button>
+						</div>
+					</div>
+				</form>
 
-				<h5>{{ lng(('menue.main.changetheme')) }}</h5>
-				<form action="index.php?module={{ moduleprefix }}Index&view=change_theme"
-					method="post" class="form"></form>
+				<h5>
+					{{ lng(('menue.main.changetheme')) }}
+				</h5>
+				<form
+					action="index.php?module={{ moduleprefix }}Index&view=changeTheme"
+					method="post" class="form">
+					<div class="form-group form-row">
+						<label for="theme" class="col-sm-5 col-form-label">{{ lng('panel.theme') }}</label>
+						<div class="col-sm-7">
+							<select id="theme" name="theme" class="form-control">
+								{{ themes|raw }}
+							</select>
+						</div>
+					</div>
+					<div class="form-group form-row mb-0">
+						<div class="col-sm-12 text-right">
+							<input type="hidden" name="send" value="send" />
+							<button type="submit" class="btn btn-success">
+								<i class="fas fa-save"></i>&nbsp;
+								{{ lng('menue.main.changetheme') }}
+							</button>
+						</div>
+					</div>
+				</form>
 			</div>
 		</div>
 	</div>
@@ -47,7 +190,8 @@
 	<div class="col-md-4 col-sm-12">
 		<div class="card mb-2">
 			<div class="card-header">
-				<i class="fas fa-key"></i>&nbsp;{{ lng('menue.main.apikeys') }}
+				<i class="fas fa-key"></i>&nbsp;
+				{{ lng('menue.main.apikeys') }}
 			</div>
 			@TODO
 		</div>

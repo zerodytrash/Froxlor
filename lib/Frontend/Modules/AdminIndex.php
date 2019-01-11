@@ -178,21 +178,65 @@ class AdminIndex extends FeModule
 
 	public function myAccount()
 	{
+		// languages
+		$default_lang = Settings::Get('panel.standardlanguage');
+		if (\Froxlor\CurrentUser::getField('def_language') != '') {
+			$default_lang = \Froxlor\CurrentUser::getField('def_language');
+		}
+		$languages = \Froxlor\User::getLanguages();
+		$language_options = "";
+		foreach ($languages as $language_file => $language_name) {
+			$language_options .= \Froxlor\UI\HTML::makeoption($language_name, $language_file, $default_lang, true);
+		}
+
+		// themes
+		$default_theme = Settings::Get('panel.default_theme');
+		if (\Froxlor\CurrentUser::getField('theme') != '') {
+			$default_theme = \Froxlor\CurrentUser::getField('theme');
+		}
+		$themes_avail = \Froxlor\UI\Template::getThemes();
+		$theme_options = '';
+		foreach ($themes_avail as $t => $d) {
+			$theme_options .= \Froxlor\UI\HTML::makeoption($d, $t, $default_theme, true);
+		}
+
+		// 2fa
+		$tfa = new \Froxlor\FroxlorTwoFactorAuth('Froxlor');
+		$type_select = "";
+		$ga_qrcode = "";
+		if (\Froxlor\CurrentUser::getField('type_2fa') == '0') {
+			// available types
+			$type_select_values = array(
+				0 => '-',
+				1 => 'E-Mail',
+				2 => 'Authenticator'
+			);
+			asort($type_select_values);
+			foreach ($type_select_values as $_val => $_type) {
+				$type_select .= \Froxlor\UI\HTML::makeoption($_type, $_val);
+			}
+		} elseif (\Froxlor\CurrentUser::getField('type_2fa') == '1') {
+			// email Edit2FA enabled
+		} elseif (\Froxlor\CurrentUser::getField('type_2fa') == '2') {
+			// authenticator Edit2FA enabled
+			$ga_qrcode = $tfa->getQRCodeImageAsDataUri(\Froxlor\CurrentUser::getField('loginname'), \Froxlor\CurrentUser::getField('data_2fa'));
+		}
+
 		\Froxlor\Frontend\UI::TwigBuffer('myaccount.html.twig', array(
-			'page_title' => \Froxlor\Frontend\UI::getLng('menue.main.username') . \Froxlor\CurrentUser::getField('loginname')
+			'page_title' => \Froxlor\Frontend\UI::getLng('menue.main.username') . \Froxlor\CurrentUser::getField('loginname'),
+			'languages' => $language_options,
+			'themes' => $theme_options,
+			'type_select' => $type_select,
+			'ga_qrcode' => $ga_qrcode
 		));
 	}
 
-	/**
-	 *
-	 * @todo rename to CamelCase
-	 */
-	public function change_password()
+	public function changePassword()
 	{
 		if (isset($_POST['send']) && $_POST['send'] == 'send') {
 			$old_password = \Froxlor\Validate\Validate::validate($_POST['old_password'], 'old password');
 
-			if (! \Froxlor\System\Crypt::validatePasswordLogin($userinfo, $old_password, TABLE_PANEL_ADMINS, 'adminid')) {
+			if (! \Froxlor\System\Crypt::validatePasswordLogin(\Froxlor\CurrentUser::getData(), $old_password, TABLE_PANEL_ADMINS, 'adminid')) {
 				\Froxlor\UI\Response::standard_error('oldpasswordnotcorrect');
 			}
 
@@ -218,122 +262,59 @@ class AdminIndex extends FeModule
 				\Froxlor\UI\Response::standard_error('newpasswordconfirmerror');
 			} else {
 				try {
-					Admins::getLocal($userinfo, array(
-						'id' => $userinfo['adminid'],
+					Admins::getLocal(\Froxlor\CurrentUser::getData(), array(
+						'id' => \Froxlor\CurrentUser::getField('adminid'),
 						'admin_password' => $new_password
 					))->update();
 				} catch (\Exception $e) {
 					\Froxlor\UI\Response::dynamic_error($e->getMessage());
 				}
 				\Froxlor\FroxlorLogger::getLog()->addNotice('changed password');
-				\Froxlor\UI\Response::redirectTo($filename, Array(
-					's' => $s
-				));
 			}
-		} else {
-			eval("echo \"" . \Froxlor\UI\Template::getTemplate("index/change_password") . "\";");
 		}
+		\Froxlor\UI\Response::redirectTo("index.php?module=AdminIndex&view=myAccount");
 	}
 
-	/**
-	 *
-	 * @todo rename to CamelCase
-	 */
-	public function change_language()
+	public function changeLanguage()
 	{
 		if (isset($_POST['send']) && $_POST['send'] == 'send') {
 			$def_language = \Froxlor\Validate\Validate::validate($_POST['def_language'], 'default language');
 
+			$languages = \Froxlor\User::getLanguages();
 			if (isset($languages[$def_language])) {
 				try {
-					Admins::getLocal($userinfo, array(
-						'id' => $userinfo['adminid'],
+					Admins::getLocal(\Froxlor\CurrentUser::getData(), array(
+						'id' => \Froxlor\CurrentUser::getField('adminid'),
 						'def_language' => $def_language
 					))->update();
 				} catch (\Exception $e) {
 					\Froxlor\UI\Response::dynamic_error($e->getMessage());
 				}
-
 				// also update current session
-				$this->lng_stmt = Database::prepare("
-					UPDATE `" . TABLE_PANEL_SESSIONS . "`
-					SET `language`= :lng
-					WHERE `hash`= :hash
-				");
-				Database::pexecute($this->lng_stmt, array(
-					'lng' => $def_language,
-					'hash' => $s
-				));
+				\Froxlor\CurrentUser::setField('def_language', $def_language);
 			}
 			\Froxlor\FroxlorLogger::getLog()->addNotice("changed his/her default language to '" . $def_language . "'");
-			\Froxlor\UI\Response::redirectTo($filename, array(
-				's' => $s
-			));
-		} else {
-
-			$language_options = '';
-
-			$default_lang = Settings::Get('panel.standardlanguage');
-			if ($userinfo['def_language'] != '') {
-				$default_lang = $userinfo['def_language'];
-			}
-
-			foreach ($languages as $language_file => $language_name) {
-				$language_options .= \Froxlor\UI\HTML::makeoption($language_name, $language_file, $default_lang, true);
-			}
-
-			eval("echo \"" . \Froxlor\UI\Template::getTemplate("index/change_language") . "\";");
 		}
+		\Froxlor\UI\Response::redirectTo("index.php?module=AdminIndex&view=myAccount");
 	}
 
-	/**
-	 *
-	 * @todo rename to CamelCase
-	 */
-	public function change_theme()
+	public function changeTheme()
 	{
 		if (isset($_POST['send']) && $_POST['send'] == 'send') {
 			$theme = \Froxlor\Validate\Validate::validate($_POST['theme'], 'theme');
 			try {
-				Admins::getLocal($userinfo, array(
-					'id' => $userinfo['adminid'],
+				Admins::getLocal(\Froxlor\CurrentUser::getData(), array(
+					'id' => \Froxlor\CurrentUser::getField('adminid'),
 					'theme' => $theme
 				))->update();
 			} catch (\Exception $e) {
 				\Froxlor\UI\Response::dynamic_error($e->getMessage());
 			}
-
 			// also update current session
-			$theme_stmt = Database::prepare("
-				UPDATE `" . TABLE_PANEL_SESSIONS . "`
-				SET `theme`= :theme
-				WHERE `hash`= :hash
-			");
-			Database::pexecute($theme_stmt, array(
-				'theme' => $theme,
-				'hash' => $s
-			));
-
+			\Froxlor\CurrentUser::setField('theme', $theme);
 			\Froxlor\FroxlorLogger::getLog()->addNotice("changed his/her theme to '" . $theme . "'");
-			\Froxlor\UI\Response::redirectTo($filename, array(
-				's' => $s
-			));
-		} else {
-
-			$theme_options = '';
-
-			$default_theme = Settings::Get('panel.default_theme');
-			if ($userinfo['theme'] != '') {
-				$default_theme = $userinfo['theme'];
-			}
-
-			$themes_avail = \Froxlor\UI\Template::getThemes();
-			foreach ($themes_avail as $t => $d) {
-				$theme_options .= \Froxlor\UI\HTML::makeoption($d, $t, $default_theme, true);
-			}
-
-			eval("echo \"" . \Froxlor\UI\Template::getTemplate("index/change_theme") . "\";");
 		}
+		\Froxlor\UI\Response::redirectTo("index.php?module=AdminIndex&view=myAccount");
 	}
 
 	/**

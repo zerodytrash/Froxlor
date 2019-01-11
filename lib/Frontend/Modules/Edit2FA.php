@@ -23,7 +23,10 @@ use Froxlor\Frontend\FeModule;
 class Edit2FA extends FeModule
 {
 
-	public function overview()
+	/**
+	 * do the delete and then just show a success-message
+	 */
+	public function delete()
 	{
 		if (Settings::Get('2fa.enabled') != '1') {
 			\Froxlor\UI\Response::dynamic_error("2FA not activated");
@@ -37,47 +40,31 @@ class Edit2FA extends FeModule
 			$uid = \Froxlor\CurrentUser::getField('customerid');
 		}
 
-		$tfa = new \Froxlor\FroxlorTwoFactorAuth('Froxlor');
-
-		$log->logAction(\Froxlor\FroxlorLogger::USR_ACTION, LOG_NOTICE, "viewed Edit2FA::overview");
-
-		if ($userinfo['type_2fa'] == '0') {
-
-			// available types
-			$type_select_values = array(
-				0 => '-',
-				1 => 'E-Mail',
-				2 => 'Authenticator'
-			);
-			asort($type_select_values);
-			$type_select = "";
-			foreach ($type_select_values as $_val => $_type) {
-				$type_select .= \Froxlor\UI\HTML::makeoption($_type, $_val);
-			}
-		} elseif ($userinfo['type_2fa'] == '1') {
-			// email Edit2FA enabled
-		} elseif ($userinfo['type_2fa'] == '2') {
-			// authenticator Edit2FA enabled
-			$ga_qrcode = $tfa->getQRCodeImageAsDataUri($userinfo['loginname'], $userinfo['data_2fa']);
-		}
-		eval("echo \"" . \Froxlor\UI\Template::getTemplate("2fa/overview", true) . "\";");
-	}
-
-	/**
-	 * do the delete and then just show a success-message
-	 */
-	public function delete()
-	{
 		Database::pexecute($upd_stmt, array(
 			't2fa' => 0,
 			'd2fa' => "",
 			'id' => $uid
 		));
-		\Froxlor\UI\Response::standard_success($lng['2fa']['2fa_removed']);
+		\Froxlor\CurrentUser::setField('type_2fa', 0);
+		\Froxlor\CurrentUser::setField('data_2fa', "");
+		\Froxlor\UI\Response::standard_success($this->lng['2fa']['2fa_removed'], "", array('filename' => "index.php?module=" . (\Froxlor\CurrentUser::isAdmin() ? "Admin" : "Customer") . "Index&view=myAccount"));
 	}
 
 	public function add()
 	{
+		if (Settings::Get('2fa.enabled') != '1') {
+			\Froxlor\UI\Response::dynamic_error("2FA not activated");
+		}
+
+		if (\Froxlor\CurrentUser::isAdmin()) {
+			$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_ADMINS . "` SET `type_2fa` = :t2fa, `data_2fa` = :d2fa WHERE adminid = :id");
+			$uid = \Froxlor\CurrentUser::getField('adminid');
+		} else {
+			$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_CUSTOMERS . "` SET `type_2fa` = :t2fa, `data_2fa` = :d2fa WHERE customerid = :id");
+			$uid = \Froxlor\CurrentUser::getField('customerid');
+		}
+		$tfa = new \Froxlor\FroxlorTwoFactorAuth('Froxlor');
+
 		$type = isset($_POST['type_2fa']) ? $_POST['type_2fa'] : '0';
 
 		if ($type == 0 || $type == 1) {
@@ -92,6 +79,8 @@ class Edit2FA extends FeModule
 			'd2fa' => $data,
 			'id' => $uid
 		));
-		\Froxlor\UI\Response::standard_success(sprintf($lng['2fa']['2fa_added'], $filename, $s));
+		\Froxlor\CurrentUser::setField('type_2fa', $type);
+		\Froxlor\CurrentUser::setField('data_2fa', $data);
+		\Froxlor\UI\Response::dynamic_success($this->lng['2fa']['2fa_added'], "", array('filename' => "index.php?module=" . (\Froxlor\CurrentUser::isAdmin() ? "Admin" : "Customer") . "Index&view=myAccount"));
 	}
 }
