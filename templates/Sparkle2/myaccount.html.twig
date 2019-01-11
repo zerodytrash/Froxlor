@@ -193,7 +193,45 @@
 				<i class="fas fa-key"></i>&nbsp;
 				{{ lng('menue.main.apikeys') }}
 			</div>
-			@TODO
+			<div class="card-body">
+				{% import "Sparkle2/table-listing.html.twig" as t %}
+				{% set content %}
+				{% for apikey in apikeys %}
+				<tr class="d-flex">
+					<td class="col-sm-5"><strong> {% if apikey.customerid == 0 %}
+							{{ apikey.adminname }} {% else %} <a
+							href="index.php?module=AdminCustomers&view=su&id={{ apikey.customerid }}">{{ apikey.loginname }}</a>
+							{% endif %}
+					</strong></td>
+					<td class="col-sm-5">{{ apikey.apikey[:16] }}...</td>
+					<td class="col-sm-2 text-right"><a href="index.php?module=ApiKeys&view=delete&id={{ apikey.id }}"
+						class="text-danger delete-btn" data-id="{{ apikey.id }}"
+						data-container="body" data-toggle="tooltip" data-placement="left"
+						title="{% trans "ApiKey löschen" %}"><i
+							class="fas fa-trash-alt"></i></a></td>
+				</tr>
+				{% endfor %}
+				{% endset %}
+				{% if apikeys|length > 0 %}
+				{{ t.listing("apikey-listing", [lng('login.username'), "ApiKey", "|Optionen"], content, [5,5,2], true) }}
+				{% else %}
+				<div class="alert alert-secondary" role="alert">
+					{{ lng('apikeys.no_api_keys') }}
+				</div>
+				{% endif %}
+				<div class="form-group form-row mb-0">
+					<div class="col-sm-12 text-right">
+					<a href="https://api.froxlor.org/doc/{{ call_static('\\Froxlor\\Froxlor', 'getVersion') }}/" rel="external"
+							class="btn btn-secondary"> <i class="fas fa-question-circle"></i>&nbsp;
+							{{ lng('menue.main.apihelp') }}
+						</a>&nbsp;
+						<a href="index.php?module=ApiKeys&view=add"
+							class="btn btn-success"> <i class="fas fa-plus-circle"></i>&nbsp;
+							{{ lng('apikeys.key_add') }}
+						</a>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 	{% endif %}

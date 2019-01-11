@@ -140,7 +140,7 @@ class UI
 	{
 		// fallback
 		$theme = self::$default_theme;
-		if ((int)\Froxlor\Settings::Get('panel.db_version') >= 201812300) {
+		if ((int) \Froxlor\Settings::Get('panel.db_version') >= 201812300) {
 			// system default
 			$theme = (\Froxlor\Settings::Get('panel.default_theme') !== null) ? \Froxlor\Settings::Get('panel.default_theme') : $theme;
 			// customer theme
@@ -218,5 +218,43 @@ class UI
 				return self::getLng(implode(".", $id), $context[$id_first]);
 			}
 		}
+	}
+
+	/**
+	 * returns an array of available themes
+	 *
+	 * @return array
+	 */
+	public static function getThemes()
+	{
+		$themespath = \Froxlor\FileDir::makeCorrectDir(\Froxlor\Froxlor::getInstallDir() . '/templates/');
+		$themes_available = array();
+
+		if (is_dir($themespath)) {
+			$its = new \DirectoryIterator($themespath);
+
+			foreach ($its as $it) {
+				if ($it->isDir() && $it->getFilename() != '.' && $it->getFilename() != '..' && $it->getFilename() != 'misc') {
+					$theme = $themespath . $it->getFilename();
+					if (file_exists($theme . '/config.json')) {
+						$themeconfig = json_decode(file_get_contents($theme . '/config.json'), true);
+						if (array_key_exists('variants', $themeconfig) && is_array($themeconfig['variants'])) {
+							foreach ($themeconfig['variants'] as $variant => $data) {
+								if ($variant == "default") {
+									$themes_available[$it->getFilename()] = $it->getFilename();
+								} elseif (array_key_exists('description', $data)) {
+									$themes_available[$it->getFilename() . '_' . $variant] = $data['description'];
+								} else {
+									$themes_available[$it->getFilename() . '_' . $variant] = $it->getFilename() . ' (' . $variant . ')';
+								}
+							}
+						} else {
+							$themes_available[$it->getFilename()] = $it->getFilename();
+						}
+					}
+				}
+			}
+		}
+		return $themes_available;
 	}
 }

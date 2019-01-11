@@ -270,7 +270,7 @@ class CustomerIndex extends FeModule
 		}
 
 		$theme_options = '';
-		$themes_avail = \Froxlor\UI\Template::getThemes();
+		$themes_avail = \Froxlor\Frontend\UI::getThemes();
 		foreach ($themes_avail as $t => $d) {
 			$theme_options .= \Froxlor\UI\HTML::makeoption($d, $t, $default_theme, true);
 		}

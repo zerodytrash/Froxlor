@@ -194,7 +194,7 @@ class AdminIndex extends FeModule
 		if (\Froxlor\CurrentUser::getField('theme') != '') {
 			$default_theme = \Froxlor\CurrentUser::getField('theme');
 		}
-		$themes_avail = \Froxlor\UI\Template::getThemes();
+		$themes_avail = \Froxlor\Frontend\UI::getThemes();
 		$theme_options = '';
 		foreach ($themes_avail as $t => $d) {
 			$theme_options .= \Froxlor\UI\HTML::makeoption($d, $t, $default_theme, true);
@@ -222,12 +222,30 @@ class AdminIndex extends FeModule
 			$ga_qrcode = $tfa->getQRCodeImageAsDataUri(\Froxlor\CurrentUser::getField('loginname'), \Froxlor\CurrentUser::getField('data_2fa'));
 		}
 
+		// api-keys
+		// select all my (accessable) certificates
+		$keys_stmt_query = "SELECT ak.*, c.loginname, a.loginname as adminname
+		FROM `" . TABLE_API_KEYS . "` ak
+		LEFT JOIN `" . TABLE_PANEL_CUSTOMERS . "` c ON `c`.`customerid` = `ak`.`customerid`
+		LEFT JOIN `" . TABLE_PANEL_ADMINS . "` a ON `a`.`adminid` = `ak`.`adminid` ";
+		$qry_params = array();
+		if (\Froxlor\CurrentUser::getField('customers_see_all') == '0') {
+			// admin with only customer-specific permissions
+			$keys_stmt_query .= "WHERE ak.adminid = :adminid ";
+			$qry_params['adminid'] = \Froxlor\CurrentUser::getField('adminid');
+		}
+		$keys_stmt = Database::prepare($keys_stmt_query);
+		Database::pexecute($keys_stmt, $qry_params);
+		$all_keys = $keys_stmt->fetchAll(\PDO::FETCH_ASSOC);
+		\Froxlor\PhpHelper::sortListBy($all_keys, 'loginname');
+
 		\Froxlor\Frontend\UI::TwigBuffer('myaccount.html.twig', array(
 			'page_title' => \Froxlor\Frontend\UI::getLng('menue.main.username') . \Froxlor\CurrentUser::getField('loginname'),
 			'languages' => $language_options,
 			'themes' => $theme_options,
 			'type_select' => $type_select,
-			'ga_qrcode' => $ga_qrcode
+			'ga_qrcode' => $ga_qrcode,
+			'apikeys' => $all_keys
 		));
 	}
 
@@ -394,7 +412,7 @@ class AdminIndex extends FeModule
 				}
 				// show a nice summary of the error-report
 				// before actually sending anything
-				eval("echo \"" . \Froxlor\UI\Template::getTemplate("index/send_error_report") . "\";");
+
 			} else {
 				\Froxlor\UI\Response::redirectTo($filename, array(
 					's' => $s
