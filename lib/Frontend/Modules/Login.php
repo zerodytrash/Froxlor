@@ -317,11 +317,13 @@ class Login extends FeModule
 			if (isset($userinfo['def_language'])) {
 				$language = $userinfo['def_language'];
 			}
+			\Froxlor\CurrentUser::setField('language', $language);
 
 			if (isset($userinfo['theme']) && $userinfo['theme'] != '') {
 				$theme = $userinfo['theme'];
 			} else {
 				$theme = Settings::Get('panel.default_theme');
+				\Froxlor\CurrentUser::setField('theme', $theme);
 			}
 
 			if (Settings::Get('session.allow_multiple_login') != '1') {
@@ -458,7 +460,7 @@ class Login extends FeModule
 			$userinfo['userid'] = $uid;
 
 			// if not successful somehow - start again
-			if (! finishLogin($userinfo)) {
+			if (! $this->finishLogin($userinfo)) {
 				\Froxlor\UI\Response::redirectTo('index.php', array(
 					'showmessage' => '2'
 				));

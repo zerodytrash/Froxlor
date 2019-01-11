@@ -291,6 +291,7 @@ class AdminIndex extends FeModule
 					\Froxlor\UI\Response::dynamic_error($e->getMessage());
 				}
 				// also update current session
+				\Froxlor\CurrentUser::setField('language', $def_language);
 				\Froxlor\CurrentUser::setField('def_language', $def_language);
 			}
 			\Froxlor\FroxlorLogger::getLog()->addNotice("changed his/her default language to '" . $def_language . "'");

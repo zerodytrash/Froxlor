@@ -74,8 +74,6 @@ require \Froxlor\Froxlor::getInstallDir() . '/lib/tables.inc.php';
 \Froxlor\Frontend\UI::initTwig();
 \Froxlor\Frontend\UI::Twig()->addGlobal('global_errors', '');
 
-define('AREA', 'login');
-
 // Language Managament
 $langs = array();
 $languages = array();
@@ -105,12 +103,11 @@ foreach ($langs as $key => $value) {
 // ensure that we can display messages
 $language = Settings::Get('panel.standardlanguage');
 
-if (isset($userinfo['language']) && isset($languages[$userinfo['language']])) {
+if (\Froxlor\CurrentUser::hasSession() && !empty(\Froxlor\CurrentUser::getField('language')) && isset($languages[\Froxlor\CurrentUser::getField('language')])) {
 	// default: use language from session, #277
-	$language = $userinfo['language'];
+	$language = \Froxlor\CurrentUser::getField('language');
 } else {
-	// this will always evaluat true, since it is the above statement inverted. @todo remove
-	if (! isset($userinfo['def_language']) || ! isset($languages[$userinfo['def_language']])) {
+	if (!\Froxlor\CurrentUser::hasSession()) {
 		if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
 			$accept_langs = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
 			for ($i = 0; $i < count($accept_langs); $i ++) {
@@ -130,7 +127,7 @@ if (isset($userinfo['language']) && isset($languages[$userinfo['language']])) {
 			}
 		}
 	} else {
-		$language = $userinfo['def_language'];
+		$language = \Froxlor\CurrentUser::getField('def_language');
 	}
 }
 
