@@ -154,7 +154,6 @@ Settings::Set('system.hostname', 'dev.froxlor.org', true);
 Settings::Set('system.nameservers', 'dev.froxlor.org', true);
 Settings::Set('system.mysql_access_host', 'localhost,127.0.0.1,2a01:440:1:12:82:149:225:46,82.149.225.46', true);
 Settings::Set('system.use_ssl', '1', true);
-Settings::Set('system.froxlordirectlyviahostname', '1', true);
 Settings::Set('system.dns_createhostnameentry', '1', true);
 Settings::Set('system.dnsenabled', '1', true);
 Settings::Set('system.dns_server', 'PowerDNS', true);

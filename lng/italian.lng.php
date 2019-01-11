@@ -1026,9 +1026,6 @@ $lng['serversettings']['mail_also_with_mxservers'] = 'Crea mail-, imap-, pop3- a
 $lng['admin']['webserver_user'] = 'Utente Webserver';
 $lng['admin']['webserver_group'] = 'Gruppo Webserver';
 
-// ADDED IN FROXLOR 0.9.10
-$lng['serversettings']['froxlordirectlyviahostname'] = 'Accedi direttamente a Froxlor via hostname';
-
 // ADDED IN FROXLOR 0.9.11-svn1
 $lng['serversettings']['panel_password_regex']['title'] = 'Espressione per le password';
 $lng['serversettings']['panel_password_regex']['description'] = 'Qui è possibile impostare una espressione regolare per la complessità delle password.<br />Vuoto = nessun requisito specificato';

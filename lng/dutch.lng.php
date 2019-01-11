@@ -998,9 +998,6 @@ $lng['serversettings']['mail_also_with_mxservers'] = 'Maak mail-, imap-, pop3- e
 $lng['admin']['webserver_user'] = 'Gebruikersnaam webserver';
 $lng['admin']['webserver_group'] = 'Groepnaam webserver';
 
-// ADDED IN FROXLOR 0.9.10
-$lng['serversettings']['froxlordirectlyviahostname'] = 'Froxlor is direct toegankelijk via hostnaam';
-
 // ADDED IN FROXLOR 0.9.11-svn1
 $lng['serversettings']['panel_password_regex']['title'] = 'Reguliere expressie voor wachtwoorden';
 $lng['serversettings']['panel_password_regex']['description'] = 'Hier kunt u een reguliere expressie opgeven voor de complexiteit van wachtwoorden.<br />Leeg betekent geen speciale complexiteit';

@@ -200,9 +200,18 @@ if (\Froxlor\Froxlor::isDatabaseVersion('201812190')) {
 	Updates::lastStepStatus(0);
 
 	Updates::showUpdateStep("Removing DKIM-ADSP support");
-	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsp');");
-	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsppolicy');");
+	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsp';");
+	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsppolicy';");
 	Updates::lastStepStatus(0);
 
 	\Froxlor\Froxlor::updateToDbVersion('201812300');
+}
+
+if (\Froxlor\Froxlor::isDatabaseVersion('201812300')) {
+
+	Updates::showUpdateStep("Removing unneeded settings");
+	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'system' AND `varname`= 'froxlordirectlyviahostname';");
+	Updates::lastStepStatus(0);
+
+	\Froxlor\Froxlor::updateToDbVersion('201901110');
 }

@@ -20,17 +20,6 @@ return array(
 			'title' => \Froxlor\Frontend\UI::getLng('admin.froxlorvhost'),
 			'fields' => array(
 				/**
-				 * Webserver-Vhost
-				 */
-				'system_froxlordirectlyviahostname' => array(
-					'label' => \Froxlor\Frontend\UI::getLng('serversettings.froxlordirectlyviahostname'),
-					'settinggroup' => 'system',
-					'varname' => 'froxlordirectlyviahostname',
-					'type' => 'bool',
-					'default' => false,
-					'save_method' => 'storeSettingField'
-				),
-				/**
 				 * SSL / Let's Encrypt
 				 */
 				'system_le_froxlor_enabled' => array(

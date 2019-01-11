@@ -643,10 +643,6 @@ class Customers extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Resource
 					if ($sendpassword == '1') {
 
 						$srv_hostname = Settings::Get('system.hostname');
-						if (Settings::Get('system.froxlordirectlyviahostname') == '0') {
-							$srv_hostname .= '/' . basename(\Froxlor\Froxlor::getInstallDir());
-						}
-
 						$srv_ip_stmt = Database::prepare("
 							SELECT ip, port FROM `" . TABLE_PANEL_IPSANDPORTS . "`
 							WHERE `id` = :defaultip

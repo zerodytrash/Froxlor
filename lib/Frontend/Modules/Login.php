@@ -566,11 +566,8 @@ class Login extends FeModule
 							$port = '';
 						}
 						// there can be only one script to handle this so we can use a fixed value here
-						$script = "/Login.php"; // $_SERVER['SCRIPT_NAME'];
-						if (Settings::Get('system.froxlordirectlyviahostname') == 0) {
-							$script = \Froxlor\FileDir::makeCorrectFile("/" . basename(__DIR__) . "/" . $script);
-						}
-						$activationlink = $protocol . '://' . $host . $port . $script . '?action=resetpwd&resetcode=' . $activationcode;
+						$script = "/index.php?module=Login"; // $_SERVER['SCRIPT_NAME'];
+						$activationlink = $protocol . '://' . $host . $port . $script . '?view=resetpwd&resetcode=' . $activationcode;
 
 						$replace_arr = array(
 							'SALUTATION' => \Froxlor\User::getCorrectUserSalutation($user),

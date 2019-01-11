@@ -561,7 +561,6 @@ opcache.interned_strings_buffer'),
 	('system', 'mod_fcgid_defaultini', '1'),
 	('system', 'ftpserver', 'proftpd'),
 	('system', 'dns_createmailentry', '0'),
-	('system', 'froxlordirectlyviahostname', '0'),
 	('system', 'report_enable', '1'),
 	('system', 'report_webmax', '90'),
 	('system', 'report_trafficmax', '90'),
@@ -678,7 +677,7 @@ opcache.interned_strings_buffer'),
 	('panel', 'customer_hide_options', ''),
 	('panel', 'is_configured', '0'),
 	('panel', 'version', '0.10.0'),
-	('panel', 'db_version', '201812300');
+	('panel', 'db_version', '201901110');
 
 
 DROP TABLE IF EXISTS `panel_tasks`;

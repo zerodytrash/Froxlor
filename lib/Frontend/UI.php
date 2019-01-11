@@ -140,7 +140,7 @@ class UI
 	{
 		// fallback
 		$theme = self::$default_theme;
-		if (\Froxlor\Settings::Get('panel.db_version') >= "201812300") {
+		if ((int)\Froxlor\Settings::Get('panel.db_version') >= 201812300) {
 			// system default
 			$theme = (\Froxlor\Settings::Get('panel.default_theme') !== null) ? \Froxlor\Settings::Get('panel.default_theme') : $theme;
 			// customer theme
