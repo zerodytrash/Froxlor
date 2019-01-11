@@ -173,6 +173,9 @@ class HtmlForm
 		if (isset($data['max'])) {
 			$extras .= ' max="' . $data['max'] . '"';
 		}
+		if (isset($data['mandatory']) || isset($data['mandatory_ex'])) {
+			$extras .= ' required';
+		}
 
 		$tpl = self::getFormTpl('input');
 		return \Froxlor\Frontend\UI::Twig()->render($tpl, array(
@@ -183,7 +186,7 @@ class HtmlForm
 			'ulfield' => $ulfield
 		));
 	}
-	
+
 	private static function int($fieldname = '', $data = array())
 	{
 		return self::textBox($fieldname, $data, 'number');
@@ -206,6 +209,9 @@ class HtmlForm
 		}
 		if (isset($data['rows'])) {
 			$extras .= ' rows="' . $data['rows'] . '"';
+		}
+		if (isset($data['mandatory']) || isset($data['mandatory_ex'])) {
+			$extras .= ' required';
 		}
 
 		$tpl = self::getFormTpl('textarea');

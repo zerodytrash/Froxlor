@@ -27,19 +27,22 @@ return array(
 						'label' => $lng['admin']['phpsettings']['description'],
 						'type' => 'text',
 						'maxlength' => 50,
-						'value' => $result['description']
+						'value' => $result['description'],
+						'mandatory' => true
 					),
 					'reload_cmd' => array(
 						'label' => $lng['serversettings']['phpfpm_settings']['reload'],
 						'type' => 'text',
 						'maxlength' => 255,
-						'value' => $result['reload_cmd']
+						'value' => $result['reload_cmd'],
+						'mandatory' => true
 					),
 					'config_dir' => array(
 						'label' => $lng['serversettings']['phpfpm_settings']['configdir'],
 						'type' => 'text',
 						'maxlength' => 255,
-						'value' => $result['config_dir']
+						'value' => $result['config_dir'],
+						'mandatory' => true
 					),
 					'pm' => array(
 						'label' => $lng['serversettings']['phpfpm_settings']['pm'],

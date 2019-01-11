@@ -33,13 +33,15 @@ return array(
 						'label' => \Froxlor\Frontend\UI::getLng('admin.phpsettings.binary'),
 						'type' => 'text',
 						'maxlength' => 255,
-						'value' => '/usr/bin/php-cgi'
+						'value' => '/usr/bin/php-cgi',
+						'mandatory' => true
 					),
 					'fpmconfig' => array(
 						'visible' => (\Froxlor\Settings::Get('phpfpm.enabled') == 1 ? true : false),
 						'label' => \Froxlor\Frontend\UI::getLng('admin.phpsettings.fpmdesc'),
 						'type' => 'select',
-						'select_var' => $fpmconfigs
+						'select_var' => $fpmconfigs,
+						'mandatory' => true
 					),
 					'file_extensions' => array(
 						'visible' => (\Froxlor\Settings::Get('system.mod_fcgid') == 1 ? true : false),
@@ -178,7 +180,8 @@ return array(
 						'type' => 'textarea',
 						'cols' => 80,
 						'rows' => 20,
-						'value' => $default_config['phpsettings']
+						'value' => $default_config['phpsettings'],
+						'mandatory' => true
 					)
 				)
 			)

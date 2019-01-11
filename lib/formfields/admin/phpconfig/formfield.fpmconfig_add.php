@@ -26,19 +26,22 @@ return array(
 					'description' => array(
 						'label' => \Froxlor\Frontend\UI::getLng('admin.phpsettings.description'),
 						'type' => 'text',
-						'maxlength' => 50
+						'maxlength' => 50,
+						'mandatory' => true
 					),
 					'reload_cmd' => array(
 						'label' => \Froxlor\Frontend\UI::getLng('serversettings.phpfpm_settings.reload'),
 						'type' => 'text',
 						'maxlength' => 255,
-						'value' => 'service php7.0-fpm restart'
+						'value' => 'service php7.0-fpm restart',
+						'mandatory' => true
 					),
 					'config_dir' => array(
 						'label' => \Froxlor\Frontend\UI::getLng('serversettings.phpfpm_settings.configdir'),
 						'type' => 'text',
 						'maxlength' => 255,
-						'value' => '/etc/php/7.0/fpm/pool.d/'
+						'value' => '/etc/php/7.0/fpm/pool.d/',
+						'mandatory' => true
 					),
 					'pm' => array(
 						'label' => \Froxlor\Frontend\UI::getLng('serversettings.phpfpm_settings.pm'),
