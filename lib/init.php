@@ -154,7 +154,7 @@ include_once \Froxlor\FileDir::makeSecurePath(\Froxlor\Froxlor::getInstallDir() 
 
 // check for custom header-graphic
 $hl_path = '../templates/Sparkle2/assets/img';
-$header_logo = $hl_path . '/logo.png';
+$header_logo = $hl_path . '/logo.svg';
 
 if (file_exists($hl_path . '/logo_custom.png')) {
 	$header_logo = $hl_path . '/logo_custom.png';
@@ -232,6 +232,7 @@ $no_log_modules = array(
 
 $module = ucfirst($module);
 \Froxlor\Frontend\UI::Twig()->addGlobal('module', $module);
+\Froxlor\Frontend\UI::Twig()->addGlobal('view', $view);
 $mod_fullpath = '\\Froxlor\\Frontend\\Modules\\' . $module;
 
 if (! class_exists($mod_fullpath)) {

@@ -29,7 +29,7 @@
 							&nbsp;<i class="fas fa-user" data-toggle="tooltip"
 							data-placement="right" title="{{ lng('panel.current_user') }}"></i>
 							{% endif %}<br> <small><a
-								href="mailto:{{ user.email }}">{{ user.email }}</a></small></td>
+								href="mailto:{{ user.email }}">{{ user.email|idnDecode }}</a></small></td>
 						<td class="col-sm-2">{{ user.loginname }}</td>
 						<td class="col-sm-1">{{ user.customers_used }} / {% if user.customers < 0 %}&infin;{% else %}
 							{{ user.customers }} {% endif %}</span></td>

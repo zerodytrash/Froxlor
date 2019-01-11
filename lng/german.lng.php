@@ -1704,3 +1704,5 @@ $lng['panel']['current_user'] = 'Aktueller Benutzer';
 $lng['question']['update_now'] = 'Soll das Update jetzt durchgeführt werden?';
 $lng['error']['noaccess'] = 'Zugriff auf "%s" nicht erlaubt';
 $lng['success']['wipecleartextmailpws'] = 'Klartext E-Mail-Konten Passwörter wurden erfolgreich gelöscht.';
+$lng['panel']['security'] = 'Sicherheit';
+$lng['panel']['lookandfeel'] = 'Ansicht und Sprache';

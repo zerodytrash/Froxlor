@@ -1,5 +1,5 @@
 <li class="nav-item d-block"><a
-	class="nav-link {% if module[-5:]|lower == 'index' %}active" href="#"
+	class="nav-link {% if module[-5:]|lower == 'index' and view|lower == 'overview' %}active" href="#"
 	{% else %}" href="index.php?module={% if call_static('\\Froxlor\\CurrentUser', 'isAdmin') %}Admin{% else %}Customer{% endif %}Index"
 	{% endif %}> <i class="fas fa-tachometer-alt"></i> Dashboard
 </a></li>
@@ -33,7 +33,7 @@
 	</div></li>
 {% elseif box.url is defined %}
 <li class="nav-item d-block"><a
-	class="nav-link {% if module[modlen:]|lower == mod %}active" href="#"
+	class="nav-link {% if module[modlen:]|lower == mod and (mod != 'index' or (mod == 'index' and view != 'overview')) %}active" href="#"
 	{% else %}" href="{{ box.url }}" {% endif %} {% if box.new_window %}
 	rel="external" {% endif %}> <i
 		class="fas fa-{% if box.icon is defined %}{{ box.icon }}{% else %}asterisk{% endif %}"></i>

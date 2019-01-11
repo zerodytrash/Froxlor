@@ -28,7 +28,7 @@
 					{% for domain in domains.list %}
 					<tr
 						class="d-flex{% if user.deactivated > 0 %} text-muted{% endif %}">
-						<td class="col-sm-3"><strong>{{ domain.domain }}</strong></td>
+						<td class="col-sm-3"><strong>{{ domain.domain|idnDecode }}</strong></td>
 						<td class="col-sm-3">{% for ip in domain.ips %}<a
 							href="index.php?module=AdminIpsandports&view=edit&id={{ ip.id }}">{{ ip.ip }}:{{ ip.port }}</a><br>
 							{% endfor %}</a></td>

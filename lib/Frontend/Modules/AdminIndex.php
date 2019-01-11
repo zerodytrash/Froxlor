@@ -176,6 +176,13 @@ class AdminIndex extends FeModule
 		));
 	}
 
+	public function myAccount()
+	{
+		\Froxlor\Frontend\UI::TwigBuffer('myaccount.html.twig', array(
+			'page_title' => \Froxlor\Frontend\UI::getLng('menue.main.username') . \Froxlor\CurrentUser::getField('loginname')
+		));
+	}
+
 	/**
 	 *
 	 * @todo rename to CamelCase

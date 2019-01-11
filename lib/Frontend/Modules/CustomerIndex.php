@@ -53,10 +53,10 @@ class CustomerIndex extends FeModule
 	public function overview()
 	{
 		$domain_stmt = Database::prepare("SELECT `domain` FROM `" . TABLE_PANEL_DOMAINS . "`
-		WHERE `customerid` = :customerid
-		AND `parentdomainid` = '0'
-		AND `id` <> :standardsubdomain
-	");
+			WHERE `customerid` = :customerid
+			AND `parentdomainid` = '0'
+			AND `id` <> :standardsubdomain
+		");
 		Database::pexecute($domain_stmt, array(
 			"customerid" => $userinfo['customerid'],
 			"standardsubdomain" => $userinfo['standardsubdomain']
@@ -87,7 +87,6 @@ class CustomerIndex extends FeModule
 			$stdsubdomain = $std_domain['domain'];
 		}
 
-		$userinfo['email'] = $idna_convert->decode($userinfo['email']);
 		$yesterday = time() - (60 * 60 * 24);
 		$month = date('M Y', $yesterday);
 
@@ -97,16 +96,9 @@ class CustomerIndex extends FeModule
 			'cid' => $userinfo['customerid']
 		));
 
-		$userinfo['diskspace'] = round($userinfo['diskspace'] / 1024, Settings::Get('panel.decimal_places'));
 		$userinfo['diskspace_used'] = round($usages['webspace'] / 1024, Settings::Get('panel.decimal_places'));
 		$userinfo['mailspace_used'] = round($usages['mail'] / 1024, Settings::Get('panel.decimal_places'));
 		$userinfo['dbspace_used'] = round($usages['mysql'] / 1024, Settings::Get('panel.decimal_places'));
-
-		$userinfo['traffic'] = round($userinfo['traffic'] / (1024 * 1024), Settings::Get('panel.decimal_places'));
-		$userinfo['traffic_used'] = round($userinfo['traffic_used'] / (1024 * 1024), Settings::Get('panel.decimal_places'));
-		$userinfo = \Froxlor\PhpHelper::strReplaceArray('-1', $lng['customer']['unlimited'], $userinfo, 'diskspace traffic mysqls emails email_accounts email_forwarders email_quota ftps subdomains');
-
-		$userinfo['custom_notes'] = ($userinfo['custom_notes'] != '') ? nl2br($userinfo['custom_notes']) : '';
 
 		$services_enabled = "";
 		$se = array();
@@ -119,6 +111,13 @@ class CustomerIndex extends FeModule
 		if ($userinfo['perlenabled'] == '1')
 			$se[] = "Perl/CGI";
 		$services_enabled = implode(", ", $se);
+	}
+	
+	public function myAccount()
+	{
+		\Froxlor\Frontend\UI::TwigBuffer('myaccount.html.twig', array(
+			'page_title' => \Froxlor\Frontend\UI::getLng('menue.main.username') . \Froxlor\CurrentUser::getField('loginname')
+		));
 	}
 }
 /*

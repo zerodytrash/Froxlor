@@ -2057,3 +2057,5 @@ $lng['panel']['current_user'] = 'Current user';
 $lng['question']['update_now'] = 'Would you like to update now?';
 $lng['error']['noaccess'] = 'Access to "%s" denied';
 $lng['success']['wipecleartextmailpws'] = 'Successfully cleared all plaintext email account passwords';
+$lng['panel']['security'] = 'Security';
+$lng['panel']['lookandfeel'] = 'Look and feel';

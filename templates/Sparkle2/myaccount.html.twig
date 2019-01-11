@@ -1,0 +1,57 @@
+{% extends "Sparkle2/userarea.html.twig" %}
+
+{% block content %}
+{% set userinfo = call_static('\\Froxlor\\CurrentUser', 'getData') %}
+{% if call_static('\\Froxlor\\CurrentUser', 'isAdmin') %}
+{% set moduleprefix = 'Admin' %}
+{% else %}
+{% set moduleprefix = 'Customer' %}
+{% endif %}
+<div class="row">
+	<div class="col-md-4 col-sm-12">
+		<!-- password and 2fa -->
+		<div class="card mb-2">
+			<div class="card-header">
+				<i class="fas fa-shield-alt"></i>&nbsp;{{ lng('panel.security') }}
+			</div>
+			<div class="card-body">
+				<h5>{{ lng('menue.main.changepassword') }}</h5>
+				<form action="index.php?module={{ moduleprefix }}Index&view=change_password"
+					method="post" class="form"></form>
+
+				<h5>{{ lng('login.2fa') }}</h5>
+				<form
+					action="index.php?module=Edit2FA&view={% if userinfo.type_2fa == 0 %}add{% else %}delete{% endif %}"
+					method="post" class="form"></form>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-4 col-sm-12">
+		<!-- language and theme -->
+		<div class="card mb-2">
+			<div class="card-header">
+				<i class="fas fa-image"></i>&nbsp;{{ lng('panel.lookandfeel') }}
+			</div>
+			<div class="card-body">
+				<h5>{{ lng('menue.main.changelanguage') }}</h5>
+				<form action="index.php?module={{ moduleprefix }}Index&view=change_language"
+					method="post" class="form"></form>
+
+				<h5>{{ lng(('menue.main.changetheme')) }}</h5>
+				<form action="index.php?module={{ moduleprefix }}Index&view=change_theme"
+					method="post" class="form"></form>
+			</div>
+		</div>
+	</div>
+	{% if get_setting('api.enabled') == 1 %}
+	<div class="col-md-4 col-sm-12">
+		<div class="card mb-2">
+			<div class="card-header">
+				<i class="fas fa-key"></i>&nbsp;{{ lng('menue.main.apikeys') }}
+			</div>
+			@TODO
+		</div>
+	</div>
+	{% endif %}
+</div>
+{% endblock %}

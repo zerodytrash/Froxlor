@@ -18,7 +18,7 @@
  */
 return array(
 	'customer' => array(
-		'mydata' => array(
+		'index' => array(
 			'icon' => 'user',
 			'label' => \Froxlor\Frontend\UI::getLng('admin.mydata'),
 			'elements' => array(
@@ -183,49 +183,11 @@ return array(
 		)
 	),
 	'admin' => array(
-		'mydata' => array(
+		'index' => array(
+			'url' => 'index.php?module=AdminIndex&view=myAccount',
 			'icon' => 'user',
 			'label' => \Froxlor\Frontend\UI::getLng('admin.mydata'),
-			'elements' => array(
-				array(
-					'label' => \Froxlor\Frontend\UI::getLng('menue.main.username') . \Froxlor\CurrentUser::getField('loginname'),
-					'icon' => 'user-circle'
-				),
-				array(
-					'url' => 'index.php?module=AdminIndex&view=change_password',
-					'label' => \Froxlor\Frontend\UI::getLng('menue.main.changepassword'),
-					'icon' => 'user-lock'
-				),
-				array(
-					'url' => 'index.php?module=Edit2FA',
-					'label' => \Froxlor\Frontend\UI::getLng('2fa.2fa'),
-					'show_element' => (\Froxlor\Settings::Get('2fa.enabled') == true),
-					'icon' => 'shield-alt'
-				),
-				array(
-					'url' => 'index.php?module=AdminIndex&view=change_language',
-					'label' => \Froxlor\Frontend\UI::getLng('menue.main.changelanguage'),
-					'icon' => 'flag'
-				),
-				array(
-					'url' => 'index.php?module=AdminIndex&view=change_theme',
-					'label' => \Froxlor\Frontend\UI::getLng('menue.main.changetheme'),
-					'show_element' => (\Froxlor\Settings::Get('panel.allow_theme_change_admin') == true),
-					'icon' => 'images'
-				),
-				array(
-					'url' => 'index.php?module=ApiKeys',
-					'label' => \Froxlor\Frontend\UI::getLng('menue.main.apikeys'),
-					'show_element' => (\Froxlor\Settings::Get('api.enabled') == true),
-					'icon' => 'key'
-				),
-				array(
-					'url' => 'index.php?module=ApiKeys&view=apihelp',
-					'label' => \Froxlor\Frontend\UI::getLng('menue.main.apihelp'),
-					'show_element' => (\Froxlor\Settings::Get('api.enabled') == true),
-					'icon' => 'question-circle'
-				)
-			)
+			'elements' => array()
 		),
 		'resources' => array(
 			'label' => \Froxlor\Frontend\UI::getLng('admin.resources'),

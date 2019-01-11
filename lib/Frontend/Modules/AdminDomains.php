@@ -44,7 +44,6 @@ class AdminDomains extends FeModule
 		$domains = $result['list'];
 		foreach ($domains as $index => $domain) {
 			// idna convert
-			$domain['domain'] = $idna->decode($domain['domain']);
 			$domain['aliasdomain'] = $idna->decode($domain['aliasdomain']);
 			// customername
 			$domain['customername'] = \Froxlor\User::getCorrectFullUserDetails($domain);
