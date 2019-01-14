@@ -156,7 +156,6 @@ class Login extends FeModule
 					));
 					$userinfo['userid'] = $userinfo[$uid];
 					$userinfo['adminsession'] = $adminsession;
-					\Froxlor\CurrentUser::setData($userinfo);
 				}
 			} else {
 				// login incorrect
@@ -313,6 +312,8 @@ class Login extends FeModule
 	{
 		if (isset($userinfo['userid']) && $userinfo['userid'] != '') {
 
+			\Froxlor\CurrentUser::setData($userinfo);
+
 			$language = Settings::Get('panel.standardlanguage');
 			if (isset($userinfo['def_language'])) {
 				$language = $userinfo['def_language'];
@@ -413,7 +414,9 @@ class Login extends FeModule
 			exit();
 		}
 		// show template to enter code
-		eval("echo \"" . \Froxlor\UI\Template::getTemplate('2fa/entercode', true) . "\";");
+		\Froxlor\Frontend\UI::TwigBuffer('login/entercode.html.twig', array(
+			'page_title' => $this->lng['login']['2fa']
+		));
 	}
 
 	public function verify2fa()

@@ -2,7 +2,7 @@
 
 {% block body %}
 <div class="container container-login text-center">
-	<form class="form-signin" method="post" action="">
+	<form class="form-signin" method="post" action="index.php?module=Login&view=verify2fa">
 		<img class="mb-4" src="{{ header_logo }}"
 			alt="Froxlor Server Management Panel">
 		<h1 class="h3 mb-3 font-weight-normal">
@@ -17,11 +17,10 @@
 			type="hidden" name="action" value="2fa_verify" /> <input
 			type="hidden" name="send" value="send" />
 		<button class="btn btn-lg btn-primary btn-block" type="submit">
-			{{ lng('2fa.2fa_verifiy') }}
+			{{ lng('2fa.2fa_verify') }}
 		</button>
 		<p class="mt-5 mb-3 text-muted">
 			<a href="?index.php">{{ lng('login.backtologin') }}</a>
-			{% endif %}
 		</p>
 	</form>
 </div>

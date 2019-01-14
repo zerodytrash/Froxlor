@@ -162,10 +162,10 @@ if (file_exists($hl_path . '/logo_custom.png')) {
 $module = isset($_GET['module']) ? $_GET['module'] : 'login';
 $view = isset($_GET['view']) ? $_GET['view'] : 'overview';
 
-if (\Froxlor\CurrentUser::hasSession() == false && $module != 'login') {
+if (\Froxlor\CurrentUser::hasSession() == false && strtolower($module) != 'login') {
 	header("Location: index.php?module=login");
 	exit();
-} elseif (\Froxlor\CurrentUser::hasSession() && ($module == 'login' && $view != 'su')) {
+} elseif (\Froxlor\CurrentUser::hasSession() && (strtolower($module) == 'login' && $view != 'su')) {
 	$module = "Index";
 	if (\Froxlor\CurrentUser::isAdmin()) {
 		$module = 'admin' . $module;
