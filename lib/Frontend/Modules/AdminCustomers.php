@@ -123,7 +123,7 @@ class AdminCustomers extends FeModule
 			$customer_edit_form = $this->customersForm($result);
 
 			\Froxlor\Frontend\UI::TwigBuffer('admin/customers/customer.html.twig', array(
-				'page_title' => $this->lng['panel']['customers'],
+				'page_title' => $this->lng['admin']['customer_edit'],
 				'account' => $result,
 				'form_data' => $customer_edit_form
 			));

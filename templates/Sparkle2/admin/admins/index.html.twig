@@ -30,7 +30,9 @@
 							data-placement="right" title="{{ lng('panel.current_user') }}"></i>
 							{% endif %}<br> <small><a
 								href="mailto:{{ user.email }}">{{ user.email|idnDecode }}</a></small></td>
-						<td class="col-sm-2">{{ user.loginname }}</td>
+						<td class="col-sm-2">{% if call_static('\\Froxlor\\CurrentUser', 'getField', ['adminid']) != user.adminid  %}<a
+							href="index.php?module=AdminAdmins&view=su&id={{ user.adminid }}">{{ user.loginname }}</a>
+							{% else %} {{ user.loginname }} {% endif %}</td>
 						<td class="col-sm-1">{{ user.customers_used }} / {% if user.customers < 0 %}&infin;{% else %}
 							{{ user.customers }} {% endif %}</span></td>
 						<td class="col-sm-3">
@@ -77,13 +79,22 @@
 						</td>
 						<td class="col-sm-2">{% if user.lastlogin > 0 %} {{ user.lastlogin|date('d.m.Y H:i') }}
 							{% else %} {% trans "keine Anmeldung bisher" %} {% endif %}</td>
-						<td class="col-sm-1 text-right">{% if call_static('\\Froxlor\\CurrentUser', 'getField', ['adminid']) == user.adminid %}
+						<td class="col-sm-1 text-right">{% if user.custom_notes is not empty %}
+							<a href="#" data-id="{{ user.customerid }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ user.custom_notes|raw }}" data-html="true"><i
+								class="fas fa-comment"></i></a>&nbsp;{% endif %}<a
+							href="index.php?module=AdminAdmins&view=edit&id={{ user.adminid }}"
+							data-id="{{ user.customerid }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ lng('panel.edit') }}"><i class="fas fa-edit"></i></a>
+						{% if call_static('\\Froxlor\\CurrentUser', 'getField', ['adminid']) == user.adminid %}
 							<span class="text-muted"><i class="fas fa-trash-alt"></i></span>
 							{% else %} <a href="#" class="text-danger delete-btn"
 							data-id="{{ user.id }}" data-container="body"
 							data-toggle="tooltip" data-placement="left"
-							title="{% trans "Konto löschen" %}"><i
-								class="fas fa-trash-alt"></i></a> {% endif %}</td>
+							title="{{ lng('panel.delete') }}"><i class="fas fa-trash-alt"></i></a>
+							{% endif %}</td>
 					</tr>
 					{% endfor %}
 					{% endset %}
