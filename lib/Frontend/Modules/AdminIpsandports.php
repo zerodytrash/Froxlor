@@ -49,7 +49,7 @@ class AdminIpsandports extends FeModule
 		\Froxlor\PhpHelper::sortListBy($result['list'], 'ip');
 
 		// add ip/port form
-		$ipsandports_add_form = $this->ipportAddForm();
+		$ipsandports_add_form = $this->ipportForm();
 
 		\Froxlor\Frontend\UI::TwigBuffer('admin/ipsandports/index.html.twig', array(
 			'page_title' => $this->lng['admin']['ipsandports']['ipsandports'],
@@ -58,7 +58,42 @@ class AdminIpsandports extends FeModule
 		));
 	}
 
-	private function ipportAddForm()
+	public function edit()
+	{
+		$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+
+		try {
+			$json_result = IpsAndPorts::getLocal(\Froxlor\CurrentUser::getData(), array(
+				'id' => $id
+			))->get();
+		} catch (\Exception $e) {
+			\Froxlor\UI\Response::dynamic_error($e->getMessage());
+		}
+		$result = json_decode($json_result, true)['data'];
+
+		if (isset($_POST['send']) && $_POST['send'] == 'send') {
+			try {
+				IpsAndPorts::getLocal(\Froxlor\CurrentUser::getData(), $_POST)->update();
+			} catch (\Exception $e) {
+				\Froxlor\UI\Response::dynamic_error($e->getMessage());
+			}
+			\Froxlor\UI\Response::redirectTo("index.php", array(
+				'module' => "AdminIpsandports"
+			));
+		} else {
+
+			// edit ip/port form
+			$ipsandports_edit_form = $this->ipportForm($result);
+
+			\Froxlor\Frontend\UI::TwigBuffer('admin/ipsandports/ipandport.html.twig', array(
+				'page_title' => $this->lng['admin']['ipsandports']['ipsandports'],
+				'ip' => $result,
+				'form_data' => $ipsandports_edit_form
+			));
+		}
+	}
+
+	private function ipportForm($result = array())
 	{
 		// Do not display attributes that are not used by the current webserver
 		$websrv = Settings::Get('system.webserver');
@@ -66,9 +101,13 @@ class AdminIpsandports extends FeModule
 		$is_apache = ($websrv == 'apache2');
 		$is_apache24 = $is_apache && (Settings::Get('system.apache24') === '1');
 
-		$ipsandports_add_data = include_once \Froxlor\Froxlor::getInstallDir() . '/lib/formfields/admin/ipsandports/formfield.ipsandports_add.php';
-		$ipsandports_add_form = \Froxlor\UI\HtmlForm::genHTMLForm($ipsandports_add_data);
-		return $ipsandports_add_form;
+		if (! empty($result) && isset($result['id'])) {
+			$ipsandports_data = include_once \Froxlor\Froxlor::getInstallDir() . '/lib/formfields/admin/ipsandports/formfield.ipsandports_edit.php';
+		} else {
+			$ipsandports_data = include_once \Froxlor\Froxlor::getInstallDir() . '/lib/formfields/admin/ipsandports/formfield.ipsandports_add.php';
+		}
+		$ipsandports_form = \Froxlor\UI\HtmlForm::genHTMLForm($ipsandports_data);
+		return $ipsandports_form;
 	}
 }
 /*
@@ -105,62 +144,7 @@ class AdminIpsandports extends FeModule
 				), $result['ip'] . ':' . $result['port']);
 			}
 		}
-	} elseif ($action == 'add') {
-		if (isset($_POST['send']) && $_POST['send'] == 'send') {
-			try {
-				IpsAndPorts::getLocal($userinfo, $_POST)->add();
-			} catch (Exception $e) {
-				\Froxlor\UI\Response::dynamic_error($e->getMessage());
-			}
-			\Froxlor\UI\Response::redirectTo($filename, array(
-				'page' => $page,
-				's' => $s
-			));
-		} else {
 
-			$ipsandports_add_data = include_once dirname(__FILE__) . '/lib/formfields/admin/ipsandports/formfield.ipsandports_add.php';
-			$ipsandports_add_form = \Froxlor\UI\HtmlForm::genHTMLForm($ipsandports_add_data);
 
-			$title = $ipsandports_add_data['ipsandports_add']['title'];
-			$image = $ipsandports_add_data['ipsandports_add']['image'];
-
-			eval("echo \"" . \Froxlor\UI\Template::getTemplate("ipsandports/ipsandports_add") . "\";");
-		}
-	} elseif ($action == 'edit' && $id != 0) {
-		try {
-			$json_result = IpsAndPorts::getLocal($userinfo, array(
-				'id' => $id
-			))->get();
-		} catch (Exception $e) {
-			\Froxlor\UI\Response::dynamic_error($e->getMessage());
-		}
-		$result = json_decode($json_result, true)['data'];
-
-		if ($result['ip'] != '') {
-
-			if (isset($_POST['send']) && $_POST['send'] == 'send') {
-				try {
-					IpsAndPorts::getLocal($userinfo, $_POST)->update();
-				} catch (Exception $e) {
-					\Froxlor\UI\Response::dynamic_error($e->getMessage());
-				}
-				\Froxlor\UI\Response::redirectTo($filename, array(
-					'page' => $page,
-					's' => $s
-				));
-			} else {
-
-				$result = \Froxlor\PhpHelper::htmlentitiesArray($result);
-
-				$ipsandports_edit_data = include_once dirname(__FILE__) . '/lib/formfields/admin/ipsandports/formfield.ipsandports_edit.php';
-				$ipsandports_edit_form = \Froxlor\UI\HtmlForm::genHTMLForm($ipsandports_edit_data);
-
-				$title = $ipsandports_edit_data['ipsandports_edit']['title'];
-				$image = $ipsandports_edit_data['ipsandports_edit']['image'];
-
-				eval("echo \"" . \Froxlor\UI\Template::getTemplate("ipsandports/ipsandports_edit") . "\";");
-			}
-		}
-	}
 }
 */

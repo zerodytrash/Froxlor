@@ -27,26 +27,22 @@
 						<td class="col-sm-3"><strong>{{ ip.ip }}</strong></td>
 						<td class="col-sm-2">{{ ip.port }}</td>
 						<td class="col-sm-2">{% if ip.vhostcontainer == 1 %}<span
-							class="text-success"><i class="fas fa-check-circle"></i></span>
-						{% else %}<span class="text-danger"><i
-								class="fas fa-times-circle"></i></span>
-						{% endif %}</td>
+							class="text-success"><i class="fas fa-check-circle"></i></span> {% else %}<span
+							class="text-danger"><i class="fas fa-times-circle"></i></span> {% endif %}</td>
 						<td class="col-sm-2">{% if ip.specialsettings is not empty %}<span
-							class="text-success"><i class="fas fa-check-circle"></i></span>
-						{% else %}<span class="text-danger"><i
-								class="fas fa-times-circle"></i></span>
-						{% endif %}</td>
+							class="text-success"><i class="fas fa-check-circle"></i></span> {% else %}<span
+							class="text-danger"><i class="fas fa-times-circle"></i></span> {% endif %}</td>
 						<td class="col-sm-2">{% if ip.ssl == 1 %}<span
-							class="text-success"><i class="fas fa-check-circle"></i></span>
-						{% else %}<span class="text-danger"><i
-								class="fas fa-times-circle"></i></span>
-						{% endif %}</td>
-						<td class="col-sm-1 text-right">{% if call_static('\\Froxlor\\CurrentUser', 'getField', ['adminid']) == user.adminid %}
-							<span class="text-muted"><i class="fas fa-trash-alt"></i></span>
-							{% else %} <a href="#" class="text-danger delete-btn"
+							class="text-success"><i class="fas fa-check-circle"></i></span> {% else %}<span
+							class="text-danger"><i class="fas fa-times-circle"></i></span> {% endif %}</td>
+						<td class="col-sm-1 text-right"><a
+							href="index.php?module=AdminIpsandports&view=edit&id={{ ip.id }}"
 							data-id="{{ ip.id }}" data-container="body" data-toggle="tooltip"
-							data-placement="left" title="{% trans "IP/Port löschen" %}"><i
-								class="fas fa-trash-alt"></i></a> {% endif %}</td>
+							data-placement="left" title="{{ lng('panel.edit') }}"><i
+								class="fas fa-edit"></i></a>&nbsp;<a href="#"
+							class="text-danger delete-btn" data-id="{{ ip.id }}"
+							data-container="body" data-toggle="tooltip" data-placement="left"
+							title="{{ lng('panel.delete') }}"><i class="fas fa-trash-alt"></i></a></td>
 					</tr>
 					{% endfor %}
 					{% endset %}
