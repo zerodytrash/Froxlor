@@ -296,6 +296,40 @@ class AdminCustomers extends FeModule
 			\Froxlor\UI\Response::dynamic_error("Cannot change back - I've never switched to another user :-)");
 		}
 	}
+
+	public function delete()
+	{
+		$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+
+		try {
+			$json_result = Customers::getLocal(\Froxlor\CurrentUser::getData(), array(
+				'id' => $id
+			))->get();
+		} catch (\Exception $e) {
+			\Froxlor\UI\Response::dynamic_error($e->getMessage());
+		}
+		$result = json_decode($json_result, true)['data'];
+
+		if (isset($_POST['send']) && $_POST['send'] == 'send') {
+			try {
+				$json_result = Customers::getLocal(\Froxlor\CurrentUser::getData(), array(
+					'id' => $id,
+					'delete_userfiles' => (isset($_POST['delete_userfiles']) ? (int) $_POST['delete_userfiles'] : 0)
+				))->delete();
+			} catch (\Exception $e) {
+				\Froxlor\UI\Response::dynamic_error($e->getMessage());
+			}
+			\Froxlor\UI\Response::redirectTo("index.php", array(
+				'module' => "AdminCustomers"
+			));
+		} else {
+			\Froxlor\UI\HTML::askYesNoWithCheckbox('admin_customer_reallydelete', 'admin_customer_alsoremovefiles', "index.php", array(
+				'module' => "AdminCustomers",
+				'view' => 'delete',
+				'id' => $id
+			), $result['loginname']);
+		}
+	}
 }
 /*
 	} elseif ($action == 'unlock' && $id != 0) {
@@ -327,36 +361,7 @@ class AdminCustomers extends FeModule
 				'action' => $action
 			), $result['loginname']);
 		}
-	} elseif ($action == 'delete' && $id != 0) {
-		try {
-			$json_result = Customers::getLocal($userinfo, array(
-				'id' => $id
-			))->get();
-		} catch (Exception $e) {
-			\Froxlor\UI\Response::dynamic_error($e->getMessage());
-		}
-		$result = json_decode($json_result, true)['data'];
 
-		if (isset($_POST['send']) && $_POST['send'] == 'send') {
-			try {
-				$json_result = Customers::getLocal($userinfo, array(
-					'id' => $id,
-					'delete_userfiles' => (isset($_POST['delete_userfiles']) ? (int) $_POST['delete_userfiles'] : 0)
-				))->delete();
-			} catch (Exception $e) {
-				\Froxlor\UI\Response::dynamic_error($e->getMessage());
-			}
-			\Froxlor\UI\Response::redirectTo($filename, array(
-				'page' => $page,
-				's' => $s
-			));
-		} else {
-			\Froxlor\UI\HTML::askYesNoWithCheckbox('admin_customer_reallydelete', 'admin_customer_alsoremovefiles', $filename, array(
-				'id' => $id,
-				'page' => $page,
-				'action' => $action
-			), $result['loginname']);
-		}
 
 
 }

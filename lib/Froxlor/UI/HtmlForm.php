@@ -176,6 +176,9 @@ class HtmlForm
 		if (isset($data['mandatory']) || isset($data['mandatory_ex'])) {
 			$extras .= ' required';
 		}
+		if (isset($data['readonly'])) {
+			$extras .= ' readonly';
+		}
 
 		$tpl = self::getFormTpl('input');
 		return \Froxlor\Frontend\UI::Twig()->render($tpl, array(

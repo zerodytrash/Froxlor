@@ -78,11 +78,24 @@
 						</td>
 						<td class="col-sm-2">{% if user.lastlogin_succ > 0 %} {{ user.lastlogin_succ|date('d.m.Y H:i') }}
 							{% else %} {% trans "keine Anmeldung bisher" %} {% endif %}</td>
-						<td class="col-sm-1 text-right"><a href="#"
-							class="text-danger delete-btn" data-id="{{ user.id }}"
+						<td class="col-sm-1 text-right">{% if user.custom_notes is not empty %}
+							<a href="#" data-id="{{ user.customerid }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ user.custom_notes|raw }}" data-html="true"><i
+								class="fas fa-comment"></i></a>&nbsp;{% endif %}<a
+							href="index.php?module=AdminCustomers&view=edit&id={{ user.customerid }}"
+							data-id="{{ user.customerid }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ lng('panel.edit') }}"><i class="fas fa-edit"></i></a> <a
+							href="#" class="text-danger delete-btn" data-id="{{ user.id }}"
 							data-container="body" data-toggle="tooltip" data-placement="left"
-							title="{% trans "Konto löschen" %}"><i
-								class="fas fa-trash-alt"></i></a></td>
+							title="{{ lng('panel.delete') }}"><i class="fas fa-trash-alt"></i></a>
+							{% if user.islocked %} <a
+							href="index.php?module=AdminCustomers&view=unlock&id={{ user.customerid }}"
+							data-id="{{ user.customerid }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ lng('panel.unlock') }}"><i class="fas fa-lock-open"></i></a>
+							{% endif %}</td>
 					</tr>
 					{% endfor %}
 					{% endset %}

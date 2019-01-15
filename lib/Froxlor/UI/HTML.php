@@ -152,15 +152,13 @@ class HTML
 	 *        	Values which will be given to $yesfile. Format: array(variable1=>value1, variable2=>value2, variable3=>value3)
 	 * @param string $targetname
 	 *        	Name of the target eg Domain or eMail address etc.
-	 * @param int $back_nr
-	 *        	Number of steps to go back when "No" is pressed
 	 *        	
 	 * @author Florian Lippert <flo@syscp.org>
 	 * @author Froxlor team <team@froxlor.org> (2010-)
 	 *        
 	 * @return string outputs parsed question_yesno template
 	 */
-	public static function askYesNo($text, $yesfile, $params = array(), $targetname = '', $back_nr = 1)
+	public static function askYesNo($text, $yesfile, $params = array(), $targetname = '', $extraparams = "")
 	{
 		$hiddenparams = '';
 
@@ -182,41 +180,24 @@ class HTML
 			'page_title' => \Froxlor\Frontend\UI::getLng('question.question'),
 			'yesno_msg' => $text,
 			'hiddenparams' => $hiddenparams,
+			'extraparams' => $extraparams,
 			'yesfile' => $yesfile
 		));
 	}
 
 	public static function askYesNoWithCheckbox($text, $chk_text, $yesfile, $params = array(), $targetname = '', $show_checkbox = true)
 	{
-		global $userinfo, $s, $header, $footer, $lng, $theme;
-
-		$hiddenparams = '';
-
-		if (is_array($params)) {
-			foreach ($params as $field => $value) {
-				$hiddenparams .= '<input type="hidden" name="' . htmlspecialchars($field) . '" value="' . htmlspecialchars($value) . '" />' . "\n";
-			}
-		}
-
-		if (isset($lng['question'][$text])) {
-			$text = $lng['question'][$text];
-		}
-
-		if (isset($lng['question'][$chk_text])) {
-			$chk_text = $lng['question'][$chk_text];
+		if (\Froxlor\Frontend\UI::getLng('question.' . $chk_text) != null) {
+			$chk_text = \Froxlor\Frontend\UI::getLng('question.' . $chk_text);
 		}
 
 		if ($show_checkbox) {
-			$checkbox = self::makecheckbox('delete_userfiles', $chk_text, '1', false, '0', true, true);
+			$checkbox = $chk_text . ':&nbsp;' . self::makeyesno('delete_userfiles', '1', '0', '0')."<br /><br />";
 		} else {
-			$checkbox = '<input type="hidden" name="delete_userfiles" value="0" />' . "\n";
-			;
+			$params['delete_userfiles'] = "0";
+			$checkbox = '';
 		}
 
-		$text = strtr($text, array(
-			'%s' => $targetname
-		));
-		eval("echo \"" . Template::getTemplate('misc/question_yesno_checkbox', '1') . "\";");
-		exit();
+		self::askYesNo($text, $yesfile, $params, $targetname, $checkbox);
 	}
 }

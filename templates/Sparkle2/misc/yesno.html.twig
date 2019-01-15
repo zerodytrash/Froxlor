@@ -1,5 +1,10 @@
 {% extends "Sparkle2/userarea.html.twig" %}
 
+{% block custom_css %}
+<link href="../templates/Sparkle2/assets/css/switch.css"
+	rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 <div class="alert alert-info fade show container" role="alert">
 	<h4 class="alert-heading">
@@ -10,6 +15,7 @@
 	</p>
 	<p class="mt-1 text-center">
 		<form action="{{ yesfile }}" method="post">
+			{{ extraparams|raw }}
 		    {{ hiddenparams|raw }}
 			<input type="hidden" name="send" value="send" />
 			<button type="submit" name="submitbutton" class="btn btn-success">{{ lng('panel.yes') }}</button>&nbsp;
