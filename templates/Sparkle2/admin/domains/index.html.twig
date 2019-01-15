@@ -32,11 +32,15 @@
 						<td class="col-sm-3">{% for ip in domain.ips %}<a
 							href="index.php?module=AdminIpsandports&view=edit&id={{ ip.id }}">{{ ip.ip }}:{{ ip.port }}</a><br>
 							{% endfor %}</a></td>
-						<td class="col-sm-3">{{ domain.customername }}</td>
-						<td class="col-sm-3 text-right"><a href="#"
+						<td class="col-sm-3">{{ domain.customername }} (<a href="index.php?AdminCustomers&view=su&id={{ domain.customerid }}">{{ domain.loginname }}</a>)</td>
+						<td class="col-sm-3 text-right"><a
+							href="index.php?module=AdminDomains&view=edit&id={{ domain.id }}"
+							data-id="{{ domain.id }}" data-container="body" data-toggle="tooltip"
+							data-placement="left" title="{{ lng('panel.edit') }}"><i
+								class="fas fa-edit"></i></a>&nbsp;<a href="#"
 							class="text-danger delete-btn" data-id="{{ domain.id }}"
 							data-container="body" data-toggle="tooltip" data-placement="left"
-							title="{% trans "Domain löschen" %}"><i
+							title="{{ lng('panel.delete') }}"><i
 								class="fas fa-trash-alt"></i></a></td>
 					</tr>
 					{% endfor %}

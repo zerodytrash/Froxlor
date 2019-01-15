@@ -1,0 +1,32 @@
+{% extends "Sparkle2/userarea.html.twig" %}
+
+{% block content %}
+<div class="card">
+	<div class="card-header">
+		<ul class="nav nav-tabs card-header-tabs" id="subnav-tab"
+			role="tablist">
+			<li class="nav-item"><a class="nav-link" id="subnav-back-tab"
+				href="index.php?module=AdminDomains" role="tab"
+				aria-controls="subnav-back" aria-selected="true">{{ lng('panel.domains') }}</a></li>
+			<li class="nav-item"><a class="nav-link active"
+				id="subnav-acc-tab" data-toggle="tab" href="#tab-acc" role="tab"
+				aria-controls="subnav-acc" aria-selected="true">{{ domain.domain }}</a></li>
+		</ul>
+	</div>
+	<div class="card-body tab-content" id="subnav-tabContent">
+		<div class="tab-pane fade show active" id="tab-acc" role="tabpanel"
+			aria-labelledby="subnav-acc-tab">
+			<div class="row">
+				<div class="col-sm-12 col-md-6 offset-md-3">
+					<h5 class="mb-3">
+						<i class="fas fa-pedit"></i>&nbsp;
+						{{ lng('admin.domain_edit') }}
+					</h5>
+					{% import "Sparkle2/misc/form/form.html.twig" as f %}
+					{{ f.form(form_data)  }}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
