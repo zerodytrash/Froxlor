@@ -42,14 +42,27 @@ class AdminDomains extends FeModule
 
 		$idna = new \Froxlor\Idna\IdnaWrapper();
 		$domains = $result['list'];
-		foreach ($domains as $index => $domain) {
+		$domain_array = array();
+		foreach ($domains as $domain) {
 			// idna convert
 			$domain['aliasdomain'] = $idna->decode($domain['aliasdomain']);
 			// customername
 			$domain['customername'] = \Froxlor\User::getCorrectFullUserDetails($domain);
-			// back to list
-			$result['list'][$index] = $domain;
+			// alias-wubba-lubba-dubdub
+			if (! isset($domain_array[$domain['domain']])) {
+				$domain_array[$domain['domain']] = $domain;
+			} else {
+				$domain_array[$domain['domain']] = array_merge($domain, $domain_array[$domain['domain']]);
+			}
+			if (isset($domain['aliasdomainid']) && $domain['aliasdomainid'] != null && isset($domain['aliasdomain']) && $domain['aliasdomain'] != '') {
+				if (! isset($domain_array[$domain['aliasdomain']])) {
+					$domain_array[$domain['aliasdomain']] = array();
+				}
+				$domain_array[$domain['aliasdomain']]['domainaliasid'] = $domain['id'];
+				$domain_array[$domain['aliasdomain']]['domainalias'] = $domain['domain'];
+			}
 		}
+		$result['list'] = $domain_array;
 
 		/*
 		 * $domain_array = array();
@@ -139,17 +152,26 @@ class AdminDomains extends FeModule
 
 		$admins = '';
 		if (\Froxlor\CurrentUser::getField('customers_see_all') == '1') {
+			if (Settings::Get('panel.allow_domain_change_admin') == '1') {
+				$sel_value = ! empty($result) && isset($result['adminid']) ? $result['adminid'] : \Froxlor\CurrentUser::getField('adminid');
+				try {
+					$json_result = Admins::getLocal(\Froxlor\CurrentUser::getData())->listing();
+				} catch (\Exception $e) {
+					\Froxlor\UI\Response::dynamic_error($e->getMessage());
+				}
+				$jresult = json_decode($json_result, true)['data'];
 
-			$sel_value = ! empty($result) && isset($result['adminid']) ? $result['adminid'] : \Froxlor\CurrentUser::getField('adminid');
-			try {
-				$json_result = Admins::getLocal(\Froxlor\CurrentUser::getData())->listing();
-			} catch (\Exception $e) {
-				\Froxlor\UI\Response::dynamic_error($e->getMessage());
-			}
-			$jresult = json_decode($json_result, true)['data'];
-
-			foreach ($jresult['list'] as $row_admin) {
-				$admins .= \Froxlor\UI\HTML::makeoption(\Froxlor\User::getCorrectFullUserDetails($row_admin) . ' (' . $row_admin['loginname'] . ')', $row_admin['adminid'], $sel_value);
+				foreach ($jresult['list'] as $row_admin) {
+					$admins .= \Froxlor\UI\HTML::makeoption(\Froxlor\User::getCorrectFullUserDetails($row_admin) . ' (' . $row_admin['loginname'] . ')', $row_admin['adminid'], $sel_value);
+				}
+			} else {
+				$admin_stmt = Database::prepare("
+							SELECT `adminid`, `loginname`, `name` FROM `" . TABLE_PANEL_ADMINS . "` WHERE `adminid` = :adminid
+						");
+				$admin = Database::pexecute_first($admin_stmt, array(
+					'adminid' => $result['adminid']
+				));
+				$result['adminname'] = \Froxlor\User::getCorrectFullUserDetails($admin) . ' (' . $admin['loginname'] . ')';
 			}
 		}
 

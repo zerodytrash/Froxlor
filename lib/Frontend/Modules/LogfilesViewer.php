@@ -76,6 +76,7 @@ class LogfilesViewer extends FeModule
 			// show content
 			\Froxlor\Frontend\UI::TwigBuffer('logfiles_viewer/index.html.twig', array(
 				'page_title' => "Dashboard",
+				'domain' => $domain,
 				'error_log_content' => $error_log_content,
 				'access_log_content' => $access_log_content
 			));

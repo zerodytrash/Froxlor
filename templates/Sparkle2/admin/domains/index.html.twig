@@ -28,20 +28,38 @@
 					{% for domain in domains.list %}
 					<tr
 						class="d-flex{% if user.deactivated > 0 %} text-muted{% endif %}">
-						<td class="col-sm-3"><strong>{{ domain.domain|idnDecode }}</strong></td>
+						<td class="col-sm-3"><strong>{{ domain.domain|idnDecode }}</strong>
+							{% if domain.domainaliasid and domain.domainaliasid != 0 %}<br>
+							<small>{{ lng('domains.hasaliasdomains') }}</small> {% endif %}</td>
 						<td class="col-sm-3">{% for ip in domain.ips %}<a
 							href="index.php?module=AdminIpsandports&view=edit&id={{ ip.id }}">{{ ip.ip }}:{{ ip.port }}</a><br>
 							{% endfor %}</a></td>
-						<td class="col-sm-3">{{ domain.customername }} (<a href="index.php?AdminCustomers&view=su&id={{ domain.customerid }}">{{ domain.loginname }}</a>)</td>
+						<td class="col-sm-3">{{ domain.customername }} (<a
+							href="index.php?AdminCustomers&view=su&id={{ domain.customerid }}">{{ domain.loginname }}</a>)</td>
 						<td class="col-sm-3 text-right"><a
+							href="index.php?module=LogfilesViewer&domain_id={{ domain.id }}"
+							data-id="{{ domain.id }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ lng('panel.viewlogs') }}"><i
+								class="fas fa-chart-bar"></i></a>&nbsp;{% if domain.isbinddomain == 1 and get_setting('system.bind_enable') == 1 and get_setting('system.dnsenabled') == 1 %}<a
+							href="index.php?module=DnsEditor&domain_id={{ domain.id }}"
+							data-id="{{ domain.id }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ lng('dnseditor.edit') }}"><i class="fas fa-globe"></i></a>&nbsp;{% endif %}<a
 							href="index.php?module=AdminDomains&view=edit&id={{ domain.id }}"
-							data-id="{{ domain.id }}" data-container="body" data-toggle="tooltip"
-							data-placement="left" title="{{ lng('panel.edit') }}"><i
-								class="fas fa-edit"></i></a>&nbsp;<a href="#"
-							class="text-danger delete-btn" data-id="{{ domain.id }}"
+							data-id="{{ domain.id }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ lng('panel.edit') }}"><i class="fas fa-edit"></i></a> {% if not (domain.domainaliasid and domain.domainaliasid != 0) and domain.id != get_setting('system.hostname_id') %}
+							{% if not (domain.standardsubdomain and domain.standardsubdomain == domain.id) %}<a
+							href="#" class="text-danger delete-btn" data-id="{{ domain.id }}"
 							data-container="body" data-toggle="tooltip" data-placement="left"
-							title="{{ lng('panel.delete') }}"><i
-								class="fas fa-trash-alt"></i></a></td>
+							title="{{ lng('panel.delete') }}"><i class="fas fa-trash-alt"></i></a>
+							{% else %}<span class="text-muted"><i
+								class="fas fa-trash-alt"></i></span>
+						{% endif %}
+							{% else %}<span class="text-muted"><i
+								class="fas fa-trash-alt"></i></span>
+						{% endif %}</td>
 					</tr>
 					{% endfor %}
 					{% endset %}
