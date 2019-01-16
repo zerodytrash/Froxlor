@@ -164,7 +164,7 @@ class AdminDomains extends FeModule
 				foreach ($jresult['list'] as $row_admin) {
 					$admins .= \Froxlor\UI\HTML::makeoption(\Froxlor\User::getCorrectFullUserDetails($row_admin) . ' (' . $row_admin['loginname'] . ')', $row_admin['adminid'], $sel_value);
 				}
-			} else {
+			} elseif (! empty($result) && isset($result['adminid'])) {
 				$admin_stmt = Database::prepare("
 							SELECT `adminid`, `loginname`, `name` FROM `" . TABLE_PANEL_ADMINS . "` WHERE `adminid` = :adminid
 						");

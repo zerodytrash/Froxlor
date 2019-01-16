@@ -179,8 +179,6 @@ class Ftps extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEntit
 				Customers::increaseUsage($customer['customerid'], 'ftps_used');
 				Customers::increaseUsage($customer['customerid'], 'ftp_lastaccountnumber');
 
-				// update admin usage
-				Admins::increaseUsage($customer['adminid'], 'ftps_used');
 
 				$this->logger()->addInfo("[API] added ftp-account '" . $username . " (" . $path . ")'");
 				\Froxlor\System\Cronjob::inserttask(5);
@@ -545,8 +543,6 @@ class Ftps extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEntit
 		// decrease ftp-user usage for customer
 		$resetaccnumber = ($customer_data['ftps_used'] == '1') ? " , `ftp_lastaccountnumber`='0'" : '';
 		Customers::decreaseUsage($customer_data['customerid'], 'ftps_used', $resetaccnumber);
-		// update admin usage
-		Admins::decreaseUsage(($this->isAdmin() ? $customer_data['adminid'] : $this->getUserDetail('adminid')), 'ftps_used');
 
 		$this->logger()->addWarning("[API] deleted ftp-user '" . $result['username'] . "'");
 		return $this->response(200, "successfull", $result);

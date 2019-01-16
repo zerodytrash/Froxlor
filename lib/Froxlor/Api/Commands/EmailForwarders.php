@@ -97,9 +97,6 @@ class EmailForwarders extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Re
 			// update customer usage
 			Customers::increaseUsage($customer['customerid'], 'email_forwarders_used');
 
-			// update admin usage
-			Admins::increaseUsage($customer['adminid'], 'email_forwarders_used');
-
 			$this->logger()->addInfo("[API] added email forwarder for '" . $result['email_full'] . "'");
 
 			$result = $this->apiCall('Emails.get', array(
@@ -198,9 +195,6 @@ class EmailForwarders extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Re
 
 			// update customer usage
 			Customers::decreaseUsage($customer['customerid'], 'email_forwarders_used');
-
-			// update admin usage
-			Admins::decreaseUsage($customer['adminid'], 'email_forwarders_used');
 
 			$this->logger()->addInfo("[API] deleted email forwarder for '" . $result['email_full'] . "'");
 

@@ -270,7 +270,7 @@ class AdminAdmins extends FeModule
 		}
 
 		if (isset($_POST['send']) && $_POST['send'] == 'send') {
-			Admins::getLocal($this->getUserData(), array(
+			Admins::getLocal(\Froxlor\CurrentUser::getData(), array(
 				'id' => $id
 			))->delete();
 			\Froxlor\UI\Response::redirectTo("index.php", array(
