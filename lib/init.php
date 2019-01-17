@@ -74,6 +74,11 @@ require \Froxlor\Froxlor::getInstallDir() . '/lib/tables.inc.php';
 \Froxlor\Frontend\UI::initTwig();
 \Froxlor\Frontend\UI::Twig()->addGlobal('global_errors', '');
 
+// re-read user data if logged in
+if (\Froxlor\CurrentUser::hasSession()) {
+	\Froxlor\CurrentUser::reReadUserData();
+}
+
 // Language Managament
 $langs = array();
 $languages = array();
