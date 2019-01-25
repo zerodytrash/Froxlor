@@ -69,10 +69,10 @@ class FroxlorAPI
 	 *        	your api-key
 	 * @param string $api_secret
 	 *        	your api-secret
-	 *
+	 *        	
 	 * @return FroxlorAPI
 	 */
-	public function __construct(string $host, string $api_key, string $api_secret)
+	public function __construct($host, $api_key, $api_secret)
 	{
 		$this->host = $host;
 		$this->api_key = $api_key;
@@ -87,56 +87,56 @@ class FroxlorAPI
 	 *
 	 * @return FroxlorAPI
 	 */
-	public function request(string $command, array $params = array()): FroxlorAPI
+	public function request($command, $params = array())
 	{
-	// build request array
-	$request = [
-		'header' => [
-			'apikey' => $this->api_key,
-			'secret' => $this->api_secret
-		],
-		'body' => [
-			'command' => $command
-		]
-	];
+		// build request array
+		$request = [
+			'header' => [
+				'apikey' => $this->api_key,
+				'secret' => $this->api_secret
+			],
+			'body' => [
+				'command' => $command
+			]
+		];
 
-	// add parameter to request-body if any
-	if (! empty($params)) {
-		$request['body']['params'] = $params;
+		// add parameter to request-body if any
+		if (! empty($params)) {
+			$request['body']['params'] = $params;
+		}
+
+		// reset last data
+		$this->last_header = array();
+		$this->last_body = array();
+
+		// send actual request
+		$response = $this->requestCurl(json_encode($request));
+
+		// decode response
+		$resp = json_decode($response[1], true);
+		// set body to data-part of response
+		$this->last_body = $resp['data'];
+		// set header of response
+		$this->last_header = [
+			'status' => $resp['status'],
+			'status_message' => $resp['status_message']
+		];
+
+		// check for error in api response
+		if (isset($this->last_header['status']) && $this->last_header['status'] >= 400) {
+			// set last-error message
+			$this->last_error .= "[" . $this->last_header['status'] . "] " . $this->last_header['status_message'];
+		}
+
+		return $this;
 	}
-
-	// reset last data
-	$this->last_header = array();
-	$this->last_body = array();
-
-	// send actual request
-	$response = $this->requestCurl(json_encode($request));
-
-	// decode response
-	$resp = json_decode($response[1], true);
-	// set body to data-part of response
-	$this->last_body = $resp['data'];
-	// set header of response
-	$this->last_header = [
-		'status' => $resp['status'],
-		'status_message' => $resp['status_message']
-	];
-
-	// check for error in api response
-	if (isset($this->last_header['status']) && $this->last_header['status'] >= 400) {
-		// set last-error message
-		$this->last_error .= "[" . $this->last_header['status'] . "] " . $this->last_header['status_message'];
-	}
-
-	return $this;
-}
 
 	/**
 	 * returns last response header
 	 *
 	 * @return array status|status_message
 	 */
-	public function getLastHeader(): array
+	public function getLastHeader()
 	{
 		return $this->last_header;
 	}
@@ -146,7 +146,7 @@ class FroxlorAPI
 	 *
 	 * @return array
 	 */
-	public function getLastResponse(): array
+	public function getLastResponse()
 	{
 		return $this->last_body;
 	}
@@ -156,7 +156,7 @@ class FroxlorAPI
 	 *
 	 * @return string
 	 */
-	public function getLastError(): string
+	public function getLastError()
 	{
 		return $this->last_error;
 	}
@@ -169,7 +169,7 @@ class FroxlorAPI
 	 *        	
 	 * @return array header|body
 	 */
-	private function requestCurl(string $data): array
+	private function requestCurl($data)
 	{
 		// reset last error message
 		$this->last_error = "";
