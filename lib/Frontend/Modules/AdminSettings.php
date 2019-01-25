@@ -45,6 +45,7 @@ class AdminSettings extends FeModule
 		if ($part == '') {
 			$part = isset($_POST['part']) ? $_POST['part'] : '';
 		}
+		$em = isset($_GET['em']) ? $_GET['em'] : '';
 
 		if (isset($_POST['send']) && $_POST['send'] == 'send') {
 
@@ -94,9 +95,50 @@ class AdminSettings extends FeModule
 			\Froxlor\Frontend\UI::TwigBuffer('admin/settings/index.html.twig', array(
 				'page_title' => \Froxlor\Frontend\UI::getLng('admin.serversettings'),
 				'form_data' => $fields,
-				'part' => $part
+				'part' => $part,
+				'em' => $em
 			));
 		}
+	}
+
+	public function jqSearchSetting()
+	{
+		$searchtext = isset($_POST['searchtext']) ? $_POST['searchtext'] : "";
+
+		$result = "";
+		if (strlen($searchtext) > 2) {
+			$settings_data = \Froxlor\PhpHelper::loadConfigArrayDir(\Froxlor\Froxlor::getInstallDir() . '/actions/admin/settings/');
+			$results = array();
+			$this->recursive_array_search($searchtext, $settings_data, $results);
+			$processed_setting = array();
+			$result .= "<ul>";
+			foreach ($results as $pathkey) {
+				$pk = explode(".", $pathkey);
+				if (count($pk) > 4) {
+					$settingkey = $pk[0] . '.' . $pk[1] . '.' . $pk[2] . '.' . $pk[3];
+					if (! array_key_exists($settingkey, $processed_setting)) {
+						$processed_setting[$settingkey] = true;
+						$sresult = $settings_data[$pk[0]][$pk[1]][$pk[2]][$pk[3]];
+						$result .= '<li><a href="index.php?module=AdminSettings&part=' . $pk[1] . '&em='.$pk[3].'">' . (is_array($sresult['label']) ? $sresult['label']['title'] : $sresult['label']) . '</a></li>';
+					}
+				}
+			}
+			$result .= "</ul>";
+		}
+		echo $result;
+	}
+
+	private function recursive_array_search($needle, $haystack, &$keys = array(), $currentKey = '')
+	{
+		foreach ($haystack as $key => $value) {
+			$pathkey = empty($currentKey) ? $key : $currentKey . '.' . $key;
+			if (is_array($value)) {
+				$this->recursive_array_search($needle, $value, $keys, $pathkey);
+			} else if (stripos($value, $needle) !== false) {
+				$keys[] = $pathkey;
+			}
+		}
+		return true;
 	}
 
 	public function updatecounters()

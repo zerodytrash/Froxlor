@@ -44,7 +44,6 @@ class Form
 
 					// if ($do_show) {
 					if (isset($groupdetails['title']) && $groupdetails['title'] != '') {
-						self::getFormGroupOutput($groupname, $groupdetails);
 						if (! isset(self::$fields['sections'])) {
 							self::$fields['sections'] = array();
 						}

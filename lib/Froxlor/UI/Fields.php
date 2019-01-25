@@ -18,7 +18,8 @@ class Fields
 		$tpl = self::getFormTpl('textarea');
 		return \Froxlor\Frontend\UI::Twig()->render($tpl, array(
 			'fieldname' => $fieldname,
-			'value' => $fielddata['value']
+			'value' => $fielddata['value'],
+			'extras' => !$do_show ? ' readonly' : ''
 		));
 	}
 
@@ -28,7 +29,8 @@ class Fields
 		return \Froxlor\Frontend\UI::Twig()->render($tpl, array(
 			'fieldname' => $fieldname,
 			'type' => 'input',
-			'value' => $fielddata['value']
+			'value' => $fielddata['value'],
+			'extras' => !$do_show ? ' readonly' : ''
 		));
 	}
 
@@ -53,6 +55,10 @@ class Fields
 			$extras = '';
 			if ($multiple) {
 				$extras .= ' multiple';
+			}
+
+			if (!$do_show) {
+				$extras .= ' readonly';
 			}
 
 			$tpl = self::getFormTpl('select');
@@ -83,7 +89,8 @@ class Fields
 		return \Froxlor\Frontend\UI::Twig()->render($tpl, array(
 			'fieldname' => $fieldname,
 			'type' => 'number',
-			'value' => $fielddata['value']
+			'value' => $fielddata['value'],
+			'extras' => !$do_show ? ' readonly' : ''
 		));
 	}
 
@@ -93,7 +100,8 @@ class Fields
 		return \Froxlor\Frontend\UI::Twig()->render($tpl, array(
 			'fieldname' => $fieldname,
 			'type' => 'password',
-			'value' => $fielddata['value']
+			'value' => $fielddata['value'],
+			'extras' => !$do_show ? ' readonly' : ''
 		));
 	}
 
@@ -112,7 +120,8 @@ class Fields
 		$tpl = self::getFormTpl('textarea');
 		return \Froxlor\Frontend\UI::Twig()->render($tpl, array(
 			'fieldname' => $fieldname,
-			'value' => $fielddata['value']
+			'value' => $fielddata['value'],
+			'extras' => !$do_show ? ' readonly' : ''
 		));
 	}
 
@@ -128,6 +137,9 @@ class Fields
 	public static function getFormFieldOutputBool($fieldname, $fielddata, $do_show = true)
 	{
 		$disabled = isset($fielddata['visible']) ? ! $fielddata['visible'] : false;
+		if (!$disabled && !$do_show) {
+			$disabled = true;
+		}
 		return \Froxlor\UI\HTML::makeyesno($fieldname, '1', '0', $fielddata['value'], $disabled);
 	}
 }

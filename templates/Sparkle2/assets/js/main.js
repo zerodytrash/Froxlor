@@ -31,4 +31,49 @@ $(document).ready(function() {
 		}
 	});
 
+	/**
+	 * settings search
+	 */
+	$("#gs_text").click(function() {
+		$("#gs_results").addClass("invisible");
+		$("#gs_results .card-header").html("");
+		$("#gs_results .card-body").html("");
+	});
+
+	var delay = (function(){
+		var timer = 0;
+		return function(callback, ms){
+			clearTimeout (timer);
+			timer = setTimeout(callback, ms);
+		};
+	})();
+
+	$('#gs_text').bind('keypress keydown keyup', function(e){
+		if(e.keyCode == 13) { e.preventDefault(); }
+	});
+
+	$("#gs_text").keyup(function() {
+		delay(function () {
+			var searchtext = $("#gs_text").val();
+			$("#gs_results").removeClass("invisible");
+			$("#gs_results .card-header").html("Searching for " + searchtext + "...");
+			if (searchtext.length <= 2) {
+				$("#gs_results .card-header").html("Fehler");
+				$("#gs_results .card-body").html("<div class=\"alert alert-danger\" role=\"alert\">Searchtext too short...</div>");
+				return;
+			}
+			$.ajax({
+				url: "index.php?module=AdminSettings&view=jqSearchSetting",
+				type: "POST",
+				data: {searchtext: searchtext },
+				success: function(data) {
+					$("#gs_results .card-body").html(data);
+					console.log(data);
+				},
+				error : function(a, b) {
+					console.log(a, b);
+				}
+			});
+		}, 500);
+	});
 });

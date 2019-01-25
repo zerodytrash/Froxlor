@@ -62,7 +62,8 @@ return array(
 						'label' => \Froxlor\Frontend\UI::getLng('customer.generated_pwd'),
 						'type' => 'text',
 						'visible' => (\Froxlor\Settings::Get('panel.password_regex') == ''),
-						'value' => \Froxlor\System\Crypt::generatePassword()
+						'value' => \Froxlor\System\Crypt::generatePassword(),
+						'readonly' => true
 					),
 					'sendpassword' => array(
 						'label' => \Froxlor\Frontend\UI::getLng('admin.sendpassword'),

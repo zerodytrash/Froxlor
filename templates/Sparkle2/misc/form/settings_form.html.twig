@@ -1,4 +1,4 @@
-{% macro form(form_data, part, action) %}
+{% macro form(form_data, part, em, action) %}
 
 <form action="{{ action|default("") }}" method="post"
 	enctype="application/x-www-form-urlencoded" class="form">
@@ -65,16 +65,26 @@
 	<div class="card mb-2">
 		<div class="card-header">
 			<div class="row">
-				<div class="col-sm-10 mt-1"><h5 class="mb-0">{{ section.title }}</h5></div>
-				<div class="col-sm-2 text-right"><a href="index.php?module=AdminSettings" class="btn btn-sm btn-primary"><i class="fas fa-chevron-circle-left"></i>&nbsp;{{ lng('panel.back') }}</a></div>
+				<div class="col-sm-10 mt-1">
+					<h5 class="mb-0">
+						{{ section.title }}
+					</h5>
+				</div>
+				<div class="col-sm-2 text-right">
+					<a href="index.php?module=AdminSettings"
+						class="btn btn-sm btn-primary"><i
+						class="fas fa-chevron-circle-left"></i>&nbsp;{{ lng('panel.back') }}</a>
+				</div>
 			</div>
 		</div>
 		<div class="card-body">
-			{% for element in section.elements %}
+			{% for fieldname, element in section.elements %}
 			{% if element.type != 'hidden' %}
-			<div class="form-group form-row border-bottom pb-3">
-				<label for="{{ element.fieldname }}" class="col-sm-7 col-form-label"><strong>{{ element.label|raw }}</strong>
-					{% if element.desc %}<br> <small>{{ element.desc|raw }}</small>{% endif %}</label>
+			<div
+				class="form-group form-row border-bottom pb-3 {% if em is not empty and fieldname == em %}bg-warning{% endif %}">
+				<label for="{{ fieldname }}" class="col-sm-7 col-form-label"><strong>{{ element.label|raw }}</strong>
+					{% if element.desc %}<br> <small>{{ element.desc|raw }}</small>
+				{% endif %}</label>
 				<div
 					class="col-sm-5 text-right{% if element.style %} {{ element.style }}{% endif %}">
 					{{ element.data_field|raw }}
