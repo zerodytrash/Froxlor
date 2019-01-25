@@ -1,0 +1,113 @@
+{% extends "Sparkle2/userarea.html.twig" %}
+
+{% block custom_js %}
+<script src="../vendor/nnnick/chartjs/dist/Chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+	<div class="card-header">
+		<ul class="nav nav-tabs card-header-tabs" id="subnav-tab"
+			role="tablist">
+			<li class="nav-item"><a class="nav-link active"
+				id="subnav-tra-tab" data-toggle="tab" href="#tab-tra" role="tab"
+				aria-controls="subnav-tra" aria-selected="true">{{ lng('admin.traffic') }}</a></li>
+			<li class="nav-item"><a class="nav-link" id="subnav-ctr-tab"
+				data-toggle="tab" href="#tab-ctr" role="tab"
+				aria-controls="subnav-ctr" aria-selected="false">Customer
+					traffic</a></li>
+		</ul>
+	</div>
+	<div class="card-body tab-content" id="subnav-tabContent">
+		<div class="tab-pane fade show active" id="tab-tra" role="tabpanel"
+			aria-labelledby="subnav-tra-tab">
+			<div class="card">
+				<div class="card-body" id="phpconfigs-list">
+					<h5 class="mb-3">
+						{{ lng('admin.traffic') }}
+					</h5>
+				</div>
+				<div class="card-img-top m-auto">
+					<canvas id="traffic-chart" height="80"></canvas>
+				</div>
+			</div>
+
+			<script>
+					var ctx = document.getElementById("traffic-chart").getContext('2d');
+					var myChart = new Chart(ctx, {
+						type : 'line',
+						data : {
+							labels : [ {% for entry in traffic.list %}"{{ entry.day }}.{{ entry.month }}.{{ entry.year }}",{% endfor %} ],
+							datasets: [{
+								label: 'HTTP',
+								fill: false,
+								backgroundColor: 'rgb(201, 203, 207)',
+								borderColor: 'rgb(201, 203, 207)',
+								data: [
+									{% for entry in traffic.list %} {{ entry.http / 1024 / 1024 }},{% endfor %}
+								]
+							},{
+								label: 'Mail',
+								fill: false,
+								backgroundColor: 'rgb(54, 162, 235)',
+								borderColor: 'rgb(54, 162, 235)',
+								data: [
+									{% for entry in traffic.list %} {{ entry.mail / 1024 / 1024 }},{% endfor %}
+								]
+							},{
+								label: 'FTP up',
+								fill: false,
+								backgroundColor: 'rgb(75, 192, 192)',
+								borderColor: 'rgb(75, 192, 192)',
+								data: [
+									{% for entry in traffic.list %} {{ entry.ftp_up / 1024 / 1024 }},{% endfor %}
+								]
+							},{
+								label: 'FTP down',
+								fill: false,
+								backgroundColor: 'rgb(255, 99, 132)',
+								borderColor: 'rgb(255, 99, 132)',
+								data: [
+									{% for entry in traffic.list %} {{ entry.ftp_down / 1024 / 1024 }},{% endfor %}
+								]
+							}]
+						},
+						options : {
+							responsive: true,
+							tooltips: {
+				                enabled: true,
+				                mode: 'single',
+				                callbacks: {
+				                    label: function(tooltipItems, data) {
+				                        return tooltipItems.yLabel + ' Mbps';
+				                    }
+				                }
+				            },
+							scales : {
+								yAxes: [{
+									display: true,
+									scaleLabel: {
+										display: true,
+										labelString: '{% trans "Wert in Mbps" %}'
+									}
+								}]
+							}
+						}
+					});
+				</script>
+		</div>
+
+		<div class="tab-pane fade" id="tab-ctr" role="tabpanel"
+			aria-labelledby="subnav-ctr-tab">
+			<div class="row">
+				<div class="col-sm-12 col-md-6 offset-md-3">
+					<h5 class="mb-3">Customer traffic</h5>
+
+				</div>
+			</div>
+		</div>
+
+
+	</div>
+</div>
+{% endblock %}

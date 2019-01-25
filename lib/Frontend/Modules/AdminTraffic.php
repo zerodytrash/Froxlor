@@ -36,6 +36,9 @@ class AdminTraffic extends FeModule
 		}
 		$result = json_decode($json_result, true)['data'];
 
-		var_dump($result);
+		\Froxlor\Frontend\UI::TwigBuffer('admin/traffic/index.html.twig', array(
+			'page_title' => \Froxlor\Frontend\UI::getLng('admin.traffic'),
+			'traffic' => $result
+		));
 	}
 }
