@@ -7,21 +7,21 @@ use Froxlor\Settings;
 class Dns
 {
 
-	public static function getAllowedDomainEntry($domain_id, $area = 'customer', $userinfo = array())
+	public static function getAllowedDomainEntry($domain_id)
 	{
 		$dom_data = array(
 			'did' => $domain_id
 		);
 
 		$where_clause = '';
-		if ($area == 'admin') {
-			if ($userinfo['domains_see_all'] != '1') {
+		if (\Froxlor\CurrentUser::isAdmin()) {
+			if (\Froxlor\CurrentUser::getField('domains_see_all') != '1') {
 				$where_clause = '`adminid` = :uid AND ';
-				$dom_data['uid'] = $userinfo['userid'];
+				$dom_data['uid'] = \Froxlor\CurrentUser::getField('userid');
 			}
 		} else {
 			$where_clause = '`customerid` = :uid AND ';
-			$dom_data['uid'] = $userinfo['userid'];
+			$dom_data['uid'] = \Froxlor\CurrentUser::getField('userid');
 		}
 
 		$dom_stmt = Database::prepare("
