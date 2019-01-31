@@ -1,4 +1,4 @@
-{% macro form(form_data, action) %}
+{% macro form(form_data, action, idfield) %}
 
 <form action="{{ action|default("") }}" method="post"
 	enctype="application/x-www-form-urlencoded" class="form">
@@ -27,6 +27,9 @@
 		<div class="card-footer">
 			<div class="form-group form-row mb-0">
 				<div class="col-sm-12 text-right">
+					{% if idfield|default("") is not empty %}
+					<input type="hidden" name="id" value="{{ idfield }}" />
+					{% endif %}
 					<input type="hidden" name="send" value="send" />
 					<button type="reset" class="btn btn-danger">
 						<i class="fas fa-times"></i>&nbsp;

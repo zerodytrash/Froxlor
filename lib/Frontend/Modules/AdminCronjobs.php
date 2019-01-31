@@ -58,14 +58,11 @@ class AdminCronjobs extends FeModule
 		if ($result['cronfile'] != '') {
 			if (isset($_POST['send']) && $_POST['send'] == 'send') {
 				try {
-					Cronjobs::getLocal($userinfo, $_POST)->update();
+					Cronjobs::getLocal(\Froxlor\CurrentUser::getData(), $_POST)->update();
 				} catch (\Exception $e) {
 					\Froxlor\UI\Response::dynamic_error($e->getMessage());
 				}
-				\Froxlor\UI\Response::redirectTo($filename, array(
-					'page' => $page,
-					's' => $s
-				));
+				\Froxlor\UI\Response::redirectTo("index.php?module=AdminCronjobs");
 			} else {
 
 				// interval

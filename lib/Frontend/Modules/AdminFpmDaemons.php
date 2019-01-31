@@ -63,7 +63,6 @@ class AdminFpmDaemons extends FeModule
 			} catch (\Exception $e) {
 				\Froxlor\UI\Response::dynamic_error($e->getMessage());
 			}
-			\Froxlor\UI\Response::redirectTo("index.php?module=AdminFpmDaemons");
 		}
 		\Froxlor\UI\Response::redirectTo('index.php?module=AdminFpmDaemons');
 	}
