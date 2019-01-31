@@ -58,6 +58,23 @@ class AdminIpsandports extends FeModule
 		));
 	}
 
+	public function add()
+	{
+		if (\Froxlor\CurrentUser::getField('change_serversettings') != '1') {
+			// not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
+		}
+
+		if (isset($_POST['send']) && $_POST['send'] == 'send') {
+			try {
+				IpsAndPorts::getLocal(\Froxlor\CurrentUser::getData(), $_POST)->add();
+			} catch (\Exception $e) {
+				\Froxlor\UI\Response::dynamic_error($e->getMessage());
+			}
+		}
+		\Froxlor\UI\Response::redirectTo('index.php?module=AdminIpsandports');
+	}
+
 	public function edit()
 	{
 		$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;

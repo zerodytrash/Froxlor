@@ -88,6 +88,23 @@ class AdminCustomers extends FeModule
 		));
 	}
 
+	public function add()
+	{
+		if (\Froxlor\CurrentUser::getField('customers') == 0) {
+			// no customers - not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
+		}
+
+		if (isset($_POST['send']) && $_POST['send'] == 'send') {
+			try {
+				Customers::getLocal(\Froxlor\CurrentUser::getData(), $_POST)->add();
+			} catch (\Exception $e) {
+				\Froxlor\UI\Response::dynamic_error($e->getMessage());
+			}
+		}
+		\Froxlor\UI\Response::redirectTo('index.php?module=AdminsCustomers');
+	}
+
 	public function edit()
 	{
 		$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;

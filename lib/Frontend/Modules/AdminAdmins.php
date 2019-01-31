@@ -165,7 +165,7 @@ class AdminAdmins extends FeModule
 				\Froxlor\UI\Response::dynamic_error($e->getMessage());
 			}
 		}
-		\Froxlor\UI\Response::redirectTo('index.php?module=AdminsAdmins');
+		\Froxlor\UI\Response::redirectTo('index.php?module=AdminAdmins');
 	}
 
 	public function edit()

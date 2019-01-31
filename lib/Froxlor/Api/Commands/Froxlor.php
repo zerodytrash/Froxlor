@@ -33,7 +33,7 @@ class Froxlor extends \Froxlor\Api\ApiCommand
 	{
 		define('UPDATE_URI', "https://version.froxlor.org/Froxlor/api/" . $this->version);
 
-		if ($this->isAdmin() && $this->getUserDetail('change_serversettings')) {
+		if ($this->isAdmin() /* && $this->getUserDetail('change_serversettings') */) {
 			if (function_exists('curl_version')) {
 				// log our actions
 				$this->logger()->addNotice("[API] checking for updates");

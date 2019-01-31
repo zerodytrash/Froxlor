@@ -99,7 +99,7 @@
 					</tr>
 					{% endfor %}
 					{% endset %}
-					{% if accounts|length > 0 %}
+					{% if accounts.count > 0 %}
 					{{ t.listing("accounts-listing", [lng('customer.name'), lng('login.username'), lng('admin.admin'), "", lng('admin.lastlogin_succ'), "|Optionen"], content, [3,2,1,3,2,1]) }}
 					<script>
 					{% for user in accounts.list %}
@@ -150,7 +150,7 @@
 						{{ lng('admin.customer_add') }}
 					</h5>
 					{% import "Sparkle2/misc/form/form.html.twig" as f %}
-					{{ f.form(form_data) }}
+					{{ f.form(form_data, "index.php?module=AdminCustomers&view=add") }}
 				</div>
 			</div>
 		</div>

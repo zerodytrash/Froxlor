@@ -83,8 +83,14 @@
 						<i class="fas fa-plus-circle"></i>&nbsp;
 						{{ lng('admin.domain_add') }}
 					</h5>
+					{% if userinfo.customers != 0 and userinfo.customers_used == 0 %}
+					<div class="alert alert-warning" role="alert">
+						<a href="index.php?module=AdminCustomers">{{ lng('admin.domain_nocustomeraddingavailable') }}</a>
+					</div>
+					{% else %}
 					{% import "Sparkle2/misc/form/form.html.twig" as f %}
-					{{ f.form(form_data) }}
+					{{ f.form(form_data, "index.php?module=AdminDomains&view=add") }}
+					{% endif %}
 				</div>
 			</div>
 		</div>

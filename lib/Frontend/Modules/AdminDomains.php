@@ -64,27 +64,6 @@ class AdminDomains extends FeModule
 		}
 		$result['list'] = $domain_array;
 
-		/*
-		 * $domain_array = array();
-		 * foreach ($result['list'] as $row) {
-		 *
-		 * // formatDomainEntry($row, $idna_convert);
-		 *
-		 * if (! isset($domain_array[$row['domain']])) {
-		 * $domain_array[$row['domain']] = $row;
-		 * } else {
-		 * $domain_array[$row['domain']] = array_merge($row, $domain_array[$row['domain']]);
-		 * }
-		 *
-		 * if (isset($row['aliasdomainid']) && $row['aliasdomainid'] != null && isset($row['aliasdomain']) && $row['aliasdomain'] != '') {
-		 * if (! isset($domain_array[$row['aliasdomain']])) {
-		 * $domain_array[$row['aliasdomain']] = array();
-		 * }
-		 * $domain_array[$row['aliasdomain']]['domainaliasid'] = $row['id'];
-		 * $domain_array[$row['aliasdomain']]['domainalias'] = $row['domain'];
-		 * }
-		 * }
-		 */
 		\Froxlor\PhpHelper::sortListBy($result['list'], 'domain');
 
 		// domain add form
@@ -98,6 +77,23 @@ class AdminDomains extends FeModule
 			'domains' => $result,
 			'form_data' => $domain_add_form
 		));
+	}
+
+	public function add()
+	{
+		if (\Froxlor\CurrentUser::getField('domains') == 0) {
+			// no domains - not allowed
+			\Froxlor\UI\Response::standard_error('noaccess', __METHOD__);
+		}
+
+		if (isset($_POST['send']) && $_POST['send'] == 'send') {
+			try {
+				Domains::getLocal(\Froxlor\CurrentUser::getData(), $_POST)->add();
+			} catch (\Exception $e) {
+				\Froxlor\UI\Response::dynamic_error($e->getMessage());
+			}
+		}
+		\Froxlor\UI\Response::redirectTo('index.php?module=AdminsDomains');
 	}
 
 	public function edit()
