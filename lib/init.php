@@ -168,7 +168,8 @@ $module = isset($_GET['module']) ? $_GET['module'] : 'login';
 $view = isset($_GET['view']) ? $_GET['view'] : 'overview';
 
 if (\Froxlor\CurrentUser::hasSession() == false && strtolower($module) != 'login') {
-	header("Location: index.php?module=login");
+	$qrystr = isset($_SERVER["QUERY_STRING"]) ? $_SERVER["QUERY_STRING"] : "";
+	header("Location: index.php?module=login&qrystr=".$qrystr);
 	exit();
 } elseif (\Froxlor\CurrentUser::hasSession() && (strtolower($module) == 'login' && $view != 'su')) {
 	$module = "Index";

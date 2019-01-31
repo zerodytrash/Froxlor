@@ -285,14 +285,6 @@ class Login extends FeModule
 			}
 
 			// Pass the last used page if needed
-			$lastscript = "";
-			if (isset($_REQUEST['script']) && $_REQUEST['script'] != "") {
-				$lastscript = $_REQUEST['script'];
-
-				if (! file_exists(__DIR__ . "/" . $lastscript)) {
-					$lastscript = "";
-				}
-			}
 			$lastqrystr = "";
 			if (isset($_REQUEST['qrystr']) && $_REQUEST['qrystr'] != "") {
 				$lastqrystr = htmlspecialchars($_REQUEST['qrystr'], ENT_QUOTES);
@@ -302,7 +294,6 @@ class Login extends FeModule
 				'page_title' => 'Login',
 				'update_in_progress' => $update_in_progress,
 				'disp_login_error' => $message,
-				'lastscript' => $lastscript,
 				'lastqry' => $lastqrystr
 			));
 		}
@@ -384,21 +375,21 @@ class Login extends FeModule
 				if (\Froxlor\Froxlor::hasUpdates() || \Froxlor\Froxlor::hasDbUpdates()) {
 					\Froxlor\UI\Response::redirectTo('index.php?module=AdminUpdates');
 				} else {
-					if (isset($_POST['script']) && $_POST['script'] != "") {
-						if (preg_match("/customer\_/", $_POST['script']) === 1) {
+					if (!empty($qryparams)) {
+						if (preg_match("/Customer/", $qryparams['module']) === 1) {
 							\Froxlor\UI\Response::redirectTo('index.php?module=AdminCustomers');
 						} else {
-							\Froxlor\UI\Response::redirectTo($_POST['script'], $qryparams);
+							\Froxlor\UI\Response::redirectTo('index.php', $qryparams);
 						}
 					} else {
-						\Froxlor\UI\Response::redirectTo('index.php?module=AdminIndex', $qryparams);
+						\Froxlor\UI\Response::redirectTo('index.php?module=AdminIndex');
 					}
 				}
 			} else {
-				if (isset($_POST['script']) && $_POST['script'] != "") {
-					\Froxlor\UI\Response::redirectTo($_POST['script'], $qryparams);
+				if (!empty($qryparams)) {
+					\Froxlor\UI\Response::redirectTo('index.php', $qryparams);
 				} else {
-					\Froxlor\UI\Response::redirectTo('index.php?module=CustomerIndex', $qryparams);
+					\Froxlor\UI\Response::redirectTo('index.php?module=CustomerIndex');
 				}
 			}
 		}

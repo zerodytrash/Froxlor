@@ -23,9 +23,8 @@
 			required autofocus> <label for="password" class="sr-only">{{ lng('login.password') }}</label>
 		<input type="password" id="password" name="password"
 			class="form-control" placeholder="{{ lng('login.password') }}"
-			required> <br> <input type="hidden" name="script"
-			value="{{ lastscript }}" /> <input type="hidden" name="qrystr"
-			value="{{ lastqrystr }}" /> <input type="hidden" name="send"
+			required> <br> <input type="hidden" name="qrystr"
+			value="{{ lastqry }}" /> <input type="hidden" name="send"
 			value="send" />
 		<button class="btn btn-lg btn-primary btn-block" type="submit">
 			{{ lng('login.login') }}
