@@ -1703,3 +1703,4 @@ $lng['error']['noaccess'] = 'Zugriff auf "%s" nicht erlaubt';
 $lng['success']['wipecleartextmailpws'] = 'Klartext E-Mail-Konten Passwörter wurden erfolgreich gelöscht.';
 $lng['panel']['security'] = 'Sicherheit';
 $lng['panel']['lookandfeel'] = 'Ansicht und Sprache';
+$lng['tasks']['remove_pdns_domain'] = 'Lösche Domain %s von PowerDNS Datenbank';
