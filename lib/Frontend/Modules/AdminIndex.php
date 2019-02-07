@@ -88,7 +88,7 @@ class AdminIndex extends FeModule
 			$overview_data[$entity] = array(
 				'avail' => \Froxlor\CurrentUser::getField($entity),
 				'used' => empty($used) ? 0 : $used,
-				'perc' => (\Froxlor\CurrentUser::getField($entity) >= 0) ? floor($used / \Froxlor\CurrentUser::getField($entity)) : 0
+				'perc' => (\Froxlor\CurrentUser::getField($entity) > 0) ? floor($used / \Froxlor\CurrentUser::getField($entity)) : 0
 			);
 		}
 		// ksort($overview_data);

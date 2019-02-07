@@ -19,7 +19,6 @@ namespace Froxlor\Frontend\Modules;
  */
 use Froxlor\Database\Database;
 use Froxlor\Settings;
-use Froxlor\Api\Commands\Customers as Customers;
 use Froxlor\Frontend\FeModule;
 
 class CustomerIndex extends FeModule
@@ -58,13 +57,13 @@ class CustomerIndex extends FeModule
 			AND `id` <> :standardsubdomain
 		");
 		Database::pexecute($domain_stmt, array(
-			"customerid" => $userinfo['customerid'],
-			"standardsubdomain" => $userinfo['standardsubdomain']
+			"customerid" => \Froxlor\CurrentUser::getField('customerid'),
+			"standardsubdomain" => \Froxlor\CurrentUser::getField('standardsubdomain')
 		));
 
 		$domains = '';
 		$domainArray = array();
-
+		$idna_convert = new \Froxlor\Idna\IdnaWrapper();
 		while ($row = $domain_stmt->fetch(\PDO::FETCH_ASSOC)) {
 			$domainArray[] = $idna_convert->decode($row['domain']);
 		}
@@ -74,45 +73,81 @@ class CustomerIndex extends FeModule
 
 		// standard-subdomain
 		$stdsubdomain = '';
-		if ($userinfo['standardsubdomain'] != '0') {
+		if (\Froxlor\CurrentUser::getField('standardsubdomain') != '0') {
 			$std_domain_stmt = Database::prepare("
-			SELECT `domain` FROM `" . TABLE_PANEL_DOMAINS . "`
-			WHERE `customerid` = :customerid
-			AND `id` = :standardsubdomain
-		");
+				SELECT `domain` FROM `" . TABLE_PANEL_DOMAINS . "`
+				WHERE `customerid` = :customerid
+				AND `id` = :standardsubdomain
+			");
 			$std_domain = Database::pexecute_first($std_domain_stmt, array(
-				"customerid" => $userinfo['customerid'],
-				"standardsubdomain" => $userinfo['standardsubdomain']
+				"customerid" => \Froxlor\CurrentUser::getField('customerid'),
+				"standardsubdomain" => \Froxlor\CurrentUser::getField('standardsubdomain')
 			));
 			$stdsubdomain = $std_domain['domain'];
 		}
 
-		$yesterday = time() - (60 * 60 * 24);
-		$month = date('M Y', $yesterday);
-
 		// get disk-space usages for web, mysql and mail
 		$usages_stmt = Database::prepare("SELECT * FROM `" . TABLE_PANEL_DISKSPACE . "` WHERE `customerid` = :cid ORDER BY `stamp` DESC LIMIT 1");
 		$usages = Database::pexecute_first($usages_stmt, array(
-			'cid' => $userinfo['customerid']
+			'cid' => \Froxlor\CurrentUser::getField('customerid')
 		));
 
-		$userinfo['diskspace_used'] = round($usages['webspace'] / 1024, Settings::Get('panel.decimal_places'));
-		$userinfo['mailspace_used'] = round($usages['mail'] / 1024, Settings::Get('panel.decimal_places'));
-		$userinfo['dbspace_used'] = round($usages['mysql'] / 1024, Settings::Get('panel.decimal_places'));
+		$overview = array(
+			'subdomains',
+			'diskspace',
+			'traffic',
+			'mysqls',
+			'ftps',
+			'emails',
+			'email_accounts',
+			'email_forwarders'
+		);
+
+		if (\Froxlor\Settings::Get('system.mail_quota_enabled') == '1') {
+			$overview[] = 'email_quota';
+		}
+
+		// calculate percentage
+		$overview_data = array();
+		foreach ($overview as $entity) {
+			$overview_data[$entity] = array(
+				'avail' => \Froxlor\CurrentUser::getField($entity),
+				'used' => \Froxlor\CurrentUser::getField($entity . '_used'),
+				'perc' => (\Froxlor\CurrentUser::getField($entity) > 0) ? floor(\Froxlor\CurrentUser::getField($entity . '_used') / \Froxlor\CurrentUser::getField($entity)) : 0
+			);
+			if ($entity == 'email_accounts') {
+				$overview_data[$entity]['hdd'] = $usages['mail'];
+			} else if ($entity == 'mysqls') {
+				$overview_data[$entity]['hdd'] = $usages['mysql'];
+			}
+		}
 
 		$services_enabled = "";
 		$se = array();
-		if ($userinfo['imap'] == '1')
+		if (\Froxlor\CurrentUser::getField('imap') == '1') {
 			$se[] = "IMAP";
-		if ($userinfo['pop3'] == '1')
+		}
+		if (\Froxlor\CurrentUser::getField('pop3') == '1') {
 			$se[] = "POP3";
-		if ($userinfo['phpenabled'] == '1')
+		}
+		if (\Froxlor\CurrentUser::getField('phpenabled') == '1') {
 			$se[] = "PHP";
-		if ($userinfo['perlenabled'] == '1')
+		}
+		if (\Froxlor\CurrentUser::getField('perlenabled') == '1') {
 			$se[] = "Perl/CGI";
+		}
 		$services_enabled = implode(", ", $se);
+
+		\Froxlor\Frontend\UI::TwigBuffer('customer/index/index.html.twig', array(
+			'page_title' => "Dashboard",
+			'usage_data' => $overview_data,
+			'disk_usage' => $usages,
+			'domains' => $domains,
+			'stdsubdomain' => $stdsubdomain,
+			'services_enabled' => $services_enabled
+		));
 	}
-	
+
 	public function myAccount()
 	{
 		\Froxlor\Frontend\UI::TwigBuffer('myaccount.html.twig', array(

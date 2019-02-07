@@ -1,0 +1,151 @@
+{% extends "Sparkle2/userarea.html.twig" %}
+
+{% block custom_css %}
+<link href="../templates/Sparkle2/assets/css/circle.css"
+	rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+{% set userinfo = call_static('\\Froxlor\\CurrentUser', 'getData') %}
+<div class="row">
+	<div class="col-md-8 col-sm-12">
+		<div class="card mb-2">
+			<div class="card-body">
+				<div class="row">
+					{% for key,value in usage_data %}
+					<div class="col-md-3 col-sm-12">
+						<div class="card text-center mb-2">
+							<div class="card-body">
+								<div
+									class="c100 small center p{{ value.perc }} {% if value.perc < 75 %}green{% else %}{% if value.avail >= 0 %}orange{% else %}dark{% endif %}{% endif %}">
+									<span id="span_progress">{% if value.avail >= 0 %} {{ value.perc }}%{% else %}&infin;{% endif %}</span>
+									<div class="slice">
+										<div class="bar"></div>
+										<div class="fill"></div>
+									</div>
+								</div>
+							</div>
+							<div class="card-footer">
+								{% set lngkey = 'panel.' ~ key %}
+								{% if key == 'diskspace' or key == 'traffic' or key == 'quota' %}
+								<p class="card-text">
+									{{ lng(lngkey) }}
+									<br>
+									{{ value.used|formatBytes }} / {% if value.avail >= 0 %}{{ value.avail|formatBytes }}{% else %}&infin;{% endif %}
+									{% if value.hdd %}
+									<br>
+									{{ value.hdd|formatBytes }}
+									{% endif %}
+								</p>
+								{% else %}
+								<p class="card-text">
+									{{ lng(lngkey) }}
+									<br>
+									{{ value.used }} / {% if value.avail >= 0 %}{{ value.avail }}{% else %}&infin;{% endif %}
+									{% if value.hdd %}
+									<br>
+									{{ value.hdd|formatBytes }}
+									{% endif %}
+								</p>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col">
+				<div class="card mb-2">
+					<div class="card-header">
+                        {{ lng('index.accountdetails') }}
+					</div>
+					<ul class="list-group">
+						<li
+							class="list-group-item d-flex justify-content-between align-items-center">
+							{{ lng('login.username') }} <span>{{ userinfo.loginname }}</span>
+						</li>
+						<li
+							class="list-group-item d-flex justify-content-between align-items-center">
+							{{ lng('panel.domains') }} <span>{{ domains|raw }}</span>
+						</li>
+						{% if stdsubdomain is not empty %}
+						<li
+							class="list-group-item d-flex justify-content-between align-items-center">
+							{{ lng('admin.stdsubdomain') }} <span>{{ stdsubdomain }}</span>
+						</li>
+						{% endif %}
+						<li
+							class="list-group-item d-flex justify-content-between align-items-center">
+							{{ lng('customer.services') }} <span>{{ services_enabled }}</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card mb-2">
+					<div class="card-header">
+						{{ lng('index.customerdetails') }}
+					</div>
+					<ul class="list-group">
+						{% if userinfo.customernumber is not empty %}
+						<li
+							class="list-group-item d-flex justify-content-between align-items-center">
+							{{ lng('customer.customernumber') }} <span>{{ userinfo.customernumber }}</span>
+						</li>
+						{% endif %}
+						{% if userinfo.company is not empty %}
+						<li
+							class="list-group-item d-flex justify-content-between align-items-center">
+							{{ lng('customer.company') }} <span>{{ userinfo.company }}</span>
+						</li>
+						{% endif %}
+						{% if userinfo.name is not empty %}
+						<li
+							class="list-group-item d-flex justify-content-between align-items-center">
+							{{ lng('customer.name') }} <span>{{ userinfo.firstname }} {{ userinfo.name }}</span>
+						</li>
+						{% endif %}
+						{% if userinfo.street is not empty %}
+						<li
+							class="list-group-item d-flex justify-content-between align-items-center">
+							{{ lng('customer.street') }} <span>{{ userinfo.street }}</span>
+						</li>
+						{% endif %}
+						{% if userinfo.city is not empty %}
+						<li
+							class="list-group-item d-flex justify-content-between align-items-center">
+							{{ lng('customer.zipcode') }} / {{ lng('customer.city') }} <span>{{ userinfo.zipcode }} {{ userinfo.city }}</span>
+						</li>
+						{% endif %}
+						<li
+							class="list-group-item d-flex justify-content-between align-items-center">
+							{{ lng('customer.email') }} <span>{{ userinfo.email}}</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col">
+		{% if userinfo.custom_notes is not empty and userinfo.custom_notes_show == '1' %}
+		<div class="card bg-light mb-2">
+			<div class="card-body">
+				<p class="card-text">
+					{{ userinfo.custom_notes|raw }}
+			</div>
+		</div>
+		{% endif %}
+		{% if get_setting('customer.show_news_feed') == 1 %}
+		<div class="card mb-2">
+			<div class="card-header">News</div>
+			<div class="list-group list-group-flush" id="newsfeed">
+				<a href="#" class="list-group-item list-group-item-action disabled"><i
+					class="fas fa-spinner fa-spin"></i> Loading newsfeed... </a>
+			</div>
+		</div>
+		{% endif %}
+	</div>
+</div>
+{% endblock %}

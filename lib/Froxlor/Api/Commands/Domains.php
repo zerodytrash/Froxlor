@@ -25,6 +25,9 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 	/**
 	 * lists all domain entries
 	 *
+	 * @param bool $extended
+	 *        	optional if true, also output all IP addresses the domain is connected to
+	 *
 	 * @access admin
 	 * @throws \Exception
 	 * @return array count|list
