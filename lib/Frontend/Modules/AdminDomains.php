@@ -216,7 +216,7 @@ class AdminDomains extends FeModule
 		}
 
 		$sel_value = ! empty($result) && isset($result['aliasdomain']) ? $result['aliasdomain'] : null;
-		$domains = \Froxlor\UI\HTML::makeoption($this->lng['domains']['noaliasdomain'], 0, NULL, true);
+		$domains = \Froxlor\UI\HTML::makeoption($this->lng['domains']['noaliasdomain'], 0, null, true);
 		$result_domains_stmt = Database::prepare("
 					SELECT `d`.`id`, `d`.`domain`, `c`.`loginname` FROM `" . TABLE_PANEL_DOMAINS . "` `d`, `" . TABLE_PANEL_CUSTOMERS . "` `c`
 					WHERE `d`.`aliasdomain` IS NULL AND `d`.`parentdomainid` = 0" . $standardsubdomains . (\Froxlor\CurrentUser::getField('customers_see_all') ? '' : " AND `d`.`adminid` = :adminid") . "
@@ -233,7 +233,7 @@ class AdminDomains extends FeModule
 		}
 
 		$sel_value = ! empty($result) && isset($result['ismainbutsubto']) ? $result['ismainbutsubto'] : null;
-		$subtodomains = \Froxlor\UI\HTML::makeoption($this->lng['domains']['nosubtomaindomain'], 0, NULL, true);
+		$subtodomains = \Froxlor\UI\HTML::makeoption($this->lng['domains']['nosubtomaindomain'], 0, null, true);
 		$result_domains_stmt = Database::prepare("
 					SELECT `d`.`id`, `d`.`domain`, `c`.`loginname` FROM `" . TABLE_PANEL_DOMAINS . "` `d`, `" . TABLE_PANEL_CUSTOMERS . "` `c`
 					WHERE `d`.`aliasdomain` IS NULL AND `d`.`parentdomainid` = 0 AND `d`.`ismainbutsubto` = 0 " . $standardsubdomains . (\Froxlor\CurrentUser::getField('customers_see_all') ? '' : " AND `d`.`adminid` = :adminid") . "

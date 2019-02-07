@@ -1,0 +1,132 @@
+{% extends "Sparkle2/userarea.html.twig" %}
+
+{% block content %}
+{% set userinfo = call_static('\\Froxlor\\CurrentUser', 'getData') %}
+<div class="card">
+	<div class="card-header">
+		<ul class="nav nav-tabs card-header-tabs" id="subnav-tab"
+			role="tablist">
+			<li class="nav-item"><a class="nav-link active"
+				id="subnav-dom-tab" data-toggle="tab" href="#tab-dom" role="tab"
+				aria-controls="subnav-dom" aria-selected="true">{{ lng('panel.domains') }}&nbsp;<span
+					class="badge badge-pill badge-secondary">{{ domains.count }}</span></a></li>
+			{% if userinfo.subdomains < 0 or (userinfo.subdomains > 0 and userinfo.subdomains_used < userinfo.subdomains) and parentdomains_count > 0 %}
+			<li class="nav-item"><a class="nav-link" id="subnav-add-tab"
+				data-toggle="tab" href="#tab-add" role="tab"
+				aria-controls="subnav-add" aria-selected="false"><i
+					class="fas fa-plus-circle"></i>&nbsp;{{ lng('domains.subdomain_add') }}</a></li>
+			{% endif %}
+		</ul>
+	</div>
+	<div class="card-body tab-content" id="subnav-tabContent">
+		<div class="tab-pane fade show active" id="tab-dom" role="tabpanel"
+			aria-labelledby="subnav-dom-tab">
+			<div class="card">
+				<div class="card-body" id="domains-list">
+					{% import "Sparkle2/table-listing.html.twig" as t %}
+					{% set content %}
+					{% for domain in domains.list %}
+					<tr class="d-flex">
+						<td class="col-sm-4">{% if domain.termination_date %}<i
+							class="fas fa-{{ domain.termination_info }}"></i> {% endif %}<strong><a
+								href="http://{{ domain.domain }}/" rel="external">{{ domain.domain|idnDecode }}</a></strong>
+							{% if domain.registration_date %}<br> <small>{{ lng('domains.registration_date') }}:
+								{{ domain.registration_date }}</small> {% endif %} {% if domain.termination_date %}<br>
+							<small class="text-danger">{{ lng('domains.termination_date_overview') }}:
+								{{ domain.termination_date }}</small> {% endif %}</td>
+						<td class="col-sm-4">{% if domain.aliasdomain is empty %} {{ domain.documentroot }}
+							{% endif %} {% if domain.aliasdomainid and domain.aliasdomainid != 0 %}
+							{{ lng('domains.aliasdomain') }} {{ domain.aliasdomain }} {% endif %}</td>
+						<td class="col-sm-2">{% if domain.parentdomainid == 0 %}<a
+							href="http://{{ domain.domain }}/{{ statsapp }}" rel="external">{{ lng('domains.statstics') }}</a>
+							{% endif %}</td>
+						<td class="col-sm-2 text-right">{% if domain.show_ssledit %}<a
+							href="index.php?module=CustomerDomains&view=domainSslEditor&id={{ domain.id }}"
+							data-id="{{ domain.id }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ lng('panel.ssleditor') }}"><i class="fas fa-{% if domain.domain_hascert == 1 %}user-lock{% elseif domain.domain_hascert == 2 %}shield-alt{% endif %}"></i></a>&nbsp;{% endif %}{% if userinfo.dnsenabled == 1 and domain.isbinddomain == 1 and get_setting('system.bind_enable') == 1 and get_setting('system.dnsenabled') == 1 %}<a
+							href="index.php?module=DnsEditor&domain_id={{ domain.id }}"
+							data-id="{{ domain.id }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ lng('dnseditor.edit') }}"><i class="fas fa-globe"></i></a>&nbsp;{% endif %}{% if userinfo.logviewenabled == 1 %}<a
+							href="index.php?module=LogfilesViewer&domain_id={{ domain.id }}"
+							data-id="{{ domain.id }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ lng('panel.viewlogs') }}"><i
+								class="fas fa-chart-bar"></i></a>&nbsp;{% endif %}{% if domain.caneditdomain == 1 %}<a
+							href="index.php?module=CustomerDomains&view=edit&id={{ domain.id }}"
+							data-id="{{ domain.id }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ lng('panel.edit') }}"><i class="fas fa-edit"></i></a>&nbsp;{% endif %}<span class="text-muted"><i class="fas fa-trash-alt"></i></span></td>
+					</tr>
+					{% for subdomain in domain.subdomains %}
+					<tr class="d-flex">
+						<td class="col-sm-4">{% if domain.termination_date %}<i
+							class="fas fa-{{ domain.termination_info }}"></i> {% endif %}<a
+							href="http://{{ subdomain.domain }}/" rel="external">{{ subdomain.domain|idnDecode }}</a>
+							{% if subdomain.registration_date %}<br> <small>{{ lng('domains.registration_date') }}:
+								{{ subdomain.registration_date }}</small> {% endif %} {% if subdomain.termination_date %}<br>
+							<small class="text-danger">{{ lng('domains.termination_date_overview') }}:
+								{{ subdomain.termination_date }}</small> {% endif %}</td>
+						<td class="col-sm-4">{% if subdomain.aliasdomain is empty %}
+							{{ subdomain.documentroot }} {% endif %} {% if subdomain.aliasdomainid and subdomain.aliasdomainid != 0 %}
+							{{ lng('domains.aliasdomain') }} {{ subdomain.aliasdomain }} {% endif %}</td>
+						<td class="col-sm-2"></td>
+						<td class="col-sm-2 text-right">{% if subdomain.show_ssledit %}<a
+							href="index.php?module=CustomerDomains&view=domainSslEditor&id={{ subdomain.id }}"
+							data-id="{{ subdomain.id }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ lng('panel.ssleditor') }}"><i class="fas fa-{% if subdomain.domain_hascert == 1 %}user-lock{% elseif subdomain.domain_hascert == 2 %}shield-alt{% endif %}"></i></a>&nbsp;{% endif %}{% if userinfo.dnsenabled == 1 and subdomain.isbinddomain == 1 and get_setting('system.bind_enable') == 1 and get_setting('system.dnsenabled') == 1 %}<a
+							href="index.php?module=DnsEditor&domain_id={{ subdomain.id }}"
+							data-id="{{ subdomain.id }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ lng('dnseditor.edit') }}"><i class="fas fa-globe"></i></a>&nbsp;{% endif %}{% if userinfo.logviewenabled == 1 %}<a
+							href="index.php?module=LogfilesViewer&domain_id={{ subdomain.id }}"
+							data-id="{{ subdomain.id }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ lng('panel.viewlogs') }}"><i
+								class="fas fa-chart-bar"></i></a>&nbsp;{% endif %}{% if subdomain.caneditdomain == 1 %}<a
+							href="index.php?module=CustomerDomains&view=edit&id={{ subdomain.id }}"
+							data-id="{{ subdomain.id }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ lng('panel.edit') }}"><i class="fas fa-edit"></i></a>&nbsp;{% endif %}{% if not (subdomain.domainaliasid and subdomain.domainaliasid != 0) and subdomain.parentdomainid != 0 %}<a
+							href="#" class="text-danger delete-btn"
+							data-id="{{ subdomain.id }}" data-container="body"
+							data-toggle="tooltip" data-placement="left"
+							title="{{ lng('panel.delete') }}"><i class="fas fa-trash-alt"></i></a>
+							{% else %}<span class="text-muted"><i
+								class="fas fa-trash-alt"></i></span>{% endif %}</td>
+					</tr>
+					{% endfor %}
+					{% endfor %}
+					{% endset %}
+					{% if domains.count > 0 %}
+					{{ t.listing("domains-listing", [lng('domains.domainname'), lng('panel.path'), lng('domains.statstics'), "|" ~ lng('panel.options')], content, [4,4,2,2]) }}
+					{% else %}
+					<div class="alert alert-info" role="alert">
+						{% trans "Keine Domains" %}
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+
+		{% if userinfo.subdomains < 0 or (userinfo.subdomains > 0 and userinfo.subdomains_used < userinfo.subdomains) and parentdomains_count > 0 %}
+		<div class="tab-pane fade" id="tab-add" role="tabpanel"
+			aria-labelledby="subnav-add-tab">
+			<div class="row">
+				<div class="col-sm-12 col-md-6 offset-md-3">
+					<h5 class="mb-3">
+						<i class="fas fa-plus-circle"></i>&nbsp;
+						{{ lng('domains.subdomain_add') }}
+					</h5>
+					{% import "Sparkle2/misc/form/form.html.twig" as f %}
+					{{ f.form(form_data, "index.php?module=CustomerDomains&view=add") }}
+				</div>
+			</div>
+		</div>
+		{% endif %}
+
+	</div>
+</div>
+{% endblock %}

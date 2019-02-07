@@ -71,7 +71,7 @@ class HtmlForm
 							$nexto = array(
 								'field' => $fieldname
 							);
-							$element[$fieldname]['data_filed'] .= '{NEXTTOFIELD_' . $fieldname . '}';
+							$element[$fieldname]['data_field'] .= '{NEXTTOFIELD_' . $fieldname . '}';
 						} else {
 							$nexto = false;
 						}

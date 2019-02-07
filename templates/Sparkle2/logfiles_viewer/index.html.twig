@@ -6,10 +6,10 @@
 		<ul class="nav nav-tabs card-header-tabs" id="subnav-tab"
 			role="tablist">
 			<li class="nav-item"><a class="nav-link" id="subnav-back-tab"
-				href="index.php?module=AdminDomains" role="tab"
+				href="index.php?module={% if call_static('\\Froxlor\\CurrentUser', 'isAdmin') %}Admin{% else %}Customer{% endif %}Domains" role="tab"
 				aria-controls="subnav-back" aria-selected="true">{{ lng('panel.domains') }}</a></li>
 			<li class="nav-item"><a class="nav-link" id="subnav-back-tab"
-				href="index.php?module=AdminDomains&view=edit&id={{ domain.id }}" role="tab"
+				href="index.php?module={% if call_static('\\Froxlor\\CurrentUser', 'isAdmin') %}Admin{% else %}Customer{% endif %}Domains&view=edit&id={{ domain.id }}" role="tab"
 				aria-controls="subnav-back" aria-selected="true">{{ domain.domain|idnDecode }}</a></li>
 			<li class="nav-item"><a class="nav-link active"
 				id="subnav-err-tab" data-toggle="tab" href="#tab-err" role="tab"
