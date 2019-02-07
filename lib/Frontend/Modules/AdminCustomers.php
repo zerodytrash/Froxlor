@@ -285,6 +285,7 @@ class AdminCustomers extends FeModule
 		if ($result) {
 			$result['switched_user'] = \Froxlor\CurrentUser::getData();
 			$result['adminsession'] = 0;
+			$result['userid'] = $result['customerid'];
 			\Froxlor\CurrentUser::setData($result);
 
 			\Froxlor\FroxlorLogger::getLog()->addInfo("switched user and is now '" . $result['loginname'] . "'");

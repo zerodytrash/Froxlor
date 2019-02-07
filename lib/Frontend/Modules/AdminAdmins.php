@@ -225,6 +225,7 @@ class AdminAdmins extends FeModule
 		if ($result) {
 			$result['switched_user'] = \Froxlor\CurrentUser::getData();
 			$result['adminsession'] = 1;
+			$result['userid'] = $result['adminid'];
 			\Froxlor\CurrentUser::setData($result);
 
 			\Froxlor\FroxlorLogger::getLog()->addInfo("switched admin and is now '" . $result['loginname'] . "'");
