@@ -2058,3 +2058,5 @@ $lng['panel']['security'] = 'Security';
 $lng['panel']['lookandfeel'] = 'Look and feel';
 $lng['tasks']['remove_pdns_domain'] = 'Delete domain %s from PowerDNS database';
 $lng['admin']['novhostcontainer'] = '<br><br><small class="red">None of the IPs and ports has the "' . $lng['admin']['ipsandports']['create_vhostcontainer'] . '" option enabled, many settings here will not be available</small>';
+$lng['serversettings']['errorlog_level']['title'] = 'Error log-level';
+$lng['serversettings']['errorlog_level']['description'] = 'Specify the error log level. Default is "warn" for apache-users and "error" for nginx-users.';
