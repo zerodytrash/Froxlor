@@ -222,5 +222,5 @@ if (\Froxlor\Froxlor::isDatabaseVersion('201901110')) {
 	Settings::AddNew('system.errorlog_level', (\Froxlor\Settings::Get('system.webserver') == 'nginx' ? 'error' : 'warn'));
 	lastStepStatus(0);
 
-	\Froxlor\Froxlor::updateToDbVersion('201901120');
+	\Froxlor\Froxlor::updateToDbVersion('201902120');
 }
