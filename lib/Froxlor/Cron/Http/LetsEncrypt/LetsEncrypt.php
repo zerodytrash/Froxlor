@@ -130,10 +130,10 @@ class LetsEncrypt extends \Froxlor\Cron\FroxlorCron
 			);
 
 			$froxlor_ssl_settings_stmt = Database::prepare("
-		SELECT * FROM `" . TABLE_PANEL_DOMAIN_SSL_SETTINGS . "`
-		WHERE `domainid` = '0' AND
-		(`expirationdate` < DATE_ADD(NOW(), INTERVAL 30 DAY) OR `expirationdate` IS NULL)
-	");
+				SELECT * FROM `" . TABLE_PANEL_DOMAIN_SSL_SETTINGS . "`
+				WHERE `domainid` = '0' AND
+				(`expirationdate` < DATE_ADD(NOW(), INTERVAL 30 DAY) OR `expirationdate` IS NULL)
+			");
 			$froxlor_ssl = Database::pexecute_first($froxlor_ssl_settings_stmt);
 
 			$insert_or_update_required = true;
@@ -148,8 +148,8 @@ class LetsEncrypt extends \Froxlor\Cron\FroxlorCron
 				// check whether we have an entry with valid certificates which just does not need
 				// updating yet, so we need to skip this here
 				$froxlor_ssl_settings_stmt = Database::prepare("
-			SELECT * FROM `" . TABLE_PANEL_DOMAIN_SSL_SETTINGS . "` WHERE `domainid` = '0'
-		");
+					SELECT * FROM `" . TABLE_PANEL_DOMAIN_SSL_SETTINGS . "` WHERE `domainid` = '0'
+				");
 				$froxlor_ssl = Database::pexecute_first($froxlor_ssl_settings_stmt);
 				if ($froxlor_ssl && ! empty($froxlor_ssl['ssl_cert_file'])) {
 					$insert_or_update_required = false;
@@ -164,6 +164,11 @@ class LetsEncrypt extends \Froxlor\Cron\FroxlorCron
 				// Only renew let's encrypt certificate if no broken ssl_redirect is enabled
 				// - this temp. deactivation of the ssl-redirect is handled by the webserver-cronjob
 				self::$cronlog->addInfo("Updating " . $certrow['domain']);
+
+				$cronlog = FroxlorLogger::getLog(array(
+					'loginname' => $certrow['loginname'],
+					'adminsession' => 0
+				));
 
 				try {
 					// Initialize Lescript with documentroot
@@ -195,11 +200,11 @@ class LetsEncrypt extends \Froxlor\Cron\FroxlorCron
 						Settings::Set('system.le_froxlor_redirect', '1');
 					}
 
-					self::$cronlog->addInfo("Updated Let's Encrypt certificate for " . $certrow['domain']);
+					$cronlog->addInfo("Updated Let's Encrypt certificate for " . $certrow['domain']);
 
 					$changedetected = 1;
 				} catch (\Exception $e) {
-					self::$cronlog->addError("Could not get Let's Encrypt certificate for " . $certrow['domain'] . ": " . $e->getMessage());
+					$cronlog->addError("Could not get Let's Encrypt certificate for " . $certrow['domain'] . ": " . $e->getMessage());
 				}
 			}
 		}
