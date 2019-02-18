@@ -643,6 +643,7 @@ opcache.interned_strings_buffer'),
 	('system', 'logfiles_script', ''),
 	('system', 'dhparams_file', ''),
 	('system', 'errorlog_level', 'warn'),
+	('system', 'leecc', '0'),
 	('api', 'enabled', '0'),
 	('2fa', 'enabled', '1'),
 	('panel', 'decimal_places', '4'),
@@ -678,7 +679,7 @@ opcache.interned_strings_buffer'),
 	('panel', 'customer_hide_options', ''),
 	('panel', 'is_configured', '0'),
 	('panel', 'version', '0.10.0'),
-	('panel', 'db_version', '201902120');
+	('panel', 'db_version', '201902170');
 
 
 DROP TABLE IF EXISTS `panel_tasks`;
@@ -890,7 +891,7 @@ INSERT INTO `cronjobs_run` (`id`, `module`, `cronfile`, `cronclass`, `interval`,
 	(2, 'froxlor/core', 'traffic', '\\Froxlor\\Cron\\Traffic\\TrafficCron', '1 DAY', '1', 'cron_traffic'),
 	(3, 'froxlor/reports', 'usage_report', '\\Froxlor\\Cron\\Traffic\\ReportsCron', '1 DAY', '1', 'cron_usage_report'),
 	(4, 'froxlor/core', 'mailboxsize', '\\Froxlor\\Cron\\System\\MailboxsizeCron', '6 HOUR', '1', 'cron_mailboxsize'),
-	(5, 'froxlor/letsencrypt', 'letsencrypt', '\\Froxlor\\Cron\\Http\\LetsEncrypt\\LetsEncrypt', '5 MINUTE', '0', 'cron_letsencrypt'),
+	(5, 'froxlor/letsencrypt', 'letsencrypt', '\\Froxlor\\Cron\\Http\\LetsEncrypt\\AcmeSh', '5 MINUTE', '0', 'cron_letsencrypt'),
 	(6, 'froxlor/backup', 'backup', '\\Froxlor\\Cron\\System\\BackupCron', '1 DAY', '1', 'cron_backup');
 
 

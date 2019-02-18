@@ -149,24 +149,6 @@ return array(
 					),
 					'save_method' => 'storeSettingField'
 				),
-				'system_letsencryptcountrycode' => array(
-					'label' => \Froxlor\Frontend\UI::getLng('serversettings.letsencryptcountrycode'),
-					'settinggroup' => 'system',
-					'varname' => 'letsencryptcountrycode',
-					'type' => 'string',
-					'string_emptyallowed' => false,
-					'default' => 'DE',
-					'save_method' => 'storeSettingField'
-				),
-				'system_letsencryptstate' => array(
-					'label' => \Froxlor\Frontend\UI::getLng('serversettings.letsencryptstate'),
-					'settinggroup' => 'system',
-					'varname' => 'letsencryptstate',
-					'type' => 'string',
-					'string_emptyallowed' => false,
-					'default' => 'Hessen',
-					'save_method' => 'storeSettingField'
-				),
 				'system_letsencryptchallengepath' => array(
 					'label' => \Froxlor\Frontend\UI::getLng('serversettings.letsencryptchallengepath'),
 					'settinggroup' => 'system',
@@ -180,9 +162,29 @@ return array(
 					'label' => \Froxlor\Frontend\UI::getLng('serversettings.letsencryptkeysize'),
 					'settinggroup' => 'system',
 					'varname' => 'letsencryptkeysize',
-					'type' => 'int',
-					'int_min' => 2048,
-					'default' => 4096,
+					'type' => 'option',
+					'default' => '2048',
+					'option_mode' => 'one',
+					'option_options' => array(
+						'2048' => '2048',
+						'3072' => '3072',
+						'4096' => '4096',
+						'8192' => '8192'
+					),
+					'save_method' => 'storeSettingField'
+				),
+				'system_leecc' => array(
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.letsencryptecc'),
+					'settinggroup' => 'system',
+					'varname' => 'leecc',
+					'type' => 'option',
+					'default' => '0',
+					'option_mode' => 'one',
+					'option_options' => array(
+						'0' => '-',
+						'256' => 'ec-256',
+						'384' => 'ec-384'
+					),
 					'save_method' => 'storeSettingField'
 				),
 				'system_letsencryptreuseold' => array(
@@ -190,7 +192,7 @@ return array(
 					'settinggroup' => 'system',
 					'varname' => 'letsencryptreuseold',
 					'type' => 'bool',
-					'default' => false,
+					'default' => true,
 					'save_method' => 'storeSettingField'
 				),
 				'system_disable_le_selfcheck' => array(
