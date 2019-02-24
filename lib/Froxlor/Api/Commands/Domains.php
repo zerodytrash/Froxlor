@@ -196,7 +196,7 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 	 * @param bool $hsts_preload
 	 *        	optional whether or not to preload HSTS header value
 	 * @param bool $ocsp_stapling
-	 *        	optional whether to enable oscp-stapling for this domain. default 0 (false), requires SSL
+	 *        	optional whether to enable ocsp-stapling for this domain. default 0 (false), requires SSL
 	 *        	
 	 * @access admin
 	 * @throws \Exception
@@ -753,7 +753,7 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 	 * @param bool $hsts_preload
 	 *        	optional whether or not to preload HSTS header value
 	 * @param bool $ocsp_stapling
-	 *        	optional whether to enable oscp-stapling for this domain. default 0 (false), requires SSL
+	 *        	optional whether to enable ocsp-stapling for this domain. default 0 (false), requires SSL
 	 *        	
 	 * @access admin
 	 * @throws \Exception

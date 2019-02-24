@@ -20,6 +20,19 @@ return array(
 			'title' => \Froxlor\Frontend\UI::getLng('admin.froxlorvhost') . (call_user_func(array('\Froxlor\Settings\FroxlorVhostSettings', 'hasVhostContainerEnabled')) == false ? \Froxlor\Frontend\UI::getLng('admin.novhostcontainer') : ''),
 			'fields' => array(
 				/**
+				 * Webserver-Vhost
+				 */
+				'system_froxloraliases' => array(
+					'label' => $lng['serversettings']['froxloraliases'],
+					'settinggroup' => 'system',
+					'varname' => 'froxloraliases',
+					'type' => 'string',
+					'string_regexp' => '/^(([a-z0-9\-\._]+, ?)*[a-z0-9\-\._]+)?$/i',
+					'string_emptyallowed' => true,
+					'default' => '',
+					'save_method' => 'storeSettingField'
+				),
+				/**
 				 * SSL / Let's Encrypt
 				 */
 				'system_le_froxlor_enabled' => array(
