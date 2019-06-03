@@ -38,7 +38,7 @@ class Certificates extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Resou
 	 *        	
 	 * @access admin, customer
 	 * @throws \Exception
-	 * @return array
+	 * @return string json-encoded array
 	 */
 	public function add()
 	{
@@ -87,7 +87,7 @@ class Certificates extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Resou
 	 *        	
 	 * @access admin, customer
 	 * @throws \Exception
-	 * @return array
+	 * @return string json-encoded array
 	 */
 	public function get()
 	{
@@ -129,7 +129,7 @@ class Certificates extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Resou
 	 *        	
 	 * @access admin, customer
 	 * @throws \Exception
-	 * @return array
+	 * @return string json-encoded array
 	 */
 	public function update()
 	{
@@ -169,7 +169,7 @@ class Certificates extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Resou
 	 *        	
 	 * @access admin, customer
 	 * @throws \Exception
-	 * @return array count|list|countall
+	 * @return string json-encoded array count|list|countall
 	 */
 	public function listing()
 	{
@@ -232,8 +232,8 @@ class Certificates extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Resou
 	 *
 	 * @param int $id
 	 *
-	 * @return array
 	 * @throws \Exception
+	 * @return string json-encoded array
 	 */
 	public function delete()
 	{

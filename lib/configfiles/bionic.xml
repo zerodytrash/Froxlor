@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <froxlor>
-	<distribution name="Debian" codename="Jessie"
-		version="8.x" defaulteditor="/usr/bin/nano" deprecated="true">
+	<distribution name="Ubuntu" codename="Bionic"
+		version="18.04" defaulteditor="/bin/nano">
 		<services>
 			<!-- HTTP -->
 			<service type="http" title="{{lng.admin.configfiles.http}}">
@@ -160,7 +160,7 @@ include_shell "/usr/share/lighttpd/include-conf-enabled.pl"
 						</visibility>
 						<visibility mode="false">{{settings.system.mod_fcgid}}
 						</visibility>
-						<content><![CDATA[apt-get install php5-cgi]]></content>
+						<content><![CDATA[apt-get install php-cgi]]></content>
 					</install>
 					<file name="/etc/nginx/nginx.conf">
 						<content><![CDATA[
@@ -1612,7 +1612,7 @@ root:               root@<SERVERNAME>
 # For common configuration examples, see BASIC_CONFIGURATION_README
 # and STANDARD_CONFIGURATION_README. To find these documents, use
 # the command "postconf html_directory readme_directory", or go to
-# http://www.postfix.org/BASIC_CONFIGURATION_README.html etc.
+# http://www.postfix.org/.
 #
 # For best results, change no more than 2-3 parameters at a time,
 # and test if Postfix still works after every change.
@@ -1646,7 +1646,7 @@ command_directory = /usr/sbin
 # daemon programs (i.e. programs listed in the master.cf file). This
 # directory must be owned by root.
 #
-daemon_directory = /usr/lib/postfix
+daemon_directory = /usr/lib/postfix/sbin
 
 # The data_directory parameter specifies the location of Postfix-writable
 # data files (caches, random numbers). This directory must be owned
@@ -1672,14 +1672,34 @@ data_directory = /var/lib/postfix
 #
 #default_privs = nobody
 
+# INTERNET HOST AND DOMAIN NAMES
+# 
+# The myhostname parameter specifies the internet hostname of this
+# mail system. The default is to use the fully-qualified domain name
+# from gethostname(). $myhostname is used as a default value for many
+# other configuration parameters.
+#
+# Froxlor Note: $myhostname can and should be the same as $mydomain as long as
+# you don't intend to send mail to it (it will be considered local, not virtual)
+# for the case of a subdomain, $mydomain *must* be equal to $myhostname,
+# otherwise you cannot use the main domain for virtual transport.
+# also check the note about $mydomain below.
+myhostname = mail.$mydomain
+#myhostname = virtual.domain.tld
+
+# The mydomain parameter specifies the local internet domain name.
+# The default is to use $myhostname minus the first component.
+# $mydomain is used as a default value for many other configuration
+# parameters.
+#
+# Froxlor Note: We are using a default here but that may or may not make sense,
+# depending on your dns configuration, please check yourself.
+
 # FQDN from Froxlor
 mydomain = <SERVERNAME>
 
-# set myhostname to $mydomain because Froxlor alrady uses a FQDN
-myhostname = $mydomain
-
 # SENDING MAIL
-#
+# 
 # The myorigin parameter specifies the domain that locally-posted
 # mail appears to come from. The default is to append $myhostname,
 # which is fine for small sites.  If you run a domain with multiple
@@ -1711,7 +1731,7 @@ myhostname = $mydomain
 #
 # Note: you need to stop/start Postfix when this parameter changes.
 #
-#inet_interfaces = all
+inet_interfaces = all
 #inet_interfaces = $myhostname
 #inet_interfaces = $myhostname, localhost
 
@@ -1759,7 +1779,7 @@ myhostname = $mydomain
 # See also below, section "REJECTING MAIL FOR UNKNOWN LOCAL USERS".
 #
 #mydestination = $myhostname, localhost.$mydomain, localhost
-#mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
+mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
 #mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain,
 #	mail.$mydomain, www.$mydomain, ftp.$mydomain
 
@@ -1781,7 +1801,7 @@ myhostname = $mydomain
 #
 # - You define $mydestination domain recipients in files other than
 #   /etc/passwd, /etc/aliases, or the $virtual_alias_maps files.
-#   For example, you define $mydestination domain recipients in
+#   For example, you define $mydestination domain recipients in    
 #   the $virtual_mailbox_maps files.
 #
 # - You redefine the local delivery agent in master.cf.
@@ -1801,7 +1821,7 @@ myhostname = $mydomain
 # The right-hand side of the lookup tables is conveniently ignored.
 # In the left-hand side, specify a bare username, an @domain.tld
 # wild-card, or specify a user@domain.tld address.
-#
+# 
 #local_recipient_maps = unix:passwd.byname $alias_maps
 #local_recipient_maps = proxy:unix:passwd.byname $alias_maps
 #local_recipient_maps =
@@ -1833,16 +1853,16 @@ unknown_local_recipient_reject_code = 550
 # clients in the same IP subnetworks as the local machine.
 # On Linux, this does works correctly only with interfaces specified
 # with the "ifconfig" command.
-#
+# 
 # Specify "mynetworks_style = class" when Postfix should "trust" SMTP
 # clients in the same IP class A/B/C networks as the local machine.
 # Don't do this with a dialup site - it would cause Postfix to "trust"
 # your entire provider's network.  Instead, specify an explicit
 # mynetworks list by hand, as described below.
-#
+#  
 # Specify "mynetworks_style = host" when Postfix should "trust"
 # only the local machine.
-#
+# 
 #mynetworks_style = class
 #mynetworks_style = subnet
 #mynetworks_style = host
@@ -1872,7 +1892,7 @@ mynetworks = 127.0.0.0/8
 # - from "untrusted" clients to destinations that match $relay_domains or
 #   subdomains thereof, except addresses with sender-specified routing.
 # The default relay_domains value is $mydestination.
-#
+# 
 # In addition to the above, the Postfix SMTP server by default accepts mail
 # that Postfix is final destination for:
 # - destinations that match $inet_interfaces or $proxy_interfaces,
@@ -1880,7 +1900,7 @@ mynetworks = 127.0.0.0/8
 # - destinations that match $virtual_alias_domains,
 # - destinations that match $virtual_mailbox_domains.
 # These destinations do not need to be listed in $relay_domains.
-#
+# 
 # Specify a list of hosts or domains, /file/name patterns or type:name
 # lookup tables, separated by commas and/or whitespace.  Continue
 # long lines by starting the next line with whitespace. A file name
@@ -1925,7 +1945,7 @@ mynetworks = 127.0.0.0/8
 # The right-hand side of the lookup tables is conveniently ignored.
 # In the left-hand side, specify an @domain.tld wild-card, or specify
 # a user@domain.tld address.
-#
+# 
 #relay_recipient_maps = hash:/etc/postfix/relay_recipients
 
 # INPUT RATE CONTROL
@@ -1934,15 +1954,15 @@ mynetworks = 127.0.0.0/8
 # flow control. This feature is turned on by default, although it
 # still needs further development (it's disabled on SCO UNIX due
 # to an SCO bug).
-#
+# 
 # A Postfix process will pause for $in_flow_delay seconds before
 # accepting a new message, when the message arrival rate exceeds the
 # message delivery rate. With the default 100 SMTP server process
 # limit, this limits the mail inflow to 100 messages a second more
 # than the number of messages delivered per second.
-#
+# 
 # Specify 0 to disable the feature. Valid delays are 0..10.
-#
+# 
 #in_flow_delay = 1s
 
 # ADDRESS REWRITING
@@ -1972,7 +1992,7 @@ mynetworks = 127.0.0.0/8
 # On systems with NIS, the default is to search the local alias
 # database, then the NIS alias database. See aliases(5) for syntax
 # details.
-#
+# 
 # If you change the alias database, run "postalias /etc/aliases" (or
 # wherever your system stores the mail alias file), or simply run
 # "newaliases" to build the necessary DBM or DB file.
@@ -2015,7 +2035,7 @@ mynetworks = 127.0.0.0/8
 #
 #home_mailbox = Mailbox
 #home_mailbox = Maildir/
-
+ 
 # The mail_spool_directory parameter specifies the directory where
 # UNIX-style mailboxes are kept. The default setting depends on the
 # system type.
@@ -2042,7 +2062,7 @@ mynetworks = 127.0.0.0/8
 # IF YOU USE THIS TO DELIVER MAIL SYSTEM-WIDE, YOU MUST SET UP AN
 # ALIAS THAT FORWARDS MAIL FOR ROOT TO A REAL USER.
 #
-#mailbox_command = /usr/bin/procmail
+mailbox_command = /usr/lib/dovecot/deliver
 #mailbox_command = /usr/bin/procmail -a "$EXTENSION"
 
 # The mailbox_transport specifies the optional transport in master.cf
@@ -2057,7 +2077,7 @@ mynetworks = 127.0.0.0/8
 #
 # NOTE: if you use this feature for accounts not in the UNIX password
 # file, then you must update the "local_recipient_maps" setting in
-# the main.cf file, otherwise the SMTP server will reject mail for
+# the main.cf file, otherwise the SMTP server will reject mail for    
 # non-UNIX accounts with "User unknown in local recipient table".
 #
 # Cyrus IMAP over LMTP. Specify ``lmtpunix      cmd="lmtpd"
@@ -2079,7 +2099,7 @@ mynetworks = 127.0.0.0/8
 #
 # NOTE: if you use this feature for accounts not in the UNIX password
 # file, then you must update the "local_recipient_maps" setting in
-# the main.cf file, otherwise the SMTP server will reject mail for
+# the main.cf file, otherwise the SMTP server will reject mail for    
 # non-UNIX accounts with "User unknown in local recipient table".
 #
 #fallback_transport = lmtp:unix:/file/name
@@ -2102,15 +2122,15 @@ mynetworks = 127.0.0.0/8
 #
 # NOTE: if you use this feature for accounts not in the UNIX password
 # file, then you must specify "local_recipient_maps =" (i.e. empty) in
-# the main.cf file, otherwise the SMTP server will reject mail for
+# the main.cf file, otherwise the SMTP server will reject mail for    
 # non-UNIX accounts with "User unknown in local recipient table".
 #
 #luser_relay = $user@other.host
 #luser_relay = $local@other.host
 #luser_relay = admin+$local
-
+  
 # JUNK MAIL CONTROLS
-#
+# 
 # The controls listed here are only a very small subset. The file
 # SMTPD_ACCESS_README provides an overview.
 
@@ -2132,11 +2152,11 @@ mynetworks = 127.0.0.0/8
 # deferred mail, so that mail can be flushed quickly with the SMTP
 # "ETRN domain.tld" command, or by executing "sendmail -qRdomain.tld".
 # See the ETRN_README document for a detailed description.
-#
+# 
 # The fast_flush_domains parameter controls what destinations are
 # eligible for this service. By default, they are all domains that
 # this server is willing to relay mail to.
-#
+# 
 #fast_flush_domains = $relay_domains
 
 # SHOW SOFTWARE VERSION OR NOT
@@ -2162,7 +2182,7 @@ smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
 # too many are run at the same time. With SMTP deliveries, 10
 # simultaneous connections to the same domain could be sufficient to
 # raise eyebrows.
-#
+# 
 # Each message delivery transport has its XXX_destination_concurrency_limit
 # parameter.  The default is $default_destination_concurrency_limit for
 # most delivery transports. For the local delivery agent the default is 2.
@@ -2220,11 +2240,11 @@ debugger_command =
 # INSTALL-TIME CONFIGURATION INFORMATION
 #
 # The following parameters are used when installing a new Postfix version.
-#
+# 
 # sendmail_path: The full pathname of the Postfix sendmail command.
 # This is the Sendmail-compatible mail posting interface.
-#
-sendmail_path = /usr/sbin/sendmail
+# 
+sendmail_path = /usr/sbin/sendmail 
 
 # newaliases_path: The full pathname of the Postfix newaliases command.
 # This is the Sendmail-compatible command to build alias databases.
@@ -2233,7 +2253,7 @@ newaliases_path = /usr/bin/newaliases
 
 # mailq_path: The full pathname of the Postfix mailq command.  This
 # is the Sendmail-compatible mail queue listing command.
-#
+# 
 mailq_path = /usr/bin/mailq
 
 # setgid_group: The group for mail submission and queue management
@@ -2342,12 +2362,12 @@ virtual_mailbox_limit = 0
 # service type  private unpriv  chroot  wakeup  maxproc command + args
 #               (yes)   (yes)   (yes)   (never) (100)
 # ==========================================================================
-smtp      inet  n       -       -       -       -       smtpd
-#smtp      inet  n       -       -       -       1       postscreen
-#smtpd     pass  -       -       -       -       -       smtpd
-#dnsblog   unix  -       -       -       -       0       dnsblog
-#tlsproxy  unix  -       -       -       -       0       tlsproxy
-#submission inet n       -       -       -       -       smtpd
+smtp      inet  n       -       y       -       -       smtpd
+#smtp      inet  n       -       y       -       1       postscreen
+#smtpd     pass  -       -       y       -       -       smtpd
+#dnsblog   unix  -       -       y       -       0       dnsblog
+#tlsproxy  unix  -       -       y       -       0       tlsproxy
+#submission inet n       -       y       -       -       smtpd
 #  -o syslog_name=postfix/submission
 #  -o smtpd_tls_security_level=encrypt
 #  -o smtpd_sasl_auth_enable=yes
@@ -2358,7 +2378,7 @@ smtp      inet  n       -       -       -       -       smtpd
 #  -o smtpd_recipient_restrictions=
 #  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
 #  -o milter_macro_daemon_name=ORIGINATING
-#smtps     inet  n       -       -       -       -       smtpd
+#smtps     inet  n       -       y       -       -       smtpd
 #  -o syslog_name=postfix/smtps
 #  -o smtpd_tls_wrappermode=yes
 #  -o smtpd_sasl_auth_enable=yes
@@ -2369,32 +2389,32 @@ smtp      inet  n       -       -       -       -       smtpd
 #  -o smtpd_recipient_restrictions=
 #  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
 #  -o milter_macro_daemon_name=ORIGINATING
-#628       inet  n       -       -       -       -       qmqpd
-pickup    unix  n       -       -       60      1       pickup
-cleanup   unix  n       -       -       -       0       cleanup
+#628       inet  n       -       y       -       -       qmqpd
+pickup    unix  n       -       y       60      1       pickup
+cleanup   unix  n       -       y       -       0       cleanup
 qmgr      unix  n       -       n       300     1       qmgr
 #qmgr     unix  n       -       n       300     1       oqmgr
-tlsmgr    unix  -       -       -       1000?   1       tlsmgr
-rewrite   unix  -       -       -       -       -       trivial-rewrite
-bounce    unix  -       -       -       -       0       bounce
-defer     unix  -       -       -       -       0       bounce
-trace     unix  -       -       -       -       0       bounce
-verify    unix  -       -       -       -       1       verify
-flush     unix  n       -       -       1000?   0       flush
+tlsmgr    unix  -       -       y       1000?   1       tlsmgr
+rewrite   unix  -       -       y       -       -       trivial-rewrite
+bounce    unix  -       -       y       -       0       bounce
+defer     unix  -       -       y       -       0       bounce
+trace     unix  -       -       y       -       0       bounce
+verify    unix  -       -       y       -       1       verify
+flush     unix  n       -       y       1000?   0       flush
 proxymap  unix  -       -       n       -       -       proxymap
 proxywrite unix -       -       n       -       1       proxymap
-smtp      unix  -       -       -       -       -       smtp
-relay     unix  -       -       -       -       -       smtp
+smtp      unix  -       -       y       -       -       smtp
+relay     unix  -       -       y       -       -       smtp
 #       -o smtp_helo_timeout=5 -o smtp_connect_timeout=5
-showq     unix  n       -       -       -       -       showq
-error     unix  -       -       -       -       -       error
-retry     unix  -       -       -       -       -       error
-discard   unix  -       -       -       -       -       discard
+showq     unix  n       -       y       -       -       showq
+error     unix  -       -       y       -       -       error
+retry     unix  -       -       y       -       -       error
+discard   unix  -       -       y       -       -       discard
 local     unix  -       n       n       -       -       local
 virtual   unix  -       n       n       -       -       virtual
-lmtp      unix  -       -       -       -       -       lmtp
-anvil     unix  -       -       -       -       1       anvil
-scache    unix  -       -       -       -       1       scache
+lmtp      unix  -       -       y       -       -       lmtp
+anvil     unix  -       -       y       -       1       anvil
+scache    unix  -       -       y       -       1       scache
 #
 # ====================================================================
 # Interfaces to non-Postfix software. Be sure to examine the manual
@@ -3374,6 +3394,74 @@ service dict {
 ]]>
 							</content>
 						</file>
+						<file name="/etc/dovecot/conf.d/10-ssl.conf" chown="root:0"
+							chmod="0644" backup="true">
+							<content><![CDATA[
+##
+## SSL settings
+##
+
+# SSL/TLS support: yes, no, required. <doc/wiki/SSL.txt>
+ssl = no
+
+# PEM encoded X.509 SSL/TLS certificate and private key. They're opened before
+# dropping root privileges, so keep the key file unreadable by anyone but
+# root. Included doc/mkcert.sh can be used to easily generate self-signed
+# certificate, just make sure to update the domains in dovecot-openssl.cnf
+#ssl_cert = </etc/dovecot/dovecot.pem
+#ssl_key = </etc/dovecot/private/dovecot.pem
+
+# If key file is password protected, give the password here. Alternatively
+# give it when starting dovecot with -p parameter. Since this file is often
+# world-readable, you may want to place this setting instead to a different
+# root owned 0600 file by using ssl_key_password = <path.
+#ssl_key_password =
+
+# PEM encoded trusted certificate authority. Set this only if you intend to use
+# ssl_verify_client_cert=yes. The file should contain the CA certificate(s)
+# followed by the matching CRL(s). (e.g. ssl_ca = </etc/ssl/certs/ca.pem)
+#ssl_ca =
+
+# Require that CRL check succeeds for client certificates.
+#ssl_require_crl = yes
+
+# Directory and/or file for trusted SSL CA certificates. These are used only
+# when Dovecot needs to act as an SSL client (e.g. imapc backend). The
+# directory is usually /etc/ssl/certs in Debian-based systems and the file is
+# /etc/pki/tls/cert.pem in RedHat-based systems.
+#ssl_client_ca_dir =
+#ssl_client_ca_file =
+
+# Request client to send a certificate. If you also want to require it, set
+# auth_ssl_require_client_cert=yes in auth section.
+#ssl_verify_client_cert = no
+
+# Which field from certificate to use for username. commonName and
+# x500UniqueIdentifier are the usual choices. You'll also need to set
+# auth_ssl_username_from_cert=yes.
+#ssl_cert_username_field = commonName
+
+# DH parameters length to use.
+#ssl_dh_parameters_length = 1024
+
+# SSL protocols to use
+#ssl_protocols = !SSLv3
+
+# SSL ciphers to use
+#ssl_cipher_list = ALL:!LOW:!SSLv2:!EXP:!aNULL
+
+# Prefer the server's order of ciphers over client's.
+#ssl_prefer_server_ciphers = no
+
+# SSL crypto device to use, for valid values run "openssl engine"
+#ssl_crypto_device =
+
+# SSL extra options. Currently supported options are:
+#   no_compression - Disable compression.
+#ssl_options =
+]]>
+							</content>
+						</file>
 						<file name="/etc/dovecot/conf.d/15-lda.conf" chown="root:0"
 							chmod="0644" backup="true">
 							<content><![CDATA[
@@ -3800,16 +3888,6 @@ plugin {
 				<!-- Dovecot with postfix -->
 				<daemon name="dovecot_postfix" version="2"
 					title="Dovecot with postfix" default="true">
-					<include>//service[@type='mail']/general/installs[@index=1]
-					</include>
-					<include>//service[@type='mail']/general/files[@index=1]
-					</include>
-					<include>//service[@type='mail']/general/commands[@index=1]
-					</include>
-				</daemon>
-				<!-- Dovecot with exim4 -->
-				<daemon name="dovecot_exim4" version="2"
-					title="Dovecot with exim4">
 					<include>//service[@type='mail']/general/installs[@index=1]
 					</include>
 					<include>//service[@type='mail']/general/files[@index=1]
@@ -4488,179 +4566,6 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 					<command><![CDATA[sed -i.bak 's|^\\(DirIcons=\\).*$|\\1\\"/awstats-icon\\"|' {{settings.system.awstats_conf}}/awstats.model.conf]]></command>
 					<command><![CDATA[rm /etc/cron.d/awstats]]></command>
 				</daemon>
-				<!-- libnss-mysql -->
-				<daemon name="libnss"
-					title="libnss-mysql (required for FCGID/php-fpm/mpm-itk)">
-					<install><![CDATA[apt-get install nscd
-wget http://debian.froxlor.org/pool/main/libn/libnss-mysql-bg/libnss-mysql-bg_1.5-3+frx1_amd64.deb
-dpkg -i libnss-mysql-bg_1.5-3+frx1_amd64.deb
-rm libnss-mysql-bg_1.5-3+frx1_amd64.deb
-]]></install>
-					<file name="/etc/libnss-mysql.cfg" chown="root:root"
-						chmod="0600" backup="true">
-						<content><![CDATA[
-getpwnam    SELECT username,'x',uid,gid,'Froxlor Customer',homedir,shell \
-            FROM ftp_users \
-            WHERE username='%1$s' \
-            AND login_enabled = 'Y' \
-            ORDER BY LENGTH(username) \
-            LIMIT 1
-getpwuid    SELECT username,'x',uid,gid,'Froxlor Customer',homedir,shell \
-            FROM ftp_users \
-            WHERE uid='%1$u' \
-            AND login_enabled = 'Y' \
-            ORDER BY LENGTH(username) \
-            LIMIT 1
-getspnam    SELECT username,password,FLOOR(UNIX_TIMESTAMP()/86400-1),'1','99999','7','-1','-1','0' \
-            FROM ftp_users \
-            WHERE username='%1$s' \
-            AND login_enabled = 'Y' \
-            ORDER BY LENGTH(username) \
-            LIMIT 1
-getpwent    SELECT username,'x',uid,gid,'Froxlor Customer',homedir,shell \
-            FROM ftp_users
-getspent    SELECT username,password,FLOOR(UNIX_TIMESTAMP()/86400-1),'1','99999','7','-1','-1','0' \
-            FROM ftp_users
-getgrnam    SELECT groupname,'x',gid \
-            FROM ftp_groups \
-            WHERE groupname='%1$s' \
-            LIMIT 1
-getgrgid    SELECT groupname,'x',gid \
-            FROM ftp_groups \
-            WHERE gid='%1$u' \
-            LIMIT 1
-getgrent    SELECT groupname,'x',gid \
-            FROM ftp_groups
-memsbygid   SELECT members \
-            FROM ftp_groups \
-            WHERE gid='%1$u'
-gidsbymem   SELECT CONCAT_WS(',', gid) as gid \
-            FROM ftp_groups \
-            WHERE FIND_IN_SET('%1$s', members)
-
-host		<SQL_HOST>
-database	<SQL_DB>
-username	<SQL_UNPRIVILEGED_USER>
-password	<SQL_UNPRIVILEGED_PASSWORD>
-port        3306
-#socket		/var/run/mysqld/mysqld.sock
-]]>
-						</content>
-					</file>
-					<commands>
-						<!-- if a socket is set for the db-server use it -->
-						<visibility mode="notempty">{{sql.socket}}</visibility>
-						<command><![CDATA[sed -i.bak 's/^port/#port/' /etc/libnss-mysql.cfg]]></command>
-						<command><![CDATA[sed -i.bak 's/^#socket/socket/' /etc/libnss-mysql.cfg]]></command>
-						<command><![CDATA[sed -i.bak 's|^\\(socket\\).*$|\\1\\"{{sql.socket}}\\"|' /etc/libnss-mysql.cfg]]></command>
-					</commands>
-					<file name="/etc/libnss-mysql-root.cfg" chown="root:root"
-						chmod="0600" backup="true">
-						<content><![CDATA[
-username	<SQL_UNPRIVILEGED_USER>
-password	<SQL_UNPRIVILEGED_PASSWORD>
-]]>
-						</content>
-					</file>
-					<file name="/etc/nsswitch.conf" backup="true">
-						<content><![CDATA[
-# Make sure that `passwd`, `group` and `shadow` have mysql in their lines
-# You should place mysql at the end, so that it is queried after the other mechanisams
-#
-passwd:         compat mysql
-group:          compat mysql
-shadow:         compat mysql
-
-hosts:       files dns
-networks:    files dns
-
-services:    db files
-protocols:   db files
-rpc:         db files
-ethers:      db files
-netmasks:    files
-netgroup:    files
-bootparams:  files
-
-automount:   files
-aliases:     files
-]]>
-						</content>
-					</file>
-					<command><![CDATA[/etc/init.d/nscd restart]]></command>
-					<!-- clear group chache -->
-					<command><![CDATA[nscd --invalidate=group]]></command>
-					<!-- @TODO separate the following mkdir command from the previous nscd -->
-					<command>
-						<visibility mode="notisdir">/etc/insserv/overrides</visibility>
-						<content><![CDATA[mkdir -p /etc/insserv/overrides]]></content>
-					</command>
-					<file name="/etc/insserv/overrides/apache2" chown="root:root"
-						chmod="0644">
-						<visibility mode="equals" value="apache2">{{settings.system.webserver}}</visibility>
-						<content><![CDATA[
-#!/bin/sh
-### BEGIN INIT INFO
-# Provides:          apache2
-# Required-Start:    $local_fs $remote_fs $network $syslog nscd
-# Required-Stop:     $local_fs $remote_fs $network $syslog
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Start/stop apache2 web server
-### END INIT INFO
-]]>
-						</content>
-					</file>
-					<file name="/etc/insserv/overrides/lighttpd" chown="root:root"
-						chmod="0644">
-						<visibility mode="equals" value="lighttpd">{{settings.system.webserver}}</visibility>
-						<content><![CDATA[
-#!/bin/sh
-### BEGIN INIT INFO
-# Provides:          lighttpd
-# Required-Start:    $local_fs $remote_fs $network $syslog nscd
-# Required-Stop:     $local_fs $remote_fs $network $syslog
-# Should-Start:      fam
-# Should-Stop:       fam
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Start the lighttpd web server.
-### END INIT INFO
-]]>
-						</content>
-					</file>
-					<file name="/etc/insserv/overrides/nginx" chown="root:root"
-						chmod="0644">
-						<visibility mode="equals" value="nginx">{{settings.system.webserver}}</visibility>
-						<content><![CDATA[
-#!/bin/sh
-### BEGIN INIT INFO
-# Provides:       nginx
-# Required-Start:    $local_fs $remote_fs $network $syslog $named nscd
-# Required-Stop:     $local_fs $remote_fs $network $syslog $named
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: starts the nginx web server
-### END INIT INFO
-]]>
-						</content>
-					</file>
-					<file name="/etc/insserv/overrides/nscd" chown="root:root"
-						chmod="0644">
-						<content><![CDATA[
-#!/bin/sh
-### BEGIN INIT INFO
-# Provides:          nscd
-# Required-Start:    $remote_fs $syslog mysql
-# Required-Stop:     $remote_fs $syslog
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Starts the Name Service Cache Daemon
-### END INIT INFO
-]]>
-						</content>
-					</file>
-				</daemon>
 				<!-- libnss-extrausers -->
 				<daemon name="libnssextrausers"
 					title="libnss-extrausers (alternative to libnss-mysql, required for FCGID/php-fpm/mpm-itk)">
@@ -4728,7 +4633,7 @@ aliases:     files
 				</daemon>
 				<!-- FCGID -->
 				<daemon name="fcgid" title="FCGID (alternative to mod_php)">
-					<install><![CDATA[apt-get install apache2-suexec libapache2-mod-fcgid php5-cgi]]></install>
+					<install><![CDATA[apt-get install apache2-suexec-pristine libapache2-mod-fcgid php-cgi]]></install>
 					<command><![CDATA[a2enmod suexec fcgid]]></command>
 					<commands index="1">
 						<visibility mode="true">{{settings.system.mod_fcgid_ownvhost}}
@@ -4737,7 +4642,7 @@ aliases:     files
 						<command><![CDATA[useradd -s /bin/false -g {{settings.system.mod_fcgid_httpgroup}} {{settings.system.mod_fcgid_httpuser}}]]></command>
 						<command><![CDATA[mkdir -p {{settings.system.mod_fcgid_configdir}}]]></command>
 						<command><![CDATA[mkdir -p {{settings.system.mod_fcgid_tmpdir}}]]></command>
-						<command><![CDATA[a2dismod php5]]></command>
+						<command><![CDATA[a2dismod php7.0]]></command>
 					</commands>
 					<!-- instead of just restarting apache, we let the cronjob do all the 
 						dirty work -->
@@ -4746,18 +4651,12 @@ aliases:     files
 				<!-- PHP-FPM -->
 				<daemon name="php-fpm"
 					title="PHP-FPM (alternative to mod_php)">
-					<commands index="1">
-						<visibility mode="equals" value="apache2">{{settings.system.webserver}}
-						</visibility>
-						<command><![CDATA[# add "non-free" after all occurrences of "main" in /etc/apt/sources.list]]></command>
-						<command><![CDATA[# this is needed for libapache2-mod-fastcgi to install]]></command>
-					</commands>
 					<install>
 						<visibility mode="equals" value="apache2">{{settings.system.webserver}}
 						</visibility>
-						<content><![CDATA[apt-get install apache2-suexec libapache2-mod-fastcgi]]></content>
+						<content><![CDATA[apt-get install apache2-suexec-pristine libapache2-mod-fastcgi]]></content>
 					</install>
-					<install><![CDATA[apt-get install php5-fpm]]></install>
+					<install><![CDATA[apt-get install php-fpm]]></install>
 					<commands index="2">
 						<visibility mode="equals" value="apache2">{{settings.system.webserver}}
 						</visibility>
@@ -4776,7 +4675,7 @@ aliases:     files
 						</visibility>
 						<visibility mode="true">{{settings.phpfpm.enabled_ownvhost}}
 						</visibility>
-						<command><![CDATA[a2dismod php5]]></command>
+						<command><![CDATA[a2dismod php7.0]]></command>
 					</commands>
 					<commands index="5">
 						<visibility mode="equals" value="apache2">{{settings.system.webserver}}
