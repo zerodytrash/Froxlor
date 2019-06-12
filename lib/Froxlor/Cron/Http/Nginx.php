@@ -135,7 +135,7 @@ class Nginx extends HttpConfigBase
 			foreach ($statusCodes as $statusCode) {
 				if (Settings::Get('defaultwebsrverrhandler.err' . $statusCode) != '') {
 					$defhandler = Settings::Get('defaultwebsrverrhandler.err' . $statusCode);
-					if (! \Froxlor\Validate\Form\Data::validateUrl($defhandler)) {
+					if (! \Froxlor\Validate\Validate::validateUrl($defhandler)) {
 						$defhandler = \Froxlor\FileDir::makeCorrectFile($defhandler);
 					}
 					$this->nginx_data[$vhosts_filename] .= 'error_page ' . $statusCode . ' ' . $defhandler . ';' . "\n";
@@ -248,7 +248,7 @@ class Nginx extends HttpConfigBase
 
 				$aliases = "";
 				$froxlor_aliases = Settings::Get('system.froxloraliases');
-				if (!empty($froxlor_aliases)) {
+				if (! empty($froxlor_aliases)) {
 					$froxlor_aliases = explode(",", $froxlor_aliases);
 					foreach ($froxlor_aliases as $falias) {
 						if (\Froxlor\Validate\Validate::validateDomain(trim($falias))) {
@@ -572,26 +572,38 @@ class Nginx extends HttpConfigBase
 		return $vhost_content;
 	}
 
+	private function cleanVhostStruct($vhost = null)
+	{
+		// Remove windows linebreaks
+		$vhost = str_replace("\r", "\n", $vhost);
+		// Break blocks into lines
+		$vhost = str_replace(array(
+			"{",
+			"}"
+		), array(
+			" {\n",
+			"\n}"
+		), $vhost);
+		// Break into array items
+		$vhost = explode("\n", preg_replace('/[ \t]+/', ' ', trim(preg_replace('/\t+/', '', $vhost))));
+		// Remove empty lines
+		$vhost = array_filter($vhost, function ($a) {
+			return preg_match("#\S#", $a);
+		});
+
+		// remove unnecessary whitespaces
+		$vhost = array_map("trim", $vhost);
+		// re-number array keys
+		$vhost = array_values($vhost);
+		return $vhost;
+	}
+
 	protected function mergeVhostCustom($vhost_frx, $vhost_usr)
 	{
 		// Clean froxlor defined settings
-		$vhost_frx = explode("\n", preg_replace('/[ \t]+/', ' ', trim(preg_replace('/\t+/', '', $vhost_frx)))); // Break into array items
-		$vhost_frx = array_map("trim", $vhost_frx); // remove unnecessary whitespaces
-
+		$vhost_frx = $this->cleanVhostStruct($vhost_frx);
 		// Clean user defined settings
-		$vhost_usr = str_replace("\r", "\n", $vhost_usr); // Remove windows linebreaks
-		$vhost_usr = str_replace(array(
-			"{ ",
-			" }"
-		), array(
-			"{\n",
-			"\n}"
-		), $vhost_usr); // Break blocks into lines
-		$vhost_usr = explode("\n", preg_replace('/[ \t]+/', ' ', trim(preg_replace('/\t+/', '', $vhost_usr)))); // Break into array items
-		// Remove empty lines
-		$vhost_usr = array_filter($vhost_usr, function ($a) {
-			return preg_match("#\S#", $a);
-		});
+		$vhost_usr = $this->cleanVhostStruct($vhost_usr);
 
 		// Cycle through the user defined settings
 		$currentBlock = array();
@@ -743,7 +755,7 @@ class Nginx extends HttpConfigBase
 		while ($row = $result_stmt->fetch(\PDO::FETCH_ASSOC)) {
 			if (! empty($row['error404path'])) {
 				$defhandler = $row['error404path'];
-				if (! \Froxlor\Validate\Form\Data::validateUrl($defhandler)) {
+				if (! \Froxlor\Validate\Validate::validateUrl($defhandler)) {
 					$defhandler = \Froxlor\FileDir::makeCorrectFile($defhandler);
 				}
 				$path_options .= "\t" . 'error_page   404    ' . $defhandler . ';' . "\n";
@@ -751,7 +763,7 @@ class Nginx extends HttpConfigBase
 
 			if (! empty($row['error403path'])) {
 				$defhandler = $row['error403path'];
-				if (! \Froxlor\Validate\Form\Data::validateUrl($defhandler)) {
+				if (! \Froxlor\Validate\Validate::validateUrl($defhandler)) {
 					$defhandler = \Froxlor\FileDir::makeCorrectFile($defhandler);
 				}
 				$path_options .= "\t" . 'error_page   403    ' . $defhandler . ';' . "\n";
@@ -759,7 +771,7 @@ class Nginx extends HttpConfigBase
 
 			if (! empty($row['error500path'])) {
 				$defhandler = $row['error500path'];
-				if (! \Froxlor\Validate\Form\Data::validateUrl($defhandler)) {
+				if (! \Froxlor\Validate\Validate::validateUrl($defhandler)) {
 					$defhandler = \Froxlor\FileDir::makeCorrectFile($defhandler);
 				}
 				$path_options .= "\t" . 'error_page   500 502 503 504    ' . $defhandler . ';' . "\n";
