@@ -186,39 +186,6 @@ if (\Froxlor\Froxlor::isDatabaseVersion('201812180')) {
 
 if (\Froxlor\Froxlor::isDatabaseVersion('201812190')) {
 
-	Updates::showUpdateStep("Updating theme for all users");
-	\Froxlor\Settings::Set('panel.default_theme', 'Sparkle2', true);
-	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_ADMINS . "` SET `theme` = :theme");
-	Database::pexecute($upd_stmt, array(
-		'theme' => 'Sparkle2'
-	));
-	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_CUSTOMERS . "` SET `theme` = :theme");
-	Database::pexecute($upd_stmt, array(
-		'theme' => 'Sparkle2'
-	));
-	// just to be sure
-	\Froxlor\CurrentUser::setField('theme', 'Sparkle2');
-	Updates::lastStepStatus(0);
-
-	Updates::showUpdateStep("Removing DKIM-ADSP support");
-	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsp';");
-	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsppolicy';");
-	Updates::lastStepStatus(0);
-
-	\Froxlor\Froxlor::updateToDbVersion('201812300');
-}
-
-if (\Froxlor\Froxlor::isDatabaseVersion('201812300')) {
-
-	Updates::showUpdateStep("Removing unneeded settings");
-	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'system' AND `varname`= 'froxlordirectlyviahostname';");
-	Updates::lastStepStatus(0);
-
-	\Froxlor\Froxlor::updateToDbVersion('201901110');
-}
-
-if (\Froxlor\Froxlor::isDatabaseVersion('201901110')) {
-
 	Updates::showUpdateStep("Adding new webserver error-log-level setting");
 	Settings::AddNew('system.errorlog_level', (\Froxlor\Settings::Get('system.webserver') == 'nginx' ? 'error' : 'warn'));
 	Updates::lastStepStatus(0);
@@ -287,4 +254,33 @@ if (\Froxlor\Froxlor::isDatabaseVersion('201904100')) {
 
 if (\Froxlor\Froxlor::isFroxlorVersion('0.10.0-rc1')) {
 	\Froxlor\Froxlor::updateToVersion('0.10.0-rc2');
+}
+
+/**
+ * fc branch testing
+ */
+if (false) {
+
+	Updates::showUpdateStep("Updating theme for all users");
+	\Froxlor\Settings::Set('panel.default_theme', 'Sparkle2', true);
+	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_ADMINS . "` SET `theme` = :theme");
+	Database::pexecute($upd_stmt, array(
+		'theme' => 'Sparkle2'
+	));
+	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_CUSTOMERS . "` SET `theme` = :theme");
+	Database::pexecute($upd_stmt, array(
+		'theme' => 'Sparkle2'
+	));
+	// just to be sure
+	\Froxlor\CurrentUser::setField('theme', 'Sparkle2');
+	Updates::lastStepStatus(0);
+
+	Updates::showUpdateStep("Removing DKIM-ADSP support");
+	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsp';");
+	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsppolicy';");
+	Updates::lastStepStatus(0);
+
+	Updates::showUpdateStep("Removing unneeded settings");
+	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'system' AND `varname`= 'froxlordirectlyviahostname';");
+	Updates::lastStepStatus(0);
 }

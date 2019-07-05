@@ -23,7 +23,7 @@ return array(
 				 * Webserver-Vhost
 				 */
 				'system_froxloraliases' => array(
-					'label' => $lng['serversettings']['froxloraliases'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.froxloraliases'),
 					'settinggroup' => 'system',
 					'varname' => 'froxloraliases',
 					'type' => 'string',
