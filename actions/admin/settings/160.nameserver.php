@@ -108,7 +108,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_dns_createcaaentry' => array(
-					'label' => $lng['serversettings']['caa_entry'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.caa_entry'),
 					'settinggroup' => 'system',
 					'varname' => 'dns_createcaaentry',
 					'type' => 'bool',
@@ -116,7 +116,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'caa_caa_entry' => array(
-					'label' => $lng['serversettings']['caa_entry_custom'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.caa_entry_custom'),
 					'settinggroup' => 'caa',
 					'varname' => 'caa_entry',
 					'type' => 'text',

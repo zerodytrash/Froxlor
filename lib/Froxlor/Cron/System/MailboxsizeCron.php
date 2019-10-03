@@ -42,7 +42,7 @@ class MailboxsizeCron extends \Froxlor\Cron\FroxlorCron
 				
 				// When quota is enabled and maildirsize file exists, use that to calculate size
 				if (\Froxlor\Settings::Get('system.mail_quota_enabled') == 1 && file_exists($maildirsize)) {
-					\Froxlor\FroxlorLogger::getInstanceOf()->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_NOTICE, 'found maildirsize file in ' . $_maildir);
+					self::$cronlog->addNotice('found maildirsize file in ' . $_maildir);
 					$file = file($maildirsize, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 					// Remove header
 					array_shift($file);

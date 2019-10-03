@@ -141,6 +141,9 @@ class UI
 		// fallback
 		$theme = self::$default_theme;
 		// system default
+		if (\Froxlor\Froxlor::DBVERSION <= 201909150) {
+			\Froxlor\Settings::Set('panel.default_theme', 'Sparkle2');
+		}
 		$theme = (\Froxlor\Settings::Get('panel.default_theme') !== null) ? \Froxlor\Settings::Get('panel.default_theme') : $theme;
 		// customer theme
 		if (\Froxlor\CurrentUser::hasSession() && \Froxlor\CurrentUser::getField('theme') != $theme) {
