@@ -1,5 +1,6 @@
 install/update.log
 lib/userdata.inc.php
+lib/userdata.inc.php.bak
 logs/*
 !logs/index.html
 .buildpath

@@ -48,7 +48,7 @@ return array(
 					'default' => 'Froxlor',
 					'option_mode' => 'one',
 					'option_options_method' => array(
-						'\\Froxlor\\UI\\Template',
+						'\\Froxlor\\Frontend\\UI',
 						'getThemes'
 					),
 					'save_method' => 'storeSettingDefaultTheme'

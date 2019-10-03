@@ -145,6 +145,7 @@ class TasksCron extends \Froxlor\Cron\FroxlorCron
 		$webserver = new $websrv(self::$cronlog);
 
 		if (isset($webserver)) {
+			$webserver->init();
 			$webserver->createIpPort();
 			$webserver->createVirtualHosts();
 			$webserver->createFileDirOptions();

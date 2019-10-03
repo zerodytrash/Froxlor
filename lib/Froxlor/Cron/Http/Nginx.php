@@ -3,7 +3,6 @@ namespace Froxlor\Cron\Http;
 
 use Froxlor\Database\Database;
 use Froxlor\Settings;
-use Froxlor\Cron\Http\Php\Fpm;
 use Froxlor\Cron\Http\Php\PhpInterface;
 
 /**
@@ -51,39 +50,6 @@ class Nginx extends HttpConfigBase
 	public function __construct($logger)
 	{
 		parent::__construct($logger);
-	}
-
-	public function reload()
-	{
-		if ((int) Settings::Get('phpfpm.enabled') == 1) {
-			// get all start/stop commands
-			$startstop_sel = Database::prepare("SELECT reload_cmd, config_dir FROM `" . TABLE_PANEL_FPMDAEMONS . "`");
-			Database::pexecute($startstop_sel);
-			$restart_cmds = $startstop_sel->fetchAll(\PDO::FETCH_ASSOC);
-			// restart all php-fpm instances
-			foreach ($restart_cmds as $restart_cmd) {
-				// check whether the config dir is empty (no domains uses this daemon)
-				// so we need to create a dummy
-				$_conffiles = glob(\Froxlor\FileDir::makeCorrectFile($restart_cmd['config_dir'] . "/*.conf"));
-				if ($_conffiles === false || empty($_conffiles)) {
-					$this->logger->addInfo('nginx::reload: fpm config directory "' . $restart_cmd['config_dir'] . '" is empty. Creating dummy.');
-					Fpm::createDummyPool($restart_cmd['config_dir']);
-				}
-				$this->logger->addInfo('nginx::reload: running ' . $restart_cmd['reload_cmd']);
-				\Froxlor\FileDir::safe_exec(escapeshellcmd($restart_cmd['reload_cmd']));
-			}
-		}
-
-		$this->logger->addInfo('nginx::reload: reloading nginx');
-		\Froxlor\FileDir::safe_exec(Settings::Get('system.apachereload_command'));
-
-		/**
-		 * nginx does not auto-spawn fcgi-processes
-		 */
-		if (Settings::Get('system.phpreload_command') != '' && (int) Settings::Get('phpfpm.enabled') == 0) {
-			$this->logger->addInfo('nginx::reload: restarting php processes');
-			\Froxlor\FileDir::safe_exec(Settings::Get('system.phpreload_command'));
-		}
 	}
 
 	private function createLogformatEntry()
@@ -276,7 +242,7 @@ class Nginx extends HttpConfigBase
 						$is_redirect = false;
 					} else {
 						$_sslport = $this->checkAlternativeSslPort();
-						$mypath = 'https://' . Settings::Get('system.hostname') . $_sslport . '/';
+						$mypath = 'https://' . Settings::Get('system.hostname') . $_sslport;
 						$this->nginx_data[$vhost_filename] .= "\t" . 'location / {' . "\n";
 						$this->nginx_data[$vhost_filename] .= "\t\t" . 'return 301 ' . $mypath . '$request_uri;' . "\n";
 						$this->nginx_data[$vhost_filename] .= "\t" . '}' . "\n";
@@ -311,7 +277,7 @@ class Nginx extends HttpConfigBase
 					$this->nginx_data[$vhost_filename] .= "\tlocation ~ \.php {\n";
 					$this->nginx_data[$vhost_filename] .= "\t\tfastcgi_split_path_info ^(.+\.php)(/.+)\$;\n";
 					$this->nginx_data[$vhost_filename] .= "\t\tinclude " . Settings::Get('nginx.fastcgiparams') . ";\n";
-					$this->nginx_data[$vhost_filename] .= "\t\tfastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;\n";
+					$this->nginx_data[$vhost_filename] .= "\t\tfastcgi_param SCRIPT_FILENAME \$request_filename;\n";
 					$this->nginx_data[$vhost_filename] .= "\t\tfastcgi_param PATH_INFO \$fastcgi_path_info;\n";
 					$this->nginx_data[$vhost_filename] .= "\t\ttry_files \$fastcgi_script_name =404;\n";
 
@@ -703,8 +669,13 @@ class Nginx extends HttpConfigBase
 					}
 					$sslsettings .= 'ssl_dhparam ' . $dhparams . ';' . "\n";
 				}
-				$sslsettings .= "\t" . 'ssl_ecdh_curve secp384r1;' . "\n";
+				// When <1.11.0: Defaults to prime256v1, similar to first curve recommendation by Mozilla.
+				// (When specifyng just one, there's no fallback when specific curve is not supported by client.)
+				// When >1.11.0: Defaults to auto, using recommended curves provided by OpenSSL.
+				// see https://github.com/Froxlor/Froxlor/issues/652
+				//$sslsettings .= "\t" . 'ssl_ecdh_curve secp384r1;' . "\n";
 				$sslsettings .= "\t" . 'ssl_prefer_server_ciphers on;' . "\n";
+				$sslsettings .= "\t" . 'ssl_session_cache shared:SSL:10m;' . "\n";
 				$sslsettings .= "\t" . 'ssl_certificate ' . \Froxlor\FileDir::makeCorrectFile($domain_or_ip['ssl_cert_file']) . ';' . "\n";
 
 				if ($domain_or_ip['ssl_key_file'] != '') {
@@ -921,6 +892,7 @@ class Nginx extends HttpConfigBase
 					$path = \Froxlor\FileDir::makeCorrectDir(substr($row_htpasswds['path'], strlen($domain['documentroot']) - 1));
 				} else {
 					// if the website contents is located in a subdirectory of the user
+					$matches = array();
 					preg_match('/^([\/[:print:]]*\/)([[:print:]\/]+){1}$/i', $row_htpasswds['path'], $matches);
 					$path = \Froxlor\FileDir::makeCorrectDir(substr($row_htpasswds['path'], strlen($matches[1]) - 1));
 				}
@@ -961,7 +933,7 @@ class Nginx extends HttpConfigBase
 			$phpopts .= "\tlocation @php {\n";
 			$phpopts .= "\t\tfastcgi_split_path_info ^(.+\.php)(/.+)\$;\n";
 			$phpopts .= "\t\tinclude " . Settings::Get('nginx.fastcgiparams') . ";\n";
-			$phpopts .= "\t\tfastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;\n";
+			$phpopts .= "\t\tfastcgi_param SCRIPT_FILENAME \$request_filename;\n";
 			$phpopts .= "\t\tfastcgi_param PATH_INFO \$fastcgi_path_info;\n";
 			$phpopts .= "\t\ttry_files \$fastcgi_script_name =404;\n";
 			$phpopts .= "\t\tfastcgi_pass " . Settings::Get('system.nginx_php_backend') . ";\n";

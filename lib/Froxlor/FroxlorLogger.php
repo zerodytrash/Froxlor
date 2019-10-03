@@ -40,6 +40,13 @@ class FroxlorLogger
 	 */
 	private static $userinfo = array();
 
+	/**
+	 * whether the logger object has already been initialized
+	 *
+	 * @var bool
+	 */
+	private static $is_initialized = false;
+
 	const USR_ACTION = '10';
 
 	const RES_ACTION = '20';

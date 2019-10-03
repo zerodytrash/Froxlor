@@ -135,8 +135,8 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 	 *        	optional, default is the calling admin's ID
 	 * @param array $ipandport
 	 *        	optional list of ip/ports to assign to domain, default is system-default-ips
-	 * @param bool $subcanemaildomain
-	 *        	optional, allow subdomains of this domain as email domains, default 0 (false)
+	 * @param int $subcanemaildomain
+	 *        	optional, allow subdomains of this domain as email domains, 1 = choosable (default no), 2 = choosable (default yes), 3 = always, default 0 (never)
 	 * @param bool $isemaildomain
 	 *        	optional, allow email usage with this domain, default 0 (false)
 	 * @param bool $email_only
@@ -689,8 +689,8 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 	 *        	optional, default is the calling admin's ID
 	 * @param array $ipandport
 	 *        	optional list of ip/ports to assign to domain, default is system-default-ips
-	 * @param bool $subcanemaildomain
-	 *        	optional, allow subdomains of this domain as email domains, default 0 (false)
+	 * @param int $subcanemaildomain
+	 *        	optional, allow subdomains of this domain as email domains, 1 = choosable (default no), 2 = choosable (default yes), 3 = always, default 0 (never)
 	 * @param bool $isemaildomain
 	 *        	optional, allow email usage with this domain, default 0 (false)
 	 * @param bool $email_only
@@ -783,7 +783,7 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 			$customerid = intval($this->getParam('customerid', true, $result['customerid']));
 			$adminid = intval($this->getParam('adminid', true, $result['adminid']));
 
-			$subcanemaildomain = $this->getBoolParam('subcanemaildomain', true, $result['subcanemaildomain']);
+			$subcanemaildomain = $this->getParam('subcanemaildomain', true, $result['subcanemaildomain']);
 			$isemaildomain = $this->getBoolParam('isemaildomain', true, $result['isemaildomain']);
 			$email_only = $this->getBoolParam('email_only', true, $result['email_only']);
 			$p_serveraliasoption = $this->getParam('selectserveralias', true, - 1);
@@ -1466,14 +1466,15 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 					}
 				}
 			}
-			if ($result['aliasdomain'] != $aliasdomain) {
+			if ($result['aliasdomain'] != $aliasdomain && is_numeric($result['aliasdomain'])) {
 				// trigger when domain id for alias destination has changed: both for old and new destination
 				\Froxlor\Domain\Domain::triggerLetsEncryptCSRForAliasDestinationDomain($result['aliasdomain'], $this->logger());
 				\Froxlor\Domain\Domain::triggerLetsEncryptCSRForAliasDestinationDomain($aliasdomain, $this->logger());
-			} elseif ($result['wwwserveralias'] != $wwwserveralias || $result['letsencrypt'] != $letsencrypt) {
+			}
+			if ($result['wwwserveralias'] != $wwwserveralias || $result['letsencrypt'] != $letsencrypt) {
 				// or when wwwserveralias or letsencrypt was changed
 				\Froxlor\Domain\Domain::triggerLetsEncryptCSRForAliasDestinationDomain($aliasdomain, $this->logger());
-				if ($aliasdomain === 0) {
+				if ((int) $aliasdomain === 0) {
 					// in case the wwwserveralias is set on a main domain, $aliasdomain is 0
 					// --> the call just above to triggerLetsEncryptCSRForAliasDestinationDomain
 					// is a noop...let's repeat it with the domain id of the main domain
@@ -1481,7 +1482,8 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 				}
 			}
 
-			$this->logger()->addWarning("[API] updated domain '" . $result['domain'] . "'");
+			$idna_convert = new \Froxlor\Idna\IdnaWrapper();
+			$this->logger()->addWarning("[API] updated domain '" . $idna_convert->decode($result['domain']) . "'");
 			return $this->response(200, "successfull", $update_data);
 		}
 		throw new \Exception("Not allowed to execute given command.", 403);

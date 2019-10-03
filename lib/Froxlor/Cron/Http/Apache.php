@@ -3,7 +3,6 @@ namespace Froxlor\Cron\Http;
 
 use Froxlor\Database\Database;
 use Froxlor\Settings;
-use Froxlor\Cron\Http\Php\Fpm;
 use Froxlor\Cron\Http\Php\PhpInterface;
 
 /**
@@ -49,30 +48,6 @@ class Apache extends HttpConfigBase
 	public function __construct($logger)
 	{
 		parent::__construct($logger);
-	}
-
-	public function reload()
-	{
-		if ((int) Settings::Get('phpfpm.enabled') == 1) {
-			// get all start/stop commands
-			$startstop_sel = Database::prepare("SELECT reload_cmd, config_dir FROM `" . TABLE_PANEL_FPMDAEMONS . "`");
-			Database::pexecute($startstop_sel);
-			$restart_cmds = $startstop_sel->fetchAll(\PDO::FETCH_ASSOC);
-			// restart all php-fpm instances
-			foreach ($restart_cmds as $restart_cmd) {
-				// check whether the config dir is empty (no domains uses this daemon)
-				// so we need to create a dummy
-				$_conffiles = glob(\Froxlor\FileDir::makeCorrectFile($restart_cmd['config_dir'] . "/*.conf"));
-				if ($_conffiles === false || empty($_conffiles)) {
-					$this->logger->addInfo('apache::reload: fpm config directory "' . $restart_cmd['config_dir'] . '" is empty. Creating dummy.');
-					Fpm::createDummyPool($restart_cmd['config_dir']);
-				}
-				$this->logger->addInfo('apache::reload: running ' . $restart_cmd['reload_cmd']);
-				\Froxlor\FileDir::safe_exec(escapeshellcmd($restart_cmd['reload_cmd']));
-			}
-		}
-		$this->logger->addInfo('apache::reload: reloading apache');
-		\Froxlor\FileDir::safe_exec(escapeshellcmd(Settings::Get('system.apachereload_command')));
 	}
 
 	/**

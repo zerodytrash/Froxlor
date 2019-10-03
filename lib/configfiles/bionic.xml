@@ -1504,7 +1504,7 @@ user = <SQL_UNPRIVILEGED_USER>
 password = <SQL_UNPRIVILEGED_PASSWORD>
 dbname = <SQL_DB>
 hosts = <SQL_HOST>
-query = SELECT destination FROM mail_virtual WHERE email = '%s' AND trim(destination) <> ''
+query = SELECT destination FROM mail_virtual AS v, panel_customers AS c WHERE c.customerid = v.customerid AND c.deactivated = 0 AND v.email = '%s' AND trim(v.destination) <> '' 
 ]]>
 							</content>
 						</file>
@@ -3746,7 +3746,7 @@ protocol sieve {
 #  %m - number of messages (before deletion)
 #  %s - mailbox size in bytes (before deletion)
 #  %u - old/new UIDL hash. may help finding out if UIDLs changed unexpectedly
-#pop3_logout_format = top=%t/%p, retr=%r/%b, del=%d/%m, size=%s
+pop3_logout_format = in=%i out=%o top=%t/%p, retr=%r/%b, del=%d/%m, size=%s
 
 # Workarounds for various client bugs:
 #   outlook-no-nuls:

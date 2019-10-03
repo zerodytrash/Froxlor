@@ -502,7 +502,7 @@ $lng['panel']['pathDescriptionSubdomain'] = $lng['panel']['pathDescription'] . $
 
 // ADDED IN 1.2.16-svn6
 
-$lng['admin']['templates']['TRAFFIC'] = 'Replaced with the traffic in mB, which was assigned to the customer.';
+$lng['admin']['templates']['TRAFFIC'] = 'Replaced with the traffic in MB, which was assigned to the customer.';
 $lng['admin']['templates']['TRAFFICUSED'] = 'Replaced with the traffic in MB, which was exhausted by the customer.';
 
 // ADDED IN 1.2.16-svn7
@@ -1623,7 +1623,7 @@ $lng['domains']['serveraliasoption_www'] = 'WWW (www.domain.tld)';
 $lng['domains']['serveraliasoption_none'] = 'No alias';
 $lng['error']['givendirnotallowed'] = 'The given directory in field %s is not allowed.';
 $lng['serversettings']['ssl']['ssl_cipher_list']['title'] = 'Configure the allowed SSL ciphers';
-$lng['serversettings']['ssl']['ssl_cipher_list']['description'] = 'This is a list of ciphers that you want (or don\'t want) to use when talking SSL. For a list of ciphers and how to include/exclude them, see sections "CIPHER LIST FORMAT" and "CIPHER STRINGS" on <a href="http://openssl.org/docs/apps/ciphers.html">the man-page for ciphers</a>.<br /><br /><b>Default value is:</b><pre>ECDH+AESGCM:ECDH+AES256:!aNULL:!MD5:!DSS:!DH:!AES128</pre>';
+$lng['serversettings']['ssl']['ssl_cipher_list']['description'] = 'This is a list of ciphers that you want (or don\'t want) to use when talking SSL. For a list of ciphers and how to include/exclude them, see sections "CIPHER LIST FORMAT" and "CIPHER STRINGS" on <a href="https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html">the man-page for ciphers</a>.<br /><br /><b>Default value is:</b><pre>ECDH+AESGCM:ECDH+AES256:!aNULL:!MD5:!DSS:!DH:!AES128</pre>';
 
 // Added in Froxlor 0.9.31
 $lng['panel']['dashboard'] = 'Dashboard';
@@ -1845,6 +1845,12 @@ $lng['serversettings']['leenabled']['title'] = "Enable Let's Encrypt";
 $lng['serversettings']['leenabled']['description'] = "If activated, customers are able to let froxlor automatically generate and renew Let's Encrypt ssl-certificates for domains with a ssl IP/port.<br /><br />Please remember that you need to go through the webserver-configuration when enabled because this feature needs a special configuration.";
 $lng['domains']['ssl_redirect_temporarilydisabled'] = "<br>The SSL redirect is temporarily deactivated while a new Let's Encrypt certificate is generated. It will be activated again after the certificate was generated.";
 
+// Added for CAA record support
+$lng['serversettings']['caa_entry']['title'] = 'Generate CAA DNS records';
+$lng['serversettings']['caa_entry']['description'] = 'Automatically generates CAA records for SSL-enabled domains that are using Let\'s Encrypt';
+$lng['serversettings']['caa_entry_custom']['title'] = 'Additional CAA DNS records';
+$lng['serversettings']['caa_entry_custom']['description']  = 'DNS Certification Authority Authorization (CAA) is an Internet security policy mechanism which allows domain name holders to indicate to certificate authorities<br>whether they are authorized to issue digital certificates for a particular domain name. It does this by means of a new "CAA" Domain Name System (DNS) resource record.<br><br>The content of this field will be included into the DNS zone directly (each line results in a CAA record).<br>If Let\'s Encrypt is enabled for this domain, this entry will always be added automatically and does not need to be added manually:<br><code>0 issue "letsencrypt.org"</code> (If domain is a wildcard domain, issuewild will be used instead).<br>To enable Incident Reporting, you can add an <code>iodef</code> record. An example for sending such report to <code>me@example.com</code> would be:<br><code>0 iodef "mailto:me@example.com"</code><br><br><strong>Attention:</strong> The code won\'t be checked for any errors. If it contains errors, your CAA records might not work!';
+
 // Autoupdate
 $lng['admin']['autoupdate'] = 'Auto-Update';
 $lng['error']['customized_version'] = 'It looks like your Froxlor installation has been modified, no support sorry.';
@@ -1883,6 +1889,7 @@ $lng['tasks']['backup_customerfiles'] = 'Backup job for customer %loginname%';
 
 $lng['error']['dns_domain_nodns'] = 'DNS is not enabled for this domain';
 $lng['error']['dns_content_empty'] = 'No content given';
+$lng['error']['dns_content_invalid'] = 'DNS content invalid';
 $lng['error']['dns_arec_noipv4'] = 'No valid IP address for A-record given';
 $lng['error']['dns_aaaarec_noipv6'] = 'No valid IP address for AAAA-record given';
 $lng['error']['dns_mx_prioempty'] = 'Invalid MX priority given';

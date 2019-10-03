@@ -70,6 +70,7 @@ class MasterCron extends \Froxlor\Cron\FroxlorCron
 					// also regenerate cron.d-file
 					\Froxlor\System\Cronjob::inserttask('99');
 					array_push($jobs_to_run, 'tasks');
+					define('CRON_IS_FORCED', 1);
 				} elseif (strtolower($argv[$x]) == '--debug') {
 					define('CRON_DEBUG_FLAG', 1);
 				} elseif (strtolower($argv[$x]) == '--no-fork') {
@@ -100,30 +101,14 @@ class MasterCron extends \Froxlor\Cron\FroxlorCron
 		if (count($jobs_to_run) > 0) {
 			// include all jobs we want to execute
 			foreach ($jobs_to_run as $cron) {
-				self::updateLastRunOfCron($cron);
+				\Froxlor\System\Cronjob::updateLastRunOfCron($cron);
 				$cronfile = self::getCronModule($cron);
 				if ($cronfile && class_exists($cronfile)) {
 					$cronfile::$cronlog = self::$cronlog;
 					$cronfile::run();
 				}
 			}
-
-			if ($tasks_cnt['jobcnt'] > 0) {
-				if (\Froxlor\Settings::Get('system.nssextrausers') == 1) {
-					\Froxlor\Cron\System\Extrausers::generateFiles(self::$cronlog);
-				}
-
-				// clear NSCD cache if using fcgid or fpm, #1570 - not needed for nss-extrausers
-				if ((\Froxlor\Settings::Get('system.mod_fcgid') == 1 || (int) \Froxlor\Settings::Get('phpfpm.enabled') == 1) && \Froxlor\Settings::Get('system.nssextrausers') == 0) {
-					$false_val = false;
-					\Froxlor\FileDir::safe_exec('nscd -i passwd 1> /dev/null', $false_val, array(
-						'>'
-					));
-					\Froxlor\FileDir::safe_exec('nscd -i group 1> /dev/null', $false_val, array(
-						'>'
-					));
-				}
-			}
+			self::refreshUsers($tasks_cnt['jobcnt']);
 		}
 
 		/**
@@ -136,6 +121,26 @@ class MasterCron extends \Froxlor\Cron\FroxlorCron
 
 		// shutdown cron
 		self::shutdown();
+	}
+
+	private static function refreshUsers($jobcount = 0)
+	{
+		if ($jobcount > 0) {
+			if (\Froxlor\Settings::Get('system.nssextrausers') == 1) {
+				\Froxlor\Cron\System\Extrausers::generateFiles(self::$cronlog);
+			}
+
+			// clear NSCD cache if using fcgid or fpm, #1570 - not needed for nss-extrausers
+			if ((\Froxlor\Settings::Get('system.mod_fcgid') == 1 || (int) \Froxlor\Settings::Get('phpfpm.enabled') == 1) && \Froxlor\Settings::Get('system.nssextrausers') == 0) {
+				$false_val = false;
+				\Froxlor\FileDir::safe_exec('nscd -i passwd 1> /dev/null', $false_val, array(
+					'>'
+				));
+				\Froxlor\FileDir::safe_exec('nscd -i group 1> /dev/null', $false_val, array(
+					'>'
+				));
+			}
+		}
 	}
 
 	private static function init()
@@ -339,16 +344,6 @@ class MasterCron extends \Froxlor\Cron\FroxlorCron
 		if (\Froxlor\Settings::Get('system.debug_cron') != '1') {
 			unlink(self::getLockfile());
 		}
-	}
-
-	private static function updateLastRunOfCron($cronname)
-	{
-		$upd_stmt = Database::prepare("
-			UPDATE `" . TABLE_PANEL_CRONRUNS . "` SET `lastrun` = UNIX_TIMESTAMP() WHERE `cronfile` = :cron;
-		");
-		Database::pexecute($upd_stmt, array(
-			'cron' => $cronname
-		));
 	}
 
 	private static function getCronModule($cronname)
