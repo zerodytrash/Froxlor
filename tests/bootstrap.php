@@ -148,7 +148,7 @@ $sel_stmt = Database::prepare("SELECT * FROM `" . TABLE_PANEL_ADMINS . "` WHERE 
 $admin_userdata = Database::pexecute_first($sel_stmt);
 $admin_userdata['adminsession'] = 1;
 
-$log = \Froxlor\FroxlorLogger::getInstanceOf($admin_userdata);
+$log = \Froxlor\FroxlorLogger::getLog($admin_userdata);
 
 Settings::Set('panel.standardlanguage', 'English', true);
 Settings::Set('panel.adminmail', 'admin@dev.froxlor.org', true);
