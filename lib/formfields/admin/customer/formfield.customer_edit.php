@@ -77,12 +77,12 @@ return array(
 						'select_var' => $language_options
 					),
 					'api_allowed' => array(
-						'label' => $lng['usersettings']['api_allowed']['title'],
-						'desc' => $lng['usersettings']['api_allowed']['description'],
+						'label' => \Froxlor\Frontend\UI::getLng('usersettings.api_allowed.title'),
+						'desc' => \Froxlor\Frontend\UI::getLng('usersettings.api_allowed.description'),
 						'type' => 'checkbox',
 						'values' => array(
 							array(
-								'label' => $lng['panel']['yes'],
+								'label' => \Froxlor\Frontend\UI::getLng('panel.yes'),
 								'value' => '1'
 							)
 						),

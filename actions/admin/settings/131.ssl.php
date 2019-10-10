@@ -55,7 +55,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_tlsv13_cipher_list' => array(
-					'label' => $lng['serversettings']['ssl']['tlsv13_cipher_list'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.ssl.tlsv13_cipher_list'),
 					'settinggroup' => 'system',
 					'varname' => 'tlsv13_cipher_list',
 					'type' => 'string',
