@@ -39,7 +39,11 @@ class Froxlor extends \Froxlor\Api\ApiCommand
 				$this->logger()->addNotice("[API] checking for updates");
 
 				// check for new version
-				$latestversion = \Froxlor\Http\HttpClient::urlGet(UPDATE_URI);
+				try {
+					$latestversion = \Froxlor\Http\HttpClient::urlGet(UPDATE_URI, true, 3);
+				} catch (\Exception $e) {
+					$latestversion = \Froxlor\Froxlor::getVersion()."|Version-check currently unavailable, please try again later";
+				}
 				$latestversion = explode('|', $latestversion);
 
 				if (is_array($latestversion) && count($latestversion) >= 1) {

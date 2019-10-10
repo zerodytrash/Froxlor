@@ -60,6 +60,21 @@ return array(
 						'type' => 'select',
 						'select_var' => $language_options,
 						'visible' => ($result['adminid'] == \Froxlor\CurrentUser::getField('userid') ? false : true)
+					),
+					'api_allowed' => array(
+						'label' => \Froxlor\Frontend\UI::getLng('usersettings.api_allowed.title'),
+						'desc' => \Froxlor\Frontend\UI::getLng('usersettings.api_allowed.description'),
+						'type' => 'checkbox',
+						'values' => array(
+							array(
+								'label' => \Froxlor\Frontend\UI::getLng('panel.yes'),
+								'value' => '1'
+							)
+						),
+						'value' => array(
+							$result['api_allowed']
+						),
+						'visible' => (\Froxlor\Settings::Get('api.enabled') == '1' ? true : false)
 					)
 				)
 			),

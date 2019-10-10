@@ -378,7 +378,9 @@ class AcmeSh extends \Froxlor\Cron\FroxlorCron
 
 	private static function checkUpgrade()
 	{
-		$acmesh_result = \Froxlor\FileDir::safe_exec(self::$acmesh . " --upgrade");
 		self::$cronlog->addInfo("Checking for LetsEncrypt client upgrades before renewing certificates:\n" . implode("\n", $acmesh_result));
+		\Froxlor\FileDir::safe_exec(self::$acmesh . " --upgrade");
+		// check for activated cron (which is installed automatically) but we don't need it
+		\Froxlor\FileDir::safe_exec(self::$acmesh . " --uninstall-cronjob");
 	}
 }

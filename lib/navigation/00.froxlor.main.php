@@ -54,7 +54,7 @@ return array(
 					'icon' => 'key'
 				),
 				array(
-					'url' => 'index.php?module=ApiKeys&view=apihelp',
+					'url' => 'https://api.froxlor.org/doc/?v='.\Froxlor\Froxlor::getVersion(),
 					'label' => \Froxlor\Frontend\UI::getLng('menue.main.apihelp'),
 					'show_element' => (\Froxlor\Settings::Get('api.enabled') == true),
 					'icon' => 'question-circle'

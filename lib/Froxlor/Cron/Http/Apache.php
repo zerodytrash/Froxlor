@@ -482,6 +482,10 @@ class Apache extends HttpConfigBase
 							// this makes it more secure, thx to Marcel (08/2013)
 							$this->virtualhosts_data[$vhosts_filename] .= ' SSLHonorCipherOrder On' . "\n";
 							$this->virtualhosts_data[$vhosts_filename] .= ' SSLCipherSuite ' . Settings::Get('system.ssl_cipher_list') . "\n";
+							$protocols = array_map('trim', explode(",", Settings::Get('system.ssl_protocols')));
+							if (in_array("TLSv1.3", $protocols) && !empty(Settings::Get('system.tlsv13_cipher_list')) && Settings::Get('system.apache24') == 1) {
+								$this->virtualhosts_data[$vhosts_filename] .= ' SSLCipherSuite TLSv1.3 ' . Settings::Get('system.tlsv13_cipher_list') . "\n";
+							}
 							$this->virtualhosts_data[$vhosts_filename] .= ' SSLVerifyDepth 10' . "\n";
 							$this->virtualhosts_data[$vhosts_filename] .= ' SSLCertificateFile ' . \Froxlor\FileDir::makeCorrectFile($domain['ssl_cert_file']) . "\n";
 
@@ -929,7 +933,7 @@ class Apache extends HttpConfigBase
 				'domainid' => $domain['id']
 			));
 
-			if ($ssldestport['port'] != '') {
+			if ($ssldestport && $ssldestport['port'] != '') {
 				$_sslport = ":" . $ssldestport['port'];
 			}
 
@@ -964,7 +968,7 @@ class Apache extends HttpConfigBase
 				$vhost_content .= '  SSLProtocol -ALL +' . str_replace(",", " +", Settings::Get('system.ssl_protocols')) . "\n";
 				if (Settings::Get('system.apache24') == '1') {
 					if (isset($domain['http2']) && $domain['http2'] == '1' && Settings::Get('system.http2_support') == '1') {
-						$vhost_content .= ' Protocols h2 http/1.1' . "\n";
+						$vhost_content .= '  Protocols h2 http/1.1' . "\n";
 					}
 					if (! empty(Settings::Get('system.dhparams_file'))) {
 						$dhparams = \Froxlor\FileDir::makeCorrectFile(Settings::Get('system.dhparams_file'));
@@ -978,6 +982,10 @@ class Apache extends HttpConfigBase
 				// this makes it more secure, thx to Marcel (08/2013)
 				$vhost_content .= '  SSLHonorCipherOrder On' . "\n";
 				$vhost_content .= '  SSLCipherSuite ' . Settings::Get('system.ssl_cipher_list') . "\n";
+				$protocols = array_map('trim', explode(",", Settings::Get('system.ssl_protocols')));
+				if (in_array("TLSv1.3", $protocols) && !empty(Settings::Get('system.tlsv13_cipher_list')) && Settings::Get('system.apache24') == 1) {
+					$vhost_content .= '  SSLCipherSuite TLSv1.3 ' . Settings::Get('system.tlsv13_cipher_list') . "\n";
+				}
 				$vhost_content .= '  SSLVerifyDepth 10' . "\n";
 				$vhost_content .= '  SSLCertificateFile ' . \Froxlor\FileDir::makeCorrectFile($domain['ssl_cert_file']) . "\n";
 
