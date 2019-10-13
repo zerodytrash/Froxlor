@@ -41,6 +41,11 @@ class AdminAutoupdate extends FeModule
 			\Froxlor\UI\Response::standard_error('autoupdate_2');
 		}
 
+		// 0.10.x requires 7.0 at least
+		if (version_compare("7.0.0", PHP_VERSION, ">=")) {
+			\Froxlor\UI\Response::standard_error('autoupdate_10');
+		}
+
 		\Froxlor\FroxlorLogger::getLog()->addNotice("checking auto-update");
 
 		// check for new version
