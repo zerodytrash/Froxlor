@@ -136,6 +136,9 @@ class CustomerIndex extends FeModule
 		if (\Froxlor\CurrentUser::getField('perlenabled') == '1') {
 			$se[] = "Perl/CGI";
 		}
+	        if (\Froxlor\CurrentUser::getField('api_allowed') == '1')
+	                $se[] = '<a href="index.php?module=ApiKeys">API</a>';
+		}
 		$services_enabled = implode(", ", $se);
 
 		\Froxlor\Frontend\UI::TwigBuffer('customer/index/index.html.twig', array(

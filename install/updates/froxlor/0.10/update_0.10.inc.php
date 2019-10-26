@@ -359,7 +359,7 @@ if (\Froxlor\Froxlor::isFroxlorVersion('0.10.0')) {
 if (\Froxlor\Froxlor::isDatabaseVersion('201910090')) {
 
 	showUpdateStep("Adjusting Let's Encrypt API setting");
-	Settings::AddNew("system.leapiversion", '2');
+	Settings::Set("system.leapiversion", '2');
 	lastStepStatus(0);
 
 	\Froxlor\Froxlor::updateToDbVersion('201910110');
@@ -384,7 +384,64 @@ if (\Froxlor\Froxlor::isDatabaseVersion('201910110')) {
 	Database::query("ALTER TABLE `" . TABLE_PANEL_DOMAINS . "` ADD `include_specialsettings` tinyint(1) NOT NULL default '0' AFTER `ssl_specialsettings`;");
 	lastStepStatus(0);
 
+	// select all ips/ports with specialsettings and SSL enabled to include the specialsettings in the ssl-vhost
+	// because the former implementation included it and users might rely on that, see https://github.com/Froxlor/Froxlor/issues/727
+	$sel_stmt = Database::prepare("SELECT * FROM `" . TABLE_PANEL_IPSANDPORTS . "` WHERE `specialsettings` <> '' AND `ssl` = '1'");
+	Database::pexecute($sel_stmt);
+	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_IPSANDPORTS . "` SET `include_specialsettings` = '1' WHERE `id` = :id");
+	if ($sel_stmt->columnCount() > 0) {
+		showUpdateStep("Adjusting IP/port settings for downward compatibility");
+		while ($row = $sel_stmt->fetch(PDO::FETCH_ASSOC)) {
+			Database::pexecute($upd_stmt, [
+				'id' => $row['id']
+			]);
+		}
+		lastStepStatus(0);
+	}
+
+	// select all domains with an ssl IP connected and specialsettings content to include these in the ssl-vhost
+	// to maintain former behavior
+	$sel_stmt = Database::prepare("
+		SELECT d.id FROM `". TABLE_PANEL_DOMAINS . "` d
+		LEFT JOIN `". TABLE_DOMAINTOIP . "` d2i ON d2i.id_domain = d.id
+		LEFT JOIN `". TABLE_PANEL_IPSANDPORTS."` i ON i.id = d2i.id_ipandports
+		WHERE d.specialsettings <> '' AND i.ssl = '1'
+	");
+	Database::pexecute($sel_stmt);
+	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_DOMAINS . "` SET `include_specialsettings` = '1' WHERE `id` = :id");
+	if ($sel_stmt->columnCount() > 0) {
+		showUpdateStep("Adjusting domain settings for downward compatibility");
+		while ($row = $sel_stmt->fetch(PDO::FETCH_ASSOC)) {
+			Database::pexecute($upd_stmt, [
+				'id' => $row['id']
+			]);
+		}
+		lastStepStatus(0);
+	}
+
 	\Froxlor\Froxlor::updateToDbVersion('201910120');
+}
+
+if (\Froxlor\Froxlor::isFroxlorVersion('0.10.1')) {
+	showUpdateStep("Updating from 0.10.1 to 0.10.2", false);
+	\Froxlor\Froxlor::updateToVersion('0.10.2');
+}
+
+if (\Froxlor\Froxlor::isDatabaseVersion('201910120')) {
+
+	showUpdateStep("Adding new TLS options to domains-table");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_DOMAINS . "` ADD `override_tls` tinyint(1) DEFAULT '0' AFTER `writeerrorlog`;");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_DOMAINS . "` ADD `ssl_protocols` text AFTER `override_tls`;");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_DOMAINS . "` ADD `ssl_cipher_list` text AFTER `ssl_protocols`;");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_DOMAINS . "` ADD `tlsv13_cipher_list` text AFTER `ssl_cipher_list`;");
+	lastStepStatus(0);
+
+	\Froxlor\Froxlor::updateToDbVersion('201910200');
+}
+
+if (\Froxlor\Froxlor::isFroxlorVersion('0.10.2')) {
+        showUpdateStep("Updating from 0.10.2 to 0.10.3", false);
+        \Froxlor\Froxlor::updateToVersion('0.10.3');
 }
 
 /**
@@ -392,26 +449,26 @@ if (\Froxlor\Froxlor::isDatabaseVersion('201910110')) {
  */
 if (false) {
 
-	Updates::showUpdateStep("Updating theme for all users");
-	\Froxlor\Settings::Set('panel.default_theme', 'Sparkle2', true);
-	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_ADMINS . "` SET `theme` = :theme");
-	Database::pexecute($upd_stmt, array(
-		'theme' => 'Sparkle2'
-	));
-	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_CUSTOMERS . "` SET `theme` = :theme");
-	Database::pexecute($upd_stmt, array(
-		'theme' => 'Sparkle2'
-	));
-	// just to be sure
-	\Froxlor\CurrentUser::setField('theme', 'Sparkle2');
-	Updates::lastStepStatus(0);
+        Updates::showUpdateStep("Updating theme for all users");
+        \Froxlor\Settings::Set('panel.default_theme', 'Sparkle2', true);
+        $upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_ADMINS . "` SET `theme` = :theme");
+        Database::pexecute($upd_stmt, array(
+                'theme' => 'Sparkle2'
+        ));
+        $upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_CUSTOMERS . "` SET `theme` = :theme");
+        Database::pexecute($upd_stmt, array(
+                'theme' => 'Sparkle2'
+        ));
+        // just to be sure
+        \Froxlor\CurrentUser::setField('theme', 'Sparkle2');
+        Updates::lastStepStatus(0);
 
-	Updates::showUpdateStep("Removing DKIM-ADSP support");
-	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsp';");
-	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsppolicy';");
-	Updates::lastStepStatus(0);
+        Updates::showUpdateStep("Removing DKIM-ADSP support");
+        Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsp';");
+        Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsppolicy';");
+        Updates::lastStepStatus(0);
 
-	Updates::showUpdateStep("Removing unneeded settings");
-	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'system' AND `varname`= 'froxlordirectlyviahostname';");
-	Updates::lastStepStatus(0);
+        Updates::showUpdateStep("Removing unneeded settings");
+        Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'system' AND `varname`= 'froxlordirectlyviahostname';");
+        Updates::lastStepStatus(0);
 }

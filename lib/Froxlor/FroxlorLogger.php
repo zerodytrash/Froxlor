@@ -57,6 +57,8 @@ class FroxlorLogger
 
 	const LOGIN_ACTION = '50';
 
+	const LOG_ERROR = '99';
+
 	/**
 	 * return FroxlorLogger instance
 	 *
@@ -116,6 +118,9 @@ class FroxlorLogger
 						self::$ml->pushHandler(new SyslogHandler('froxlor', LOG_USER, $level));
 						break;
 					case 'file':
+						if (empty(Settings::Get('logger.logfile')) || ! is_writeable(Settings::Get('logger.logfile'))) {
+							Settings::Set('logger.logfile', '/tmp/froxlor.log');
+						}
 						self::$ml->pushHandler(new StreamHandler(Settings::Get('logger.logfile'), $level));
 						break;
 					case 'mysql':
