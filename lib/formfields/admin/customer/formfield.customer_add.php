@@ -94,7 +94,7 @@ return array(
 							)
 						),
 						'value' => array(
-							'1'
+							(\Froxlor\Settings::Get('api.enabled') == '1' ? '1' : '0')
 						),
 						'visible' => (\Froxlor\Settings::Get('api.enabled') == '1' ? true : false)
 					)

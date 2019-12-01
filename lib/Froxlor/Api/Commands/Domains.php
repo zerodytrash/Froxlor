@@ -25,9 +25,17 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 	/**
 	 * lists all domain entries
 	 *
-	 * @param bool $extended
-	 *        	optional if true, also output all IP addresses the domain is connected to
-	 *
+	 * @param bool $with_ips
+	 *        	optional, default true
+	 * @param array $sql_search
+	 *        	optional array with index = fieldname, and value = array with 'op' => operator (one of <, > or =), LIKE is used if left empty and 'value' => searchvalue
+	 * @param int $sql_limit
+	 *        	optional specify number of results to be returned
+	 * @param int $sql_offset
+	 *        	optional specify offset for resultset
+	 * @param array $sql_orderby
+	 *        	optional array with index = fieldname and value = ASC|DESC to order the resultset by one or more fields
+	 *        	
 	 * @access admin
 	 * @throws \Exception
 	 * @return string json-encoded array count|list
@@ -35,8 +43,9 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 	public function listing()
 	{
 		if ($this->isAdmin()) {
-			$extended = self::getBoolParam('extended', true, false);
-			$this->logger()->addNotice("[API] list domains");
+			$with_ips = $this->getParam('with_ips', true, true);
+			$this->logger()->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "[API] list domains");
+			$query_fields = array();
 			$result_stmt = Database::prepare("
 				SELECT
 				`d`.*, `c`.`loginname`, `c`.`deactivated`, `c`.`name`, `c`.`firstname`, `c`.`company`, `c`.`standardsubdomain`,
@@ -44,25 +53,18 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 				FROM `" . TABLE_PANEL_DOMAINS . "` `d`
 				LEFT JOIN `" . TABLE_PANEL_CUSTOMERS . "` `c` USING(`customerid`)
 				LEFT JOIN `" . TABLE_PANEL_DOMAINS . "` `ad` ON `d`.`aliasdomain`=`ad`.`id`
-				WHERE `d`.`parentdomainid`='0' " . ($this->getUserDetail('customers_see_all') ? '' : " AND `d`.`adminid` = :adminid "));
+				WHERE `d`.`parentdomainid`='0' " . ($this->getUserDetail('customers_see_all') ? '' : " AND `d`.`adminid` = :adminid ") . $this->getSearchWhere($query_fields, true) . $this->getOrderBy() . $this->getLimit());
 			$params = array();
 			if ($this->getUserDetail('customers_see_all') == '0') {
 				$params['adminid'] = $this->getUserDetail('adminid');
 			}
-			Database::pexecute($result_stmt, $params);
-			// IP query
-			$ip_sel_stmt = Database::prepare("
-				SELECT iap.id, iap.ip, iap.port, iap.ssl
-				FROM `" . TABLE_PANEL_IPSANDPORTS . "` iap
-				LEFT JOIN `" . TABLE_DOMAINTOIP . "` dti ON dti.`id_domain` = :domainid AND dti.`id_ipandports` = iap.`id`
-			");
+			$params = array_merge($params, $query_fields);
+			Database::pexecute($result_stmt, $params, true, true);
 			$result = array();
 			while ($row = $result_stmt->fetch(\PDO::FETCH_ASSOC)) {
-				if ($extended) {
-					Database::pexecute($ip_sel_stmt, array(
-						'domainid' => $row['id']
-					));
-					$row['ips'] = $ip_sel_stmt->fetchAll(\PDO::FETCH_ASSOC);
+				$row['ipsandports'] = array();
+				if ($with_ips) {
+					$row['ipsandports'] = $this->getIpsForDomain($row['id']);
 				}
 				$result[] = $row;
 			}
@@ -75,12 +77,44 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 	}
 
 	/**
+	 * returns the total number of accessable domains
+	 *
+	 * @access admin
+	 * @throws \Exception
+	 * @return string json-encoded array count|list
+	 */
+	public function listingCount()
+	{
+		if ($this->isAdmin()) {
+			$this->logger()->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "[API] list domains");
+			$result_stmt = Database::prepare("
+				SELECT
+				COUNT(*) as num_domains
+				FROM `" . TABLE_PANEL_DOMAINS . "` `d`
+				LEFT JOIN `" . TABLE_PANEL_CUSTOMERS . "` `c` USING(`customerid`)
+				LEFT JOIN `" . TABLE_PANEL_DOMAINS . "` `ad` ON `d`.`aliasdomain`=`ad`.`id`
+				WHERE `d`.`parentdomainid`='0' " . ($this->getUserDetail('customers_see_all') ? '' : " AND `d`.`adminid` = :adminid "));
+			$params = array();
+			if ($this->getUserDetail('customers_see_all') == '0') {
+				$params['adminid'] = $this->getUserDetail('adminid');
+			}
+			$result = Database::pexecute_first($result_stmt, $params, true, true);
+			if ($result) {
+				return $this->response(200, "successfull", $result['num_domains']);
+			}
+		}
+		throw new \Exception("Not allowed to execute given command.", 403);
+	}
+
+	/**
 	 * return a domain entry by either id or domainname
 	 *
 	 * @param int $id
 	 *        	optional, the domain-id
 	 * @param string $domainname
 	 *        	optional, the domainname
+	 * @param bool $with_ips
+	 *        	optional, default true
 	 * @param bool $no_std_subdomain
 	 *        	optional, default false
 	 *        	
@@ -94,6 +128,7 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 			$id = $this->getParam('id', true, 0);
 			$dn_optional = ($id <= 0 ? false : true);
 			$domainname = $this->getParam('domainname', $dn_optional, '');
+			$with_ips = $this->getParam('with_ips', true, true);
 			$no_std_subdomain = $this->getParam('no_std_subdomain', true, false);
 
 			// convert possible idn domain to punycode
@@ -116,6 +151,10 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 			}
 			$result = Database::pexecute_first($result_stmt, $params, true, true);
 			if ($result) {
+				$result['ipsandports'] = array();
+				if ($with_ips) {
+					$result['ipsandports'] = $this->getIpsForDomain($result['id']);
+				}
 				$this->logger()->addNotice("[API] get domain '" . $result['domain'] . "'");
 				return $this->response(200, "successfull", $result);
 			}
@@ -123,6 +162,34 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 			throw new \Exception("Domain with " . $key . " could not be found", 404);
 		}
 		throw new \Exception("Not allowed to execute given command.", 403);
+	}
+
+	/**
+	 * get ips connected to given domain as array
+	 *
+	 * @param number $domain_id
+	 * @return array
+	 */
+	private function getIpsForDomain($domain_id = 0)
+	{
+		$resultips_stmt = Database::prepare("
+			SELECT `ips`.* FROM `" . TABLE_DOMAINTOIP . "` AS `dti`, `" . TABLE_PANEL_IPSANDPORTS . "` AS `ips`
+			WHERE `dti`.`id_ipandports` = `ips`.`id` AND `dti`.`id_domain` = :domainid
+		");
+
+		Database::pexecute($resultips_stmt, array(
+			'domainid' => $domain_id
+		));
+
+		$ipandports = array();
+		while ($rowip = $resultips_stmt->fetch(\PDO::FETCH_ASSOC)) {
+			if (filter_var($rowip['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+				$rowip['is_ipv6'] = true;
+			}
+			$ipandports[] = $rowip;
+		}
+
+		return $ipandports;
 	}
 
 	/**
@@ -798,7 +865,7 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 	 * @param bool $include_specialsettings
 	 *        	optional, whether or not to include non-ssl specialsettings in the generated ssl-vhost, default false
 	 * @param bool $specialsettingsforsubdomains
-	 *        	optional, whether to apply specialsettings to all subdomains of this domain, default 0 (false)
+	 *        	optional, whether to apply specialsettings to all subdomains of this domain, default is read from setting system.apply_specialsettings_default
 	 * @param bool $notryfiles
 	 *        	optional, [nginx only] do not generate the default try-files directive, default 0 (false)
 	 * @param bool $writeaccesslog
@@ -810,7 +877,7 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 	 * @param bool $phpenabled
 	 *        	optional, whether php is enabled for this domain, default 0 (false)
 	 * @param bool $phpsettingsforsubdomains
-	 *        	optional, whether to apply php-setting to apply to all subdomains of this domain, default 0 (false)
+	 *        	optional, whether to apply php-setting to apply to all subdomains of this domain, default is read from setting system.apply_phpconfigs_default
 	 * @param bool $openbasedir
 	 *        	optional, whether to activate openbasedir restriction for this domain, default 0 (false)
 	 * @param int $phpsettingid
@@ -824,7 +891,9 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 	 * @param bool $letsencrypt
 	 *        	optional, whether to generate a Let's Encrypt certificate for this domain, default false; requires SSL to be enabled
 	 * @param array $ssl_ipandport
-	 *        	optional, list of ssl-enabled ip/port id's to assign to this domain
+	 *        	optional, list of ssl-enabled ip/port id's to assign to this domain, if left empty, the current set value is being used, to remove all ssl ips use $remove_ssl_ipandport
+	 * @param bool $remove_ssl_ipandport
+	 *        	optional, if set to true and no $ssl_ipandport value is given, the ip's get removed, otherwise, the currently set value is used, default false
 	 * @param bool $http2
 	 *        	optional, whether to enable http/2 for this domain (requires to be enabled in the settings), default 0 (false)
 	 * @param int $hsts_maxage
@@ -878,20 +947,23 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 			$specialsettings = $this->getParam('specialsettings', true, $result['specialsettings']);
 			$ssl_specialsettings = $this->getParam('ssl_specialsettings', true, $result['ssl_specialsettings']);
 			$include_specialsettings = $this->getBoolParam('include_specialsettings', true, $result['include_specialsettings']);
-			$ssfs = $this->getBoolParam('specialsettingsforsubdomains', true, 0);
+			$ssfs = $this->getBoolParam('specialsettingsforsubdomains', true, \Froxlor\Settings::Get('system.apply_specialsettings_default'));
 			$notryfiles = $this->getBoolParam('notryfiles', true, $result['notryfiles']);
 			$writeaccesslog = $this->getBoolParam('writeaccesslog', true, $result['writeaccesslog']);
 			$writeerrorlog = $this->getBoolParam('writeerrorlog', true, $result['writeerrorlog']);
 			$documentroot = $this->getParam('documentroot', true, $result['documentroot']);
 			$phpenabled = $this->getBoolParam('phpenabled', true, $result['phpenabled']);
-			$phpfs = $this->getBoolParam('phpsettingsforsubdomains', true, 0);
+			$phpfs = $this->getBoolParam('phpsettingsforsubdomains', true, \Froxlor\Settings::Get('system.apply_phpconfigs_default'));
 			$openbasedir = $this->getBoolParam('openbasedir', true, $result['openbasedir']);
 			$phpsettingid = $this->getParam('phpsettingid', true, $result['phpsettingid']);
 			$mod_fcgid_starter = $this->getParam('mod_fcgid_starter', true, $result['mod_fcgid_starter']);
 			$mod_fcgid_maxrequests = $this->getParam('mod_fcgid_maxrequests', true, $result['mod_fcgid_maxrequests']);
 			$ssl_redirect = $this->getBoolParam('ssl_redirect', true, $result['ssl_redirect']);
 			$letsencrypt = $this->getBoolParam('letsencrypt', true, $result['letsencrypt']);
-			$p_ssl_ipandports = $this->getParam('ssl_ipandport', true, array());
+			$remove_ssl_ipandport = $this->getBoolParam('remove_ssl_ipandport', true, 0);
+			$p_ssl_ipandports = $this->getParam('ssl_ipandport', true, $remove_ssl_ipandport ? array(
+				- 1
+			) : null);
 			$http2 = $this->getBoolParam('http2', true, $result['http2']);
 			$hsts_maxage = $this->getParam('hsts_maxage', true, $result['hsts']);
 			$hsts_sub = $this->getBoolParam('hsts_sub', true, $result['hsts_sub']);
@@ -1174,13 +1246,23 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 			// check non-ssl IP
 			$ipandports = $this->validateIpAddresses($p_ipandports, false, $result['id']);
 			// check ssl IP
+			if (empty($p_ssl_ipandports) || (! is_array($p_ssl_ipandports) && is_null($p_ssl_ipandports))) {
+				foreach ($result['ipsandports'] as $ip) {
+					if ($ip['ssl'] == 1) {
+						$p_ssl_ipandports[] = $ip['id'];
+					}
+				}
+			}
 			$ssl_ipandports = array();
-			if (Settings::Get('system.use_ssl') == "1" && ! empty($p_ssl_ipandports)) {
+			if (Settings::Get('system.use_ssl') == "1" && ! empty($p_ssl_ipandports) && $p_ssl_ipandports[0] != - 1) {
 				$ssl_ipandports = $this->validateIpAddresses($p_ssl_ipandports, true, $result['id']);
 
 				if ($this->getUserDetail('change_serversettings') == '1') {
 					$ssl_specialsettings = \Froxlor\Validate\Validate::validate(str_replace("\r\n", "\n", $ssl_specialsettings), 'ssl_specialsettings', '/^[^\0]*$/', '', array(), true);
 				}
+			}
+			if ($remove_ssl_ipandport || (! empty($p_ssl_ipandports) && $p_ssl_ipandports[0] == - 1)) {
+				$ssl_ipandports = array();
 			}
 			if (Settings::Get('system.use_ssl') == "0" || empty($ssl_ipandports)) {
 				$ssl_redirect = 0;
@@ -1529,7 +1611,6 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 				$_update_data['phpsettingid'] = $phpsettingid;
 				$update_phpconfig = ", `phpsettingid` = :phpsettingid";
 			}
-
 			// if we have no more ssl-ip's for this domain,
 			// all its subdomains must have "ssl-redirect = 0"
 			// and disable let's encrypt
@@ -1793,8 +1874,8 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 
 			// remove domains DNS from powerDNS if used, #581
 			\Froxlor\System\Cronjob::inserttask('11', $result['domain']);
-                        // remove domain from acme.sh / lets encrypt if used
-                        \Froxlor\System\Cronjob::inserttask('12', $result['domain']);
+			// remove domain from acme.sh / lets encrypt if used
+			\Froxlor\System\Cronjob::inserttask('12', $result['domain']);
 
 			$this->logger()->addInfo("[API] deleted domain/subdomains (#" . $result['id'] . ")");
 
@@ -1874,8 +1955,10 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 		} elseif ($edit_id > 0) {
 			// set currently used ip's
 			$ipsresult_stmt = Database::prepare("
-				SELECT `id_ipandports` FROM `" . TABLE_DOMAINTOIP . "` WHERE `id_domain` = :id
-			");
+				SELECT d2i.`id_ipandports`
+				FROM `" . TABLE_DOMAINTOIP . "` d2i
+				LEFT JOIN `" . TABLE_PANEL_IPSANDPORTS . "` i ON i.id = d2i.id_ipandports
+				WHERE d2i.`id_domain` = :id AND i.`ssl` = " . ($ssl ? "'1'" : "'0'"));
 			Database::pexecute($ipsresult_stmt, array(
 				'id' => $edit_id
 			), true, true);

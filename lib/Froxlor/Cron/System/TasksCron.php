@@ -121,7 +121,6 @@ class TasksCron extends \Froxlor\Cron\FroxlorCron
 
 	private static function rebuildWebserverConfigs()
 	{
-
 		if (Settings::Get('system.webserver') == "apache2") {
 			$websrv = '\\Froxlor\\Cron\\Http\\Apache';
 			if (Settings::Get('system.mod_fcgid') == 1 || Settings::Get('phpfpm.enabled') == 1) {
@@ -417,6 +416,7 @@ class TasksCron extends \Froxlor\Cron\FroxlorCron
 			while ($row = $result_stmt->fetch(\PDO::FETCH_ASSOC)) {
 				// We do not want to set a quota for root by accident
 				if ($row['guid'] != 0) {
+					$used_quota = isset($usedquota[$row['guid']]) ? $usedquota[$row['guid']]['block']['hard'] : 0;
 					// The user has no quota in Froxlor, but on the filesystem
 					if (($row['diskspace'] == 0 || $row['diskspace'] == - 1024) && $usedquota[$row['guid']]['block']['hard'] != 0) {
 						self::$cronjob->addNotice("Disabling quota for " . $row['loginname']);
@@ -425,9 +425,9 @@ class TasksCron extends \Froxlor\Cron\FroxlorCron
 						} else {
 							\Froxlor\FileDir::safe_exec(Settings::Get('system.diskquota_quotatool_path') . " -u " . $row['guid'] . " -bl 0 -q 0 " . escapeshellarg(Settings::Get('system.diskquota_customer_partition')));
 						}
-					} elseif ($row['diskspace'] != $usedquota[$row['guid']]['block']['hard'] && $row['diskspace'] != - 1024) {
+					} elseif ($row['diskspace'] != $used_quota && $row['diskspace'] != - 1024) {
 						// The user quota in Froxlor is different than on the filesystem
-						self::$cronjob->addNotice("Setting quota for " . $row['loginname'] . " from " . $usedquota[$row['guid']]['block']['hard'] . " to " . $row['diskspace']);
+						self::$cronjob->addNotice("Setting quota for " . $row['loginname'] . " from " . $used_quota . " to " . $row['diskspace']);
 						if (\Froxlor\FileDir::isFreeBSD()) {
 							\Froxlor\FileDir::safe_exec(Settings::Get('system.diskquota_quotatool_path') . " -e " . escapeshellarg(Settings::Get('system.diskquota_customer_partition')) . ":" . $row['diskspace'] . ":" . $row['diskspace'] . " " . $row['guid']);
 						} else {

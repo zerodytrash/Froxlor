@@ -4,6 +4,7 @@ use PHPUnit\Framework\TestCase;
 use Froxlor\Api\Commands\Admins;
 use Froxlor\Api\Commands\Customers;
 use Froxlor\Api\Commands\Mysqls;
+use Froxlor\Database\Database;
 
 /**
  *
@@ -12,6 +13,8 @@ use Froxlor\Api\Commands\Mysqls;
  * @covers \Froxlor\Api\Commands\Mysqls
  * @covers \Froxlor\Api\Commands\Customers
  * @covers \Froxlor\Api\Commands\Admins
+ * @covers \Froxlor\Database\DbManager
+ * @covers \Froxlor\Database\Manager\DbManagerMySQL
  */
 class MysqlsTest extends TestCase
 {
@@ -36,7 +39,7 @@ class MysqlsTest extends TestCase
 		$result = json_decode($json_result, true)['data'];
 		$this->assertEquals('testdb', $result['description']);
 		$this->assertEquals(0, $result['dbserver']);
-		
+
 		// test connection
 		try {
 			$test_conn = new \PDO("mysql:host=127.0.0.1", 'test1sql1', $newPwd);
@@ -139,6 +142,10 @@ class MysqlsTest extends TestCase
 		$result = json_decode($json_result, true)['data'];
 		$this->assertEquals(1, $result['count']);
 		$this->assertEquals('test1sql1', $result['list'][0]['databasename']);
+
+		$json_result = Mysqls::getLocal($customer_userdata)->listingCount();
+		$result = json_decode($json_result, true)['data'];
+		$this->assertEquals(1, $result);
 	}
 
 	/**
@@ -161,5 +168,40 @@ class MysqlsTest extends TestCase
 		$json_result = Mysqls::getLocal($customer_userdata, $data)->delete();
 		$result = json_decode($json_result, true)['data'];
 		$this->assertEquals('test1sql1', $result['databasename']);
+	}
+
+	/**
+	 *
+	 * @depends testCustomerMysqlsAdd
+	 */
+	public function testGetAllSqlUsers()
+	{
+		\Froxlor\Database\Database::needRoot(true);
+		$dbm = new \Froxlor\Database\DbManager(\Froxlor\FroxlorLogger::getInstanceOf());
+		$users = $dbm->getManager()->getAllSqlUsers(false);
+		foreach ($users as $user => $data) {
+			$this->assertNotEmpty($data['password'], 'No password for user "' . $user . '"');
+		}
+
+		if (TRAVIS_CI == 0) {
+			// just to be sure, not required for travis as the vm is fresh every time
+			Database::needRoot(true);
+			Database::query("DROP USER IF EXISTS froxlor010@10.0.0.10;");
+		}
+
+		// grant privileges to another host
+		$testdata = $users['froxlor010'];
+		$dbm->getManager()->grantPrivilegesTo('froxlor010', $testdata['password'], '10.0.0.10', true);
+
+		// select all entries from mysql.user for froxlor010 to compare password-hashes
+		$sel_stmt = Database::prepare("SELECT * FROM mysql.user WHERE `User` = :usr");
+		Database::pexecute($sel_stmt, [
+			'usr' => 'froxlor010'
+		]);
+		$results = $sel_stmt->fetchAll(\PDO::FETCH_ASSOC);
+		foreach ($results as $user) {
+			$passwd = $user['Password'] ?? $user['authentication_string'];
+			$this->assertEquals($testdata['password'], $passwd);
+		}
 	}
 }

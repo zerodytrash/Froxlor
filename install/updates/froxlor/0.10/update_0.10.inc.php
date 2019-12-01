@@ -402,9 +402,9 @@ if (\Froxlor\Froxlor::isDatabaseVersion('201910110')) {
 	// select all domains with an ssl IP connected and specialsettings content to include these in the ssl-vhost
 	// to maintain former behavior
 	$sel_stmt = Database::prepare("
-		SELECT d.id FROM `". TABLE_PANEL_DOMAINS . "` d
-		LEFT JOIN `". TABLE_DOMAINTOIP . "` d2i ON d2i.id_domain = d.id
-		LEFT JOIN `". TABLE_PANEL_IPSANDPORTS."` i ON i.id = d2i.id_ipandports
+		SELECT d.id FROM `" . TABLE_PANEL_DOMAINS . "` d
+		LEFT JOIN `" . TABLE_DOMAINTOIP . "` d2i ON d2i.id_domain = d.id
+		LEFT JOIN `" . TABLE_PANEL_IPSANDPORTS . "` i ON i.id = d2i.id_ipandports
 		WHERE d.specialsettings <> '' AND i.ssl = '1'
 	");
 	Database::pexecute($sel_stmt);
@@ -440,8 +440,61 @@ if (\Froxlor\Froxlor::isDatabaseVersion('201910120')) {
 }
 
 if (\Froxlor\Froxlor::isFroxlorVersion('0.10.2')) {
-        showUpdateStep("Updating from 0.10.2 to 0.10.3", false);
-        \Froxlor\Froxlor::updateToVersion('0.10.3');
+	showUpdateStep("Updating from 0.10.2 to 0.10.3", false);
+	\Froxlor\Froxlor::updateToVersion('0.10.3');
+}
+
+if (\Froxlor\Froxlor::isFroxlorVersion('0.10.3')) {
+	showUpdateStep("Updating from 0.10.3 to 0.10.4", false);
+	\Froxlor\Froxlor::updateToVersion('0.10.4');
+}
+
+if (\Froxlor\Froxlor::isFroxlorVersion('0.10.4')) {
+	showUpdateStep("Updating from 0.10.4 to 0.10.5", false);
+	\Froxlor\Froxlor::updateToVersion('0.10.5');
+}
+
+if (\Froxlor\Froxlor::isDatabaseVersion('201910200')) {
+
+	showUpdateStep("Optimizing customer and admin table for size");
+	// ALTER TABLE `panel_customers` CHANGE `name` `name` VARCHAR(250) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '';
+	Database::query("ALTER TABLE `" . TABLE_PANEL_CUSTOMERS . "` CHANGE `zipcode` `zipcode` varchar(25) NOT NULL default '';");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_CUSTOMERS . "` CHANGE `phone` `phone` varchar(50) NOT NULL default '';");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_CUSTOMERS . "` CHANGE `fax` `fax` varchar(50) NOT NULL default '';");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_CUSTOMERS . "` CHANGE `def_language` `def_language` varchar(100) NOT NULL default '';");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_CUSTOMERS . "` CHANGE `theme` `theme` varchar(50) NOT NULL default 'Sparkle';");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_CUSTOMERS . "` CHANGE `data_2fa` `data_2fa` varchar(25) NOT NULL default '';");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_CUSTOMERS . "` CHANGE `def_language` `def_language` varchar(100) NOT NULL default '';");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_CUSTOMERS . "` DROP `leaccount`;");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_ADMINS . "` CHANGE `def_language` `def_language` varchar(100) NOT NULL default '';");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_ADMINS . "` CHANGE `theme` `theme` varchar(50) NOT NULL default 'Sparkle';");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_ADMINS . "` CHANGE `data_2fa` `data_2fa` varchar(25) NOT NULL default '';");
+	lastStepStatus(0);
+
+	\Froxlor\Froxlor::updateToDbVersion('201911130');
+}
+
+if (\Froxlor\Froxlor::isFroxlorVersion('0.10.5')) {
+	showUpdateStep("Updating from 0.10.5 to 0.10.6", false);
+	\Froxlor\Froxlor::updateToVersion('0.10.6');
+}
+
+if (\Froxlor\Froxlor::isDatabaseVersion('201911130')) {
+	showUpdateStep("Adding new settings for domain edit form default values");
+	Settings::AddNew("system.apply_specialsettings_default", '1');
+	Settings::AddNew("system.apply_phpconfigs_default", '1');
+	lastStepStatus(0);
+	\Froxlor\Froxlor::updateToDbVersion('201911220');
+}
+
+if (\Froxlor\Froxlor::isFroxlorVersion('0.10.6')) {
+	showUpdateStep("Updating from 0.10.6 to 0.10.7", false);
+	\Froxlor\Froxlor::updateToVersion('0.10.7');
+}
+
+if (\Froxlor\Froxlor::isFroxlorVersion('0.10.7')) {
+	showUpdateStep("Updating from 0.10.7 to 0.10.8", false);
+	\Froxlor\Froxlor::updateToVersion('0.10.8');
 }
 
 /**

@@ -25,6 +25,15 @@ class IpsAndPorts extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Resour
 	/**
 	 * lists all ip/port entries
 	 *
+	 * @param array $sql_search
+	 *        	optional array with index = fieldname, and value = array with 'op' => operator (one of <, > or =), LIKE is used if left empty and 'value' => searchvalue
+	 * @param int $sql_limit
+	 *        	optional specify number of results to be returned
+	 * @param int $sql_offset
+	 *        	optional specify offset for resultset
+	 * @param array $sql_orderby
+	 *        	optional array with index = fieldname and value = ASC|DESC to order the resultset by one or more fields
+	 *
 	 * @access admin
 	 * @throws \Exception
 	 * @return string json-encoded array count|list
@@ -34,12 +43,14 @@ class IpsAndPorts extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Resour
 		if ($this->isAdmin() && ($this->getUserDetail('change_serversettings') || ! empty($this->getUserDetail('ip')))) {
 			$this->logger()->addNotice("[API] list ips and ports");
 			$ip_where = "";
+			$append_where = false;
 			if (! empty($this->getUserDetail('ip')) && $this->getUserDetail('ip') != - 1) {
 				$ip_where = "WHERE `id` IN (" . implode(", ", json_decode($this->getUserDetail('ip'), true)) . ")";
+				$append_where = true;
 			}
+			$query_fields = array();
 			$result_stmt = Database::prepare("
-				SELECT * FROM `" . TABLE_PANEL_IPSANDPORTS . "` " . $ip_where . " ORDER BY `ip` ASC, `port` ASC
-			");
+				SELECT * FROM `" . TABLE_PANEL_IPSANDPORTS . "` " . $ip_where . $this->getSearchWhere($query_fields, $append_where) . $this->getOrderBy() . $this->getLimit());
 			Database::pexecute($result_stmt, null, true, true);
 			$result = array();
 			while ($row = $result_stmt->fetch(\PDO::FETCH_ASSOC)) {
@@ -49,6 +60,30 @@ class IpsAndPorts extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Resour
 				'count' => count($result),
 				'list' => $result
 			));
+		}
+		throw new \Exception("Not allowed to execute given command.", 403);
+	}
+
+	/**
+	 * returns the total number of accessable ip/port entries
+	 *
+	 * @access admin
+	 * @throws \Exception
+	 * @return string json-encoded array
+	 */
+	public function listingCount()
+	{
+		if ($this->isAdmin() && ($this->getUserDetail('change_serversettings') || ! empty($this->getUserDetail('ip')))) {
+			$ip_where = "";
+			if (! empty($this->getUserDetail('ip')) && $this->getUserDetail('ip') != - 1) {
+				$ip_where = "WHERE `id` IN (" . implode(", ", json_decode($this->getUserDetail('ip'), true)) . ")";
+			}
+			$result_stmt = Database::prepare("
+				SELECT COUNT(*) as num_ips FROM `" . TABLE_PANEL_IPSANDPORTS . "` " . $ip_where);
+			$result = Database::pexecute_first($result_stmt, null, true, true);
+			if ($result) {
+				return $this->response(200, "successfull", $result['num_ips']);
+			}
 		}
 		throw new \Exception("Not allowed to execute given command.", 403);
 	}
@@ -135,7 +170,7 @@ class IpsAndPorts extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Resour
 	{
 		if ($this->isAdmin() && $this->getUserDetail('change_serversettings')) {
 
-			$ip = \Froxlor\Validate\Validate::validate_ip2($this->getParam('ip'), false, 'invalidip', false, false, false, true);
+			$ip = \Froxlor\Validate\Validate::validate_ip2($this->getParam('ip'), false, 'invalidip', false, false, false, false, true);
 			$port = \Froxlor\Validate\Validate::validate($this->getParam('port', true, 80), 'port', '/^(([1-9])|([1-9][0-9])|([1-9][0-9][0-9])|([1-9][0-9][0-9][0-9])|([1-5][0-9][0-9][0-9][0-9])|(6[0-4][0-9][0-9][0-9])|(65[0-4][0-9][0-9])|(655[0-2][0-9])|(6553[0-5]))$/Di', array(
 				'stringisempty',
 				'myport'
@@ -332,7 +367,7 @@ class IpsAndPorts extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Resour
 				'id' => $id
 			));
 
-			$ip = \Froxlor\Validate\Validate::validate_ip2($this->getParam('ip', true, $result['ip']), false, 'invalidip', false, false, false, true);
+			$ip = \Froxlor\Validate\Validate::validate_ip2($this->getParam('ip', true, $result['ip']), false, 'invalidip', false, false, false, false, true);
 			$port = \Froxlor\Validate\Validate::validate($this->getParam('port', true, $result['port']), 'port', '/^(([1-9])|([1-9][0-9])|([1-9][0-9][0-9])|([1-9][0-9][0-9][0-9])|([1-5][0-9][0-9][0-9][0-9])|(6[0-4][0-9][0-9][0-9])|(65[0-4][0-9][0-9])|(655[0-2][0-9])|(6553[0-5]))$/Di', array(
 				'stringisempty',
 				'myport'
@@ -505,7 +540,7 @@ class IpsAndPorts extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Resour
 			));
 
 			$result_checkdomain_stmt = Database::prepare("
-				SELECT `id_domain` as `id` FROM `" . TABLE_DOMAINTOIP . "` WHERE `id_ipandports` = :id
+				SELECT `id_domain` FROM `" . TABLE_DOMAINTOIP . "` WHERE `id_ipandports` = :id
 			");
 			$result_checkdomain = Database::pexecute_first($result_checkdomain_stmt, array(
 				'id' => $id

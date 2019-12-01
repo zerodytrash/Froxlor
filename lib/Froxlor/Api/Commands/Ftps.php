@@ -56,7 +56,9 @@ class Ftps extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEntit
 			throw new \Exception("You cannot access this resource", 405);
 		}
 
-		if ($this->getUserDetail('ftps_used') < $this->getUserDetail('ftps') || $this->getUserDetail('ftps') == '-1') {
+		$is_defaultuser = $this->getBoolParam('is_defaultuser', true, 0);
+
+		if (($this->getUserDetail('ftps_used') < $this->getUserDetail('ftps') || $this->getUserDetail('ftps') == '-1') || $this->isAdmin() && $is_defaultuser == 1) {
 
 			// required paramters
 			$path = $this->getParam('path');
@@ -71,7 +73,6 @@ class Ftps extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEntit
 			$ftpdomain = $this->getParam('ftp_domain', true, '');
 
 			$additional_members = $this->getParam('additional_members', true, array());
-			$is_defaultuser = $this->getBoolParam('is_defaultuser', true, 0);
 
 			// validation
 			$password = \Froxlor\Validate\Validate::validate($password, 'password', '', '', array(), true);
@@ -105,7 +106,7 @@ class Ftps extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEntit
 				$sendinfomail = 0;
 			}
 
-			if (Settings::Get('customer.ftpatdomain') == '1' && !$is_defaultuser) {
+			if (Settings::Get('customer.ftpatdomain') == '1' && ! $is_defaultuser) {
 				if ($ftpusername == '') {
 					\Froxlor\UI\Response::standard_error(array(
 						'stringisempty',
@@ -459,7 +460,15 @@ class Ftps extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEntit
 	 *        	optional, admin-only, select ftp-users of a specific customer by id
 	 * @param string $loginname
 	 *        	optional, admin-only, select ftp-users of a specific customer by loginname
-	 *        	
+	 * @param array $sql_search
+	 *        	optional array with index = fieldname, and value = array with 'op' => operator (one of <, > or =), LIKE is used if left empty and 'value' => searchvalue
+	 * @param int $sql_limit
+	 *        	optional specify number of results to be returned
+	 * @param int $sql_offset
+	 *        	optional specify offset for resultset
+	 * @param array $sql_orderby
+	 *        	optional array with index = fieldname and value = ASC|DESC to order the resultset by one or more fields
+	 *
 	 * @access admin, customer
 	 * @throws \Exception
 	 * @return string json-encoded array count|list
@@ -468,11 +477,11 @@ class Ftps extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEntit
 	{
 		$customer_ids = $this->getAllowedCustomerIds('ftp');
 		$result = array();
+		$query_fields = array();
 		$result_stmt = Database::prepare("
 			SELECT * FROM `" . TABLE_FTP_USERS . "`
-			WHERE `customerid` IN (" . implode(", ", $customer_ids) . ")
-		");
-		Database::pexecute($result_stmt, null, true, true);
+			WHERE `customerid` IN (" . implode(", ", $customer_ids) . ")" . $this->getSearchWhere($query_fields, true) . $this->getOrderBy() . $this->getLimit());
+		Database::pexecute($result_stmt, $query_fields, true, true);
 		while ($row = $result_stmt->fetch(\PDO::FETCH_ASSOC)) {
 			$result[] = $row;
 		}
@@ -481,6 +490,32 @@ class Ftps extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEntit
 			'count' => count($result),
 			'list' => $result
 		));
+	}
+
+	/**
+	 * returns the total number of accessable ftp accounts
+	 *
+	 * @param int $customerid
+	 *        	optional, admin-only, select ftp-users of a specific customer by id
+	 * @param string $loginname
+	 *        	optional, admin-only, select ftp-users of a specific customer by loginname
+	 *        	
+	 * @access admin, customer
+	 * @throws \Exception
+	 * @return string json-encoded array
+	 */
+	public function listingCount()
+	{
+		$customer_ids = $this->getAllowedCustomerIds('ftp');
+		$result = array();
+		$result_stmt = Database::prepare("
+			SELECT COUNT(*) as num_ftps FROM `" . TABLE_FTP_USERS . "`
+			WHERE `customerid` IN (" . implode(", ", $customer_ids) . ")
+		");
+		$result = Database::pexecute_first($result_stmt, null, true, true);
+		if ($result) {
+			return $this->response(200, "successfull", $result['num_ftps']);
+		}
 	}
 
 	/**
@@ -541,6 +576,9 @@ class Ftps extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEntit
 				"username" => $customer_data['loginname']
 			);
 			Database::pexecute($stmt, $params, true, true);
+		} else {
+			// do not allow removing default ftp-account
+			\Froxlor\UI\Response::standard_error('ftp_cantdeletemainaccount', '', true);
 		}
 
 		// remove all quotatallies

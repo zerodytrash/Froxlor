@@ -569,7 +569,7 @@ $lng['serversettings']['apacheconf_htpasswddir']['description'] = 'Where should 
 
 $lng['error']['formtokencompromised'] = 'The request seems to be compromised. For security reasons you were logged out.';
 $lng['serversettings']['mysql_access_host']['title'] = 'MySQL-Access-Hosts';
-$lng['serversettings']['mysql_access_host']['description'] = 'A comma separated list of hosts from which users should be allowed to connect to the MySQL-Server.';
+$lng['serversettings']['mysql_access_host']['description'] = 'A comma separated list of hosts from which users should be allowed to connect to the MySQL-Server. To allow a subnet the netmask or cidr syntax is valid.';
 
 // ADDED IN 1.2.18-svn1
 
@@ -1850,7 +1850,7 @@ $lng['domains']['ssl_redirect_temporarilydisabled'] = "<br>The SSL redirect is t
 $lng['serversettings']['caa_entry']['title'] = 'Generate CAA DNS records';
 $lng['serversettings']['caa_entry']['description'] = 'Automatically generates CAA records for SSL-enabled domains that are using Let\'s Encrypt';
 $lng['serversettings']['caa_entry_custom']['title'] = 'Additional CAA DNS records';
-$lng['serversettings']['caa_entry_custom']['description']  = 'DNS Certification Authority Authorization (CAA) is an Internet security policy mechanism which allows domain name holders to indicate to certificate authorities<br>whether they are authorized to issue digital certificates for a particular domain name. It does this by means of a new "CAA" Domain Name System (DNS) resource record.<br><br>The content of this field will be included into the DNS zone directly (each line results in a CAA record).<br>If Let\'s Encrypt is enabled for this domain, this entry will always be added automatically and does not need to be added manually:<br><code>0 issue "letsencrypt.org"</code> (If domain is a wildcard domain, issuewild will be used instead).<br>To enable Incident Reporting, you can add an <code>iodef</code> record. An example for sending such report to <code>me@example.com</code> would be:<br><code>0 iodef "mailto:me@example.com"</code><br><br><strong>Attention:</strong> The code won\'t be checked for any errors. If it contains errors, your CAA records might not work!';
+$lng['serversettings']['caa_entry_custom']['description'] = 'DNS Certification Authority Authorization (CAA) is an Internet security policy mechanism which allows domain name holders to indicate to certificate authorities<br>whether they are authorized to issue digital certificates for a particular domain name. It does this by means of a new "CAA" Domain Name System (DNS) resource record.<br><br>The content of this field will be included into the DNS zone directly (each line results in a CAA record).<br>If Let\'s Encrypt is enabled for this domain, this entry will always be added automatically and does not need to be added manually:<br><code>0 issue "letsencrypt.org"</code> (If domain is a wildcard domain, issuewild will be used instead).<br>To enable Incident Reporting, you can add an <code>iodef</code> record. An example for sending such report to <code>me@example.com</code> would be:<br><code>0 iodef "mailto:me@example.com"</code><br><br><strong>Attention:</strong> The code won\'t be checked for any errors. If it contains errors, your CAA records might not work!';
 
 // Autoupdate
 $lng['admin']['autoupdate'] = 'Auto-Update';
@@ -2085,3 +2085,6 @@ $lng['admin']['ownsslvhostsettings'] = 'Own SSL vHost-settings';
 $lng['admin']['ipsandports']['ssl_default_vhostconf_domain'] = 'Default SSL vHost-settings for every domain container';
 $lng['customer']['total_diskspace'] = 'Total diskspace (MiB)';
 $lng['admin']['domain_override_tls'] = 'Override system TLS settings';
+$lng['domains']['isaliasdomainof'] = 'Is aliasdomain for %s';
+$lng['serversettings']['apply_specialsettings_default']['title'] = 'Default value for "' . $lng['admin']['specialsettingsforsubdomains'] . "' setting when editing a domain";
+$lng['serversettings']['apply_phpconfigs_default']['title'] = 'Default value for "' . $lng['admin']['phpsettingsforsubdomains'] . "' setting when editing a domain";

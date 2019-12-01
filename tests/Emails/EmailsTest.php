@@ -193,6 +193,38 @@ class MailsTest extends TestCase
 
 	/**
 	 *
+	 * @depends testCustomerEmailForwardersAddAnother
+	 */
+	public function testCustomerEmailForwardersListing()
+	{
+		global $admin_userdata;
+
+		Settings::Set('panel.customer_hide_options', '', true);
+
+		// get customer
+		$json_result = Customers::getLocal($admin_userdata, array(
+			'loginname' => 'test1'
+		))->get();
+		$customer_userdata = json_decode($json_result, true)['data'];
+
+		$data = [
+			'emailaddr' => 'info@test2.local'
+		];
+		$json_result = EmailForwarders::getLocal($customer_userdata, $data)->listing();
+		$result = json_decode($json_result, true)['data'];
+		$this->assertEquals(2, $result['count']);
+		$this->assertEquals(0, $result['list'][0]['id']);
+		$this->assertEquals('other@domain.tld', $result['list'][0]['address']);
+		$this->assertEquals(1, $result['list'][1]['id']);
+		$this->assertEquals('other2@domain.tld', $result['list'][1]['address']);
+
+		$json_result = EmailForwarders::getLocal($customer_userdata, $data)->listingCount();
+		$result = json_decode($json_result, true)['data'];
+		$this->assertEquals(2, $result);
+	}
+
+	/**
+	 *
 	 * @depends testCustomerEmailForwardersDeleteEmailHidden
 	 */
 	public function testCustomerEmailForwardersAddWithSpaces()
@@ -292,13 +324,6 @@ class MailsTest extends TestCase
 		EmailForwarders::getLocal($admin_userdata)->update();
 	}
 
-	public function testAdminEmailForwadersUndefinedListing()
-	{
-		global $admin_userdata;
-		$this->expectExceptionCode(303);
-		EmailForwarders::getLocal($admin_userdata)->listing();
-	}
-
 	/**
 	 *
 	 * @depends testCustomerEmailForwardersAddAnother
@@ -362,6 +387,10 @@ class MailsTest extends TestCase
 		$this->assertEquals(2, $result['count']);
 		$this->assertEquals("info@test2.local", $result['list'][0]['email']);
 		$this->assertEquals("@test2.local", $result['list'][1]['email']);
+
+		$json_result = Emails::getLocal($customer_userdata)->listingCount();
+		$result = json_decode($json_result, true)['data'];
+		$this->assertEquals(2, $result);
 	}
 
 	public function testCustomerEmailAccountsAdd()

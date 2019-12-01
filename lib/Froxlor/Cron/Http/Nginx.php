@@ -283,7 +283,7 @@ class Nginx extends HttpConfigBase
 
 				if (! $is_redirect) {
 					$this->nginx_data[$vhost_filename] .= "\tlocation ~ \.php {\n";
-					$this->nginx_data[$vhost_filename] .= "\t\tfastcgi_split_path_info ^(.+\.php)(/.+)\$;\n";
+					$this->nginx_data[$vhost_filename] .= "\t\tfastcgi_split_path_info ^(.+?\.php)(/.*)$;\n";
 					$this->nginx_data[$vhost_filename] .= "\t\tinclude " . Settings::Get('nginx.fastcgiparams') . ";\n";
 					$this->nginx_data[$vhost_filename] .= "\t\tfastcgi_param SCRIPT_FILENAME \$request_filename;\n";
 					$this->nginx_data[$vhost_filename] .= "\t\tfastcgi_param PATH_INFO \$fastcgi_path_info;\n";
@@ -535,7 +535,7 @@ class Nginx extends HttpConfigBase
 				}
 
 				if ($domain['ssl_specialsettings'] != '' && $ssl_vhost == true) {
-					$vhost_content .= $this->processSpecialConfigTemplate($domain['ssl_specialsettings'], $domain, $domain['ip'], $domain['port'], $ssl_vhost) . "\n";
+					$vhost_content = $this->mergeVhostCustom($vhost_content, $this->processSpecialConfigTemplate($domain['ssl_specialsettings'], $domain, $domain['ip'], $domain['port'], $ssl_vhost));
 				}
 
 				if ($_vhost_content != '') {
@@ -547,7 +547,7 @@ class Nginx extends HttpConfigBase
 				}
 
 				if (Settings::Get('system.default_sslvhostconf') != '' && $ssl_vhost == true) {
-					$vhost_content .= $this->processSpecialConfigTemplate(Settings::Get('system.default_sslvhostconf'), $domain, $domain['ip'], $domain['port'], $ssl_vhost) . "\n";
+					$vhost_content = $this->mergeVhostCustom($vhost_content, $this->processSpecialConfigTemplate(Settings::Get('system.default_sslvhostconf'), $domain, $domain['ip'], $domain['port'], $ssl_vhost) . "\n");
 				}
 			}
 		}
@@ -560,6 +560,8 @@ class Nginx extends HttpConfigBase
 	{
 		// Remove windows linebreaks
 		$vhost = str_replace("\r", "\n", $vhost);
+		// remove comments
+		$vhost = implode("\n", preg_replace('/^(\s+)?#(.*)$/', '', explode("\n", $vhost)));
 		// Break blocks into lines
 		$vhost = str_replace(array(
 			"{",
@@ -953,7 +955,7 @@ class Nginx extends HttpConfigBase
 			$phpopts .= "\t" . '}' . "\n\n";
 
 			$phpopts .= "\tlocation @php {\n";
-			$phpopts .= "\t\tfastcgi_split_path_info ^(.+\.php)(/.+)\$;\n";
+			$phpopts .= "\t\tfastcgi_split_path_info ^(.+?\.php)(/.*)$;\n";
 			$phpopts .= "\t\tinclude " . Settings::Get('nginx.fastcgiparams') . ";\n";
 			$phpopts .= "\t\tfastcgi_param SCRIPT_FILENAME \$request_filename;\n";
 			$phpopts .= "\t\tfastcgi_param PATH_INFO \$fastcgi_path_info;\n";

@@ -32,9 +32,7 @@ class AdminDomains extends FeModule
 	public function overview()
 	{
 		try {
-			$json_result = Domains::getLocal(\Froxlor\CurrentUser::getData(), array(
-				'extended' => true
-			))->listing();
+			$json_result = Domains::getLocal(\Froxlor\CurrentUser::getData())->listing();
 		} catch (\Exception $e) {
 			\Froxlor\UI\Response::dynamic_error($e->getMessage());
 		}
