@@ -44,7 +44,7 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 	{
 		if ($this->isAdmin()) {
 			$with_ips = $this->getParam('with_ips', true, true);
-			$this->logger()->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "[API] list domains");
+			$this->logger()->addNotice("[API] list domains");
 			$query_fields = array();
 			$result_stmt = Database::prepare("
 				SELECT
@@ -86,7 +86,7 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 	public function listingCount()
 	{
 		if ($this->isAdmin()) {
-			$this->logger()->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_NOTICE, "[API] list domains");
+			$this->logger()->addNotice("[API] list domains");
 			$result_stmt = Database::prepare("
 				SELECT
 				COUNT(*) as num_domains
@@ -459,7 +459,7 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 						);
 						foreach ($p_ssl_protocols as $ssl_protocol) {
 							if (! in_array(trim($ssl_protocol), $protocols_available)) {
-								$this->logger()->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_DEBUG, "[API] unknown SSL protocol '" . trim($ssl_protocol) . "'");
+								$this->logger()->addDebug("[API] unknown SSL protocol '" . trim($ssl_protocol) . "'");
 								continue;
 							}
 							$ssl_protocols[] = $ssl_protocol;
@@ -1202,7 +1202,7 @@ class Domains extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEn
 					);
 					foreach ($p_ssl_protocols as $ssl_protocol) {
 						if (! in_array(trim($ssl_protocol), $protocols_available)) {
-							$this->logger()->logAction(\Froxlor\FroxlorLogger::ADM_ACTION, LOG_DEBUG, "[API] unknown SSL protocol '" . trim($ssl_protocol) . "'");
+							$this->logger()->addDebug("[API] unknown SSL protocol '" . trim($ssl_protocol) . "'");
 							continue;
 						}
 						$ssl_protocols[] = $ssl_protocol;

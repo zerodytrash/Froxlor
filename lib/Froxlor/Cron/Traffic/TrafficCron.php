@@ -140,7 +140,7 @@ class TrafficCron extends \Froxlor\Cron\FroxlorCron
 				if ($mysql_usage_row) {
 					$mysqlusage_all[$row_database['customerid']] += floatval($mysql_usage_row['customerusage']);
 				} else {
-					\Froxlor\FroxlorLogger::getInstanceOf()->logAction(\Froxlor\FroxlorLogger::CRON_ACTION, LOG_WARNING, "Cannot get usage for database " . $row_database['databasename'] . ".");
+					\Froxlor\FroxlorLogger::getLog()->addWarning("Cannot get usage for database " . $row_database['databasename'] . ".");
 				}
 			} else {
 				self::$cronlog->addWarning("Seems like the database " . $row_database['databasename'] . " had been removed manually.");

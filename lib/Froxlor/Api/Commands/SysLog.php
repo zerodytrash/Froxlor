@@ -73,7 +73,7 @@ class SysLog extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEnt
 		while ($row = $result_stmt->fetch(\PDO::FETCH_ASSOC)) {
 			$result[] = $row;
 		}
-		$this->logger()->logAction($this->isAdmin() ? \Froxlor\FroxlorLogger::ADM_ACTION : \Froxlor\FroxlorLogger::USR_ACTION, LOG_NOTICE, "[API] list log-entries");
+		$this->logger()->addNotice("[API] list log-entries");
 		return $this->response(200, "successfull", array(
 			'count' => count($result),
 			'list' => $result
@@ -204,7 +204,7 @@ class SysLog extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEnt
 			}
 			$params['trunc'] = $truncatedate;
 			Database::pexecute($result_stmt, $params, true, true);
-			$this->logger()->logAction($this->isAdmin() ? \Froxlor\FroxlorLogger::ADM_ACTION : \Froxlor\FroxlorLogger::USR_ACTION, LOG_WARNING, "[API] truncated the froxlor syslog");
+			$this->logger()->addWarning("[API] truncated the froxlor syslog");
 			return $this->response(200, "successfull", true);
 		}
 		throw new \Exception("Not allowed to execute given command.", 403);

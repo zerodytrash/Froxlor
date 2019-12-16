@@ -177,7 +177,7 @@ class MysqlsTest extends TestCase
 	public function testGetAllSqlUsers()
 	{
 		\Froxlor\Database\Database::needRoot(true);
-		$dbm = new \Froxlor\Database\DbManager(\Froxlor\FroxlorLogger::getInstanceOf());
+		$dbm = new \Froxlor\Database\DbManager(\Froxlor\FroxlorLogger::getLog());
 		$users = $dbm->getManager()->getAllSqlUsers(false);
 		foreach ($users as $user => $data) {
 			$this->assertNotEmpty($data['password'], 'No password for user "' . $user . '"');
