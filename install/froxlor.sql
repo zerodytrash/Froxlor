@@ -655,6 +655,7 @@ opcache.interned_strings_buffer'),
 	('system', 'tlsv13_cipher_list', ''),
 	('system', 'honorcipherorder', '0'),
 	('system', 'sessiontickets', '1'),
+	('system', 'sessionticketsenabled', '1'),
 	('system', 'logfiles_format', ''),
 	('system', 'logfiles_type', '1'),
 	('system', 'logfiles_piped', '0'),
@@ -699,8 +700,8 @@ opcache.interned_strings_buffer'),
 	('panel', 'password_special_char', '!?<>§$%+#=@'),
 	('panel', 'customer_hide_options', ''),
 	('panel', 'is_configured', '0'),
-	('panel', 'version', '0.10.10'),
-	('panel', 'db_version', '201912100');
+	('panel', 'version', '0.10.11'),
+	('panel', 'db_version', '201912311');
 
 
 DROP TABLE IF EXISTS `panel_tasks`;
@@ -846,6 +847,7 @@ CREATE TABLE `panel_fpmdaemons` (
   `max_requests` int(4) NOT NULL DEFAULT '0',
   `idle_timeout` int(4) NOT NULL DEFAULT '30',
   `limit_extensions` varchar(255) NOT NULL default '.php',
+  `custom_config` text,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `reload` (`reload_cmd`),
   UNIQUE KEY `config` (`config_dir`)

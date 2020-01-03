@@ -520,31 +520,21 @@ if (\Froxlor\Froxlor::isFroxlorVersion('0.10.9')) {
 	\Froxlor\Froxlor::updateToVersion('0.10.10');
 }
 
-/**
- * fc branch testing
- */
-if (false) {
+if (\Froxlor\Froxlor::isDatabaseVersion('201912100')) {
+	showUpdateStep("Adding option to disable SSL sessiontickets for older systems");
+	Settings::AddNew("system.sessionticketsenabled", '1');
+	lastStepStatus(0);
+	\Froxlor\Froxlor::updateToDbVersion('201912310');
+}
 
-        Updates::showUpdateStep("Updating theme for all users");
-        \Froxlor\Settings::Set('panel.default_theme', 'Sparkle2', true);
-        $upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_ADMINS . "` SET `theme` = :theme");
-        Database::pexecute($upd_stmt, array(
-                'theme' => 'Sparkle2'
-        ));
-        $upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_CUSTOMERS . "` SET `theme` = :theme");
-        Database::pexecute($upd_stmt, array(
-                'theme' => 'Sparkle2'
-        ));
-        // just to be sure
-        \Froxlor\CurrentUser::setField('theme', 'Sparkle2');
-        Updates::lastStepStatus(0);
+if (\Froxlor\Froxlor::isDatabaseVersion('201912310')) {
+	showUpdateStep("Adding custom phpfpm pool configuration field");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_FPMDAEMONS . "` ADD `custom_config` text AFTER `limit_extensions`;");
+	lastStepStatus(0);
+	\Froxlor\Froxlor::updateToDbVersion('201912311');
+}
 
-        Updates::showUpdateStep("Removing DKIM-ADSP support");
-        Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsp';");
-        Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'dkim' AND `varname`= 'dkim_add_adsppolicy';");
-        Updates::lastStepStatus(0);
-
-        Updates::showUpdateStep("Removing unneeded settings");
-        Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'system' AND `varname`= 'froxlordirectlyviahostname';");
-        Updates::lastStepStatus(0);
+if (\Froxlor\Froxlor::isFroxlorVersion('0.10.10')) {
+        showUpdateStep("Updating from 0.10.10 to 0.10.11", false);
+        \Froxlor\Froxlor::updateToVersion('0.10.11');
 }
