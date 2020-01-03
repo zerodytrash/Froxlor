@@ -243,7 +243,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_apply_specialsettings_default' => array(
-					'label' => $lng['serversettings']['apply_specialsettings_default'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.apply_specialsettings_default'),
 					'settinggroup' => 'system',
 					'varname' => 'apply_specialsettings_default',
 					'type' => 'bool',
@@ -251,7 +251,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_apply_phpconfigs_default' => array(
-					'label' => $lng['serversettings']['apply_phpconfigs_default'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.apply_phpconfigs_default'),
 					'settinggroup' => 'system',
 					'varname' => 'apply_phpconfigs_default',
 					'type' => 'bool',

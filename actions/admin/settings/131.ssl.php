@@ -116,7 +116,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_sessionticketsenabled' => array(
-					'label' => $lng['admin']['domain_sessionticketsenabled'],
+					'label' => \Froxlor\Frontend\UI::getLng('admin.domain_sessionticketsenabled'),
 					'settinggroup' => 'system',
 					'varname' => 'sessionticketsenabled',
 					'type' => 'bool',

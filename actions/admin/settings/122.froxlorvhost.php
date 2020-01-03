@@ -98,7 +98,7 @@ return array(
 					), true)
 				),
 				'system_honorcipherorder' => array(
-					'label' => $lng['admin']['domain_honorcipherorder'],
+					'label' => \Froxlor\Frontend\UI::getLng('admin.domain_honorcipherorder'),
 					'settinggroup' => 'system',
 					'varname' => 'honorcipherorder',
 					'type' => 'bool',
@@ -110,7 +110,7 @@ return array(
 					), true)
 				),
 				'system_sessiontickets' => array(
-					'label' => $lng['admin']['domain_sessiontickets'],
+					'label' => \Froxlor\Frontend\UI::getLng('admin.domain_sessiontickets'),
 					'settinggroup' => 'system',
 					'varname' => 'sessiontickets',
 					'type' => 'bool',

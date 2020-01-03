@@ -251,7 +251,7 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_default_sslvhostconf' => array(
-					'label' => $lng['serversettings']['default_sslvhostconf'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.default_sslvhostconf'),
 					'settinggroup' => 'system',
 					'varname' => 'default_sslvhostconf',
 					'type' => 'text',
@@ -260,7 +260,7 @@ return array(
 					'visible' => \Froxlor\Settings::Get('system.use_ssl') == 1
 				),
 				'system_include_default_vhostconf' => array(
-					'label' => $lng['serversettings']['includedefault_sslvhostconf'],
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.includedefault_sslvhostconf'),
 					'settinggroup' => 'system',
 					'varname' => 'include_default_vhostconf',
 					'type' => 'bool',

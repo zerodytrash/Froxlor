@@ -20,7 +20,7 @@ namespace Froxlor\Frontend\Modules;
 use Froxlor\Api\Commands\PhpSettings;
 use Froxlor\Database\Database;
 use Froxlor\Settings;
-use Froxlor\Api\Commands\Customers as Customers;
+use Froxlor\Api\Commands\Customers;
 use Froxlor\Frontend\FeModule;
 
 class AdminCustomers extends FeModule
@@ -102,7 +102,7 @@ class AdminCustomers extends FeModule
 				\Froxlor\UI\Response::dynamic_error($e->getMessage());
 			}
 		}
-		\Froxlor\UI\Response::redirectTo('index.php?module=AdminsCustomers');
+		\Froxlor\UI\Response::redirectTo('index.php?module=AdminCustomers');
 	}
 
 	public function edit()
