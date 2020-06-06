@@ -96,7 +96,7 @@ class DirOptions extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\Resourc
 		), true, true);
 
 		// duplicate check
-		if ($path_dupe_check['path'] == $path) {
+		if ($path_dupe_check && $path_dupe_check['path'] == $path) {
 			\Froxlor\UI\Response::standard_error('errordocpathdupe', $userpath, true);
 		}
 

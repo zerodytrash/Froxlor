@@ -125,6 +125,10 @@ class Mysqls extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEnt
 			$replace_arr = array(
 				'SALUTATION' => \Froxlor\User::getCorrectUserSalutation($userinfo),
 				'CUST_NAME' => \Froxlor\User::getCorrectUserSalutation($userinfo), // < keep this for compatibility
+				'NAME' => $userinfo['name'],
+				'FIRSTNAME' => $userinfo['firstname'],
+				'COMPANY' => $userinfo['company'],
+				'CUSTOMER_NO' => $userinfo['customernumber'],
 				'DB_NAME' => $username,
 				'DB_PASS' => $password,
 				'DB_DESC' => $databasedescription,
@@ -252,7 +256,7 @@ class Mysqls extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEnt
 			), true, true);
 			$mbdata = $mbdata_stmt->fetch(\PDO::FETCH_ASSOC);
 			Database::needRoot(false);
-			$result['size'] = $mbdata['MB'];
+			$result['size'] = $mbdata['MB'] ?? 0;
 			$this->logger()->addNotice("[API] get database '" . $result['databasename'] . "'");
 			return $this->response(200, "successfull", $result);
 		}
@@ -411,7 +415,7 @@ class Mysqls extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEnt
 						"table_schema" => $row['databasename']
 					), true, true);
 					$mbdata = $mbdata_stmt->fetch(\PDO::FETCH_ASSOC);
-					$row['size'] = $mbdata['MB'];
+					$row['size'] = $mbdata['MB'] ?? 0;
 					$result[] = $row;
 				}
 				Database::needRoot(false);

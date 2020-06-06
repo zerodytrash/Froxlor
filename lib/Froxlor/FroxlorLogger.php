@@ -118,7 +118,10 @@ class FroxlorLogger
 						self::$ml->pushHandler(new SyslogHandler('froxlor', LOG_USER, $level));
 						break;
 					case 'file':
-						if (empty(Settings::Get('logger.logfile')) || ! is_writeable(Settings::Get('logger.logfile'))) {
+						$logger_logfile = Settings::Get('logger.logfile');
+						// is_writable needs an existing file to check if it's actually writable
+						@touch($logger_logfile);
+						if (empty($logger_logfile) || ! is_writable($logger_logfile)) {
 							Settings::Set('logger.logfile', '/tmp/froxlor.log');
 						}
 						self::$ml->pushHandler(new StreamHandler(Settings::Get('logger.logfile'), $level));

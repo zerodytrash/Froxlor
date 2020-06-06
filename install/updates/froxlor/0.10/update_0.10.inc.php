@@ -535,6 +535,103 @@ if (\Froxlor\Froxlor::isDatabaseVersion('201912310')) {
 }
 
 if (\Froxlor\Froxlor::isFroxlorVersion('0.10.10')) {
-        showUpdateStep("Updating from 0.10.10 to 0.10.11", false);
-        \Froxlor\Froxlor::updateToVersion('0.10.11');
+	showUpdateStep("Updating from 0.10.10 to 0.10.11", false);
+	\Froxlor\Froxlor::updateToVersion('0.10.11');
+}
+
+if (\Froxlor\Froxlor::isDatabaseVersion('201912311')) {
+	showUpdateStep("Migrate logfiles_format setting");
+	$current_format = Settings::Set('system.logfiles_format');
+	if (! empty($current_format)) {
+		Settings::Set('system.logfiles_format', '"' . Settings::Get('system.logfiles_format') . '"');
+		lastStepStatus(0);
+	} else {
+		lastStepStatus(0, 'not needed');
+	}
+	\Froxlor\Froxlor::updateToDbVersion('201912312');
+}
+
+if (\Froxlor\Froxlor::isDatabaseVersion('201912312')) {
+	showUpdateStep("Adding option change awstats LogFormat");
+	Settings::AddNew("system.awstats_logformat", '1');
+	lastStepStatus(0);
+	\Froxlor\Froxlor::updateToDbVersion('201912313');
+}
+
+if (\Froxlor\Froxlor::isFroxlorVersion('0.10.11')) {
+	showUpdateStep("Updating from 0.10.11 to 0.10.12", false);
+	\Froxlor\Froxlor::updateToVersion('0.10.12');
+}
+
+if (\Froxlor\Froxlor::isFroxlorVersion('0.10.12')) {
+	showUpdateStep("Updating from 0.10.12 to 0.10.13", false);
+	\Froxlor\Froxlor::updateToVersion('0.10.13');
+}
+
+if (\Froxlor\Froxlor::isDatabaseVersion('201912313')) {
+	showUpdateStep("Adding new field to domains table");
+	Database::query("ALTER TABLE `" . TABLE_PANEL_DOMAINS . "` ADD `domain_ace` varchar(255) NOT NULL default '' AFTER `domain`;");
+	lastStepStatus(0);
+
+	showUpdateStep("Updating domain entries");
+	$upd_stmt = Database::prepare("UPDATE `" . TABLE_PANEL_DOMAINS . "` SET `domain_ace` = :ace WHERE `id` = :domainid");
+	$sel_stmt = Database::prepare("SELECT id, domain FROM `" . TABLE_PANEL_DOMAINS . "` ORDER BY id ASC");
+	Database::pexecute($sel_stmt);
+	$idna_convert = new \Froxlor\Idna\IdnaWrapper();
+	while ($domain = $sel_stmt->fetch(\PDO::FETCH_ASSOC)) {
+		Database::pexecute($upd_stmt, [
+			'ace' => $idna_convert->decode($domain['domain']),
+			'domainid' => $domain['id']
+		]);
+	}
+	lastStepStatus(0);
+
+	\Froxlor\Froxlor::updateToDbVersion('202002290');
+}
+
+if (\Froxlor\Froxlor::isFroxlorVersion('0.10.13')) {
+	showUpdateStep("Updating from 0.10.13 to 0.10.14", false);
+	\Froxlor\Froxlor::updateToVersion('0.10.14');
+}
+
+if (\Froxlor\Froxlor::isFroxlorVersion('0.10.14')) {
+	showUpdateStep("Updating from 0.10.14 to 0.10.15", false);
+	\Froxlor\Froxlor::updateToVersion('0.10.15');
+}
+
+if (\Froxlor\Froxlor::isDatabaseVersion('202002290')) {
+	showUpdateStep("Adding new setting to validate DNS when using Let's Encrypt");
+	Database::query("DELETE FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'system' AND `varname` = 'disable_le_selfcheck'");
+	$le_domain_dnscheck = isset($_POST['system_le_domain_dnscheck']) ? (int) $_POST['system_le_domain_dnscheck'] : '1';
+	Settings::AddNew("system.le_domain_dnscheck", $le_domain_dnscheck);
+	lastStepStatus(0);
+
+	\Froxlor\Froxlor::updateToDbVersion('202004140');
+}
+
+if (\Froxlor\Froxlor::isFroxlorVersion('0.10.15')) {
+	showUpdateStep("Updating from 0.10.15 to 0.10.16", false);
+	\Froxlor\Froxlor::updateToVersion('0.10.16');
+}
+
+if (\Froxlor\Froxlor::isDatabaseVersion('202004140')) {
+
+	showUpdateStep("Adding unique key on domainid field in domain ssl table");
+	// check for duplicate entries prior to set a unique key to avoid errors on update
+	Database::query("
+		DELETE a.* FROM domain_ssl_settings AS a
+		LEFT JOIN domain_ssl_settings AS b ON
+		((b.`domainid`=a.`domainid` AND UNIX_TIMESTAMP(b.`expirationdate`) > UNIX_TIMESTAMP(a.`expirationdate`))
+		OR (UNIX_TIMESTAMP(b.`expirationdate`) = UNIX_TIMESTAMP(a.`expirationdate`) AND b.`id`>a.`id`))
+		WHERE b.`id` IS NOT NULL
+	");
+	Database::query("ALTER TABLE `domain_ssl_settings` ADD UNIQUE(`domainid`)");
+	lastStepStatus(0);
+
+	\Froxlor\Froxlor::updateToDbVersion('202005150');
+}
+
+if (\Froxlor\Froxlor::isFroxlorVersion('0.10.16')) {
+	showUpdateStep("Updating from 0.10.16 to 0.10.17", false);
+	\Froxlor\Froxlor::updateToVersion('0.10.17');
 }

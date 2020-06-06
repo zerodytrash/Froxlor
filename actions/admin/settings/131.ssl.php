@@ -35,7 +35,7 @@ return array(
 					'settinggroup' => 'system',
 					'varname' => 'ssl_protocols',
 					'type' => 'option',
-					'default' => 'TLSv1,TLSv1.2',
+					'default' => 'TLSv1.2',
 					'option_mode' => 'multiple',
 					'option_options' => array(
 						'TLSv1' => 'TLSv1',
@@ -122,10 +122,7 @@ return array(
 					'type' => 'bool',
 					'default' => true,
 					'save_method' => 'storeSettingField',
-					'visible' => \Froxlor\Settings::Get('system.use_ssl') && (\Froxlor\Settings::Get('system.webserver') == "nginx" || (\Froxlor\Settings::Get('system.webserver') == "apache2" && \Froxlor\Settings::Get('system.apache24') == 1)) && call_user_func(array(
-						'\Froxlor\Settings\FroxlorVhostSettings',
-						'hasVhostContainerEnabled'
-					), true)
+					'visible' => \Froxlor\Settings::Get('system.use_ssl') && (\Froxlor\Settings::Get('system.webserver') == "nginx" || (\Froxlor\Settings::Get('system.webserver') == "apache2" && \Froxlor\Settings::Get('system.apache24') == 1))
 				),
 				'system_leenabled' => array(
 					'label' => \Froxlor\Frontend\UI::getLng('serversettings.leenabled'),
@@ -217,11 +214,11 @@ return array(
 					'save_method' => 'storeSettingField'
 				),
 				'system_disable_le_selfcheck' => array(
-					'label' => \Froxlor\Frontend\UI::getLng('serversettings.disable_le_selfcheck'),
+					'label' => \Froxlor\Frontend\UI::getLng('serversettings.le_domain_dnscheck'),
 					'settinggroup' => 'system',
-					'varname' => 'disable_le_selfcheck',
+					'varname' => 'le_domain_dnscheck',
 					'type' => 'bool',
-					'default' => false,
+					'default' => true,
 					'save_method' => 'storeSettingField'
 				)
 			)

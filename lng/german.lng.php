@@ -202,6 +202,7 @@ $lng['error']['mydomain'] = '\'Domain\'';
 $lng['error']['mydocumentroot'] = '\'Documentroot\'';
 $lng['error']['loginnameexists'] = 'Der Login-Name "%s" existiert bereits.';
 $lng['error']['emailiswrong'] = 'Die E-Mail-Adresse "%s" enthält ungültige Zeichen oder ist nicht vollständig.';
+$lng['error']['alternativeemailiswrong'] = 'Die angegebene alternative E-Mail Adresse "%s", an welche die Zugangsdaten geschickt werden soll, scheint ungültig zu sein.';
 $lng['error']['loginnameiswrong'] = 'Der Login-Name "%s" enthält ungültige Zeichen.';
 $lng['error']['loginnameiswrong2'] = 'Der Login-Name enthält zu viele Zeichen, es sind maximal %s Zeichen erlaubt.';
 $lng['error']['userpathcombinationdupe'] = 'Die Kombination aus Benutzername und Pfad existiert bereits.';
@@ -314,6 +315,7 @@ $lng['admin']['templates']['COMPANY'] = 'Wird mit dem Firmennamen des Kunden ers
 $lng['admin']['templates']['USERNAME'] = 'Wird mit dem Benutzernamen des neuen Kundenkontos ersetzt.';
 $lng['admin']['templates']['PASSWORD'] = 'Wird mit dem Passwort des neuen Kundenkontos ersetzt.';
 $lng['admin']['templates']['EMAIL'] = 'Wird mit der Adresse des neuen E-Mail-Kontos ersetzt.';
+$lng['admin']['templates']['CUSTOMER_NO'] = 'Wir mit der Kunden-Nummer ersetzt';
 $lng['admin']['bindzonewarning'] = $lng['panel']['emptyfordefault'] . '<br /><strong class="text-danger">WARNUNG:</strong> Bei der Verwendung einer Zonendatei müssen alle benötigten Records aller Subdomains ebenfalls manuell verwaltet werden.';
 
 /**
@@ -335,7 +337,7 @@ $lng['serversettings']['logfiles_directory']['description'] = 'Wo sollen die Log
 $lng['serversettings']['logfiles_script']['title'] = 'Eigenes Script zu dem Log-Files übergeben werden';
 $lng['serversettings']['logfiles_script']['description'] = 'Hier kann ein Script an das die Loginhalte übergeben werden hinterlegt und die Platzhalter <strong>{LOGFILE}, {DOMAIN} und {CUSTOMER}</strong> genutzt werden, sofern nötig. Falls ein Script angegeben wird, muss die Option <strong>Webserver Logdateien umleiten</strong> gesetzt werden';
 $lng['serversettings']['logfiles_format']['title'] = 'Access-Log Format';
-$lng['serversettings']['logfiles_format']['description'] = 'Hier kann ein angepasstes Log-format entsprechend der Webserver-Dokumentation angegeben werden, leer lassen für Standard';
+$lng['serversettings']['logfiles_format']['description'] = 'Hier kann ein angepasstes Log-format entsprechend der Webserver-Dokumentation angegeben werden, leer lassen für Standard. Abhängig vom LogFormat muss die Angabe unter Anführungszeichen stehen.<br/>Wenn verwendet mit nginx, so kann es wie folgt aussehen: <i>log_format frx_custom {EINGESTELLTES_FORMAT}</i>.<br/>Wenn verwendet mit Apache, so kann es wie folgt aussehen: <i>LogFormat {EINGESTELLTES_FORMAT} frx_custom</i>.<br /><strong>ACHTUNG:</strong> Der Code wird nicht auf Fehler geprüft. Etwaige Fehler werden auch übernommen und der Webserver könnte nicht mehr starten!';
 $lng['serversettings']['logfiles_type']['title'] = 'Access-Log Typ';
 $lng['serversettings']['logfiles_type']['description'] = 'Wähle zwischen <strong>combined</strong> oder <strong>vhost_combined</strong>.';
 $lng['serversettings']['logfiles_piped']['title'] = 'Webserver Logdateien zu eigenem Script umleiten (siehe oben)';
@@ -403,6 +405,7 @@ $lng['admin']['ipsandports']['add'] = 'IP-Adresse/Port hinzufügen';
 $lng['admin']['ipsandports']['edit'] = 'IP-Adresse/Port bearbeiten';
 $lng['admin']['ipsandports']['ipandport'] = 'IP-Adresse/Port';
 $lng['admin']['ipsandports']['ip'] = 'IP-Adresse';
+$lng['admin']['ipsandports']['ipnote'] = '<div id="ipnote" class="red">Hinweis: Obwohl private IP Adressen erlaubt sind, kann es bei manchen Features wie DNS zu ungewolltem Verhalten kommen.<br>Verwende private Adressen nur wenn du sicher bist.</div>';
 $lng['admin']['ipsandports']['port'] = 'Port';
 
 // ADDED IN 1.2.13-rc3
@@ -1627,8 +1630,8 @@ $lng['admin']['domain_http2']['title'] = 'HTTP2 Unterstützung';
 $lng['admin']['domain_http2']['description'] = 'Siehe <a target="_blank" href="https://de.wikipedia.org/wiki/Hypertext_Transfer_Protocol#HTTP.2F2">Wikipedia</a> für eine ausführliche Beschreibung von HTTP2';
 $lng['admin']['testmail'] = 'SMTP Test';
 $lng['success']['testmailsent'] = 'Test E-Mail erfolgreich gesendet';
-$lng['serversettings']['disable_le_selfcheck']['title'] = "Deaktiviere Let's Encrypt lokale Selbstprüfung";
-$lng['serversettings']['disable_le_selfcheck']['description'] = "Wenn aktiviert wird Froxlor <strong>keine</strong> Erreichbarkeitsprüfung des Tokens vornehmen. Nötig bei ge-NAT-eten IP-Adressen oder Ähnlichem";
+$lng['serversettings']['le_domain_dnscheck']['title'] = "Validiere DNS der Domains wenn Let's Encrypt genutzt wird";
+$lng['serversettings']['le_domain_dnscheck']['description'] = "Wenn aktiviert wird froxlor überprüfen ob die DNS Einträge der Domains, welche ein Let's Encrypt Zertifikat beantragt, mindestens auf eine der System IP Adressen auflöst.";
 $lng['menue']['phpsettings']['fpmdaemons'] = 'PHP-FPM Versionen';
 $lng['admin']['phpsettings']['activephpconfigs'] = 'In Verwendung für PHP-Konfiguration(en)';
 $lng['admin']['phpsettingsforsubdomains'] = 'PHP-Config für alle Subdomains übernehmen:';
@@ -1637,7 +1640,7 @@ $lng['serversettings']['leapiversion']['title'] = "Wählen Sie die Let's Encrypt
 $lng['serversettings']['leapiversion']['description'] = "Aktuell unterstützt froxlor lediglich die ACME v2 Implementierung von Let's Encrypt.";
 $lng['admin']['phpsettings']['pass_authorizationheader'] = 'Füge "-pass-header Authorization" / "CGIPassAuth On" in Vhosts ein';
 $lng['serversettings']['ssl']['ssl_protocols']['title'] = 'SSL Protokollversion festlegen';
-$lng['serversettings']['ssl']['ssl_protocols']['description'] = 'Dies ist eine Liste von SSL/TLS Protokollversionen die genutzt werden sollen (oder auch nicht genutzt werden sollen), wenn SSL verwendet wird. <b>Hinweis:</b> Ältere Browser sind möglicherweise nicht vollständig zum neusten Protokoll kompatibel.<br /><br /><b>Standard-Wert ist:</b><pre>TLSv1, TLSv1.2</pre>';
+$lng['serversettings']['ssl']['ssl_protocols']['description'] = 'Dies ist eine Liste von SSL/TLS Protokollversionen die genutzt werden sollen (oder auch nicht genutzt werden sollen), wenn SSL verwendet wird. <b>Hinweis:</b> Ältere Browser sind möglicherweise nicht vollständig zum neusten Protokoll kompatibel.<br /><br /><b>Standard-Wert ist:</b><pre>TLSv1.2</pre>';
 $lng['serversettings']['phpfpm_settings']['limit_extensions']['title'] = 'Erlaubte Dateiendungen';
 $lng['serversettings']['phpfpm_settings']['limit_extensions']['description'] = 'Beschränkt die Dateierweiterungen des Haupt-Skripts, das FPM zu parsen erlaubt. Dies kann Konfigurationsfehler auf der Webserverseite verhindern. Sie sollten FPM nur auf .php Erweiterungen beschränken, um zu verhindern, dass bösartige Nutzter andere Erweiterungen verwenden, um PHP Code auszuführen. Standardwert: .php';
 $lng['phpfpm']['ini_flags'] = 'Mögliche <strong>php_flag</strong>s für die php.ini. Pro Zeile eine Direktive';
@@ -1745,3 +1748,6 @@ $lng['admin']['domain_sessionticketsenabled']['description'] = 'Standardwert <st
 $lng['serversettings']['phpfpm_settings']['restart_note'] = 'Achtung: Der Code wird nicht auf Fehler geprüft. Bei etwaigen Fehlern könnte der PHP-FPM-Prozess nicht mehr starten!';
 $lng['serversettings']['phpfpm_settings']['custom_config']['title'] = 'Benutzerdefinierte Konfiguration';
 $lng['serversettings']['phpfpm_settings']['custom_config']['description'] = 'Füge eine benutzerdefinierte Einstellungen zur PHP-FPM Instanz hinzu, beispielsweise <i>pm.status_path = /status</i> für Monitoring. Unten ersichtliche Variablen können verwendet werden.' . ' <strong>' . $lng['serversettings']['phpfpm_settings']['restart_note'] . '</strong>';
+
+$lng['serversettings']['awstats']['logformat']['title'] = 'LogFormat Einstellung';
+$lng['serversettings']['awstats']['logformat']['description'] = 'Wenn ein benutzerdefiniertes LogFormat beim Webserver verwendet wird, muss LogFormat von awstats ebenso angepasst werden.<br/>Standard ist 1. Für weitere Informationen siehe Dokumentation unter <a target="_blank" href="https://awstats.sourceforge.io/docs/awstats_config.html#LogFormat">hier</a>.';

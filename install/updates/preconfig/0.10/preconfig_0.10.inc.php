@@ -11,7 +11,7 @@
  * @copyright  (c) the authors
  * @author     Froxlor team <team@froxlor.org> (2010-)
  * @license    GPLv2 http://files.froxlor.org/misc/COPYING.txt
- * @package    Language
+ * @package    Updater
  *
  */
 use Froxlor\Database\Database;
@@ -19,11 +19,14 @@ use Froxlor\Settings;
 use Froxlor\Install\PreConfig;
 use PHPMailer\PHPMailer;
 
-if (PreConfig::versionInUpdate($current_db_version, '201812190')) {
-	$item = array(
-		'description' => '<div class="alert alert-warning" role="alert">The ticketsystem has been removed completely. Please backup any contents from the froxlor database if you need them.</div>',
-		'question' => array()
-	);
+if (PreConfig::versionInUpdate($current_db_version, '202004140')) {
+	$item = [
+		'description' => 'Froxlor can now optionally validate the dns entries of domains that request Lets Encrypt certificates to reduce dns-related problems (e.g. freshly registered domain or updated a-record).',
+		'question' => [
+			'title' => 'Validate DNS of domains when using Lets Encrypt',
+			'form' => \Froxlor\UI\HTML::makeyesno('system_le_domain_dnscheck', '1', '0', '1')
+		]
+	];
 	array_push($preconfig_items, $item);
 }
 
@@ -34,3 +37,4 @@ if (PreConfig::versionInUpdate($current_db_version, '201901110')) {
 	);
 	array_push($preconfig_items, $item);
 }
+

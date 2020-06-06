@@ -204,6 +204,7 @@ $lng['error']['mydomain'] = '\'Domain\'';
 $lng['error']['mydocumentroot'] = '\'Documentroot\'';
 $lng['error']['loginnameexists'] = 'Loginname %s already exists';
 $lng['error']['emailiswrong'] = 'Email-address %s contains invalid characters or is incomplete';
+$lng['error']['alternativeemailiswrong'] = 'The given alternative email address %s to send the credentials to seems to be invalid';
 $lng['error']['loginnameiswrong'] = 'Loginname "%s" contains illegal characters.';
 $lng['error']['loginnameiswrong2'] = 'Loginname contains too many characters. Only %s characters are allowed.';
 $lng['error']['userpathcombinationdupe'] = 'Combination of username and path already exists';
@@ -317,6 +318,7 @@ $lng['admin']['templates']['COMPANY'] = 'Replaces with the customer\'s company n
 $lng['admin']['templates']['USERNAME'] = 'Replaced with the customer\'s account username.';
 $lng['admin']['templates']['PASSWORD'] = 'Replaced with the customer\'s account password.';
 $lng['admin']['templates']['EMAIL'] = 'Replaced with the address of the POP3/IMAP account.';
+$lng['admin']['templates']['CUSTOMER_NO'] = 'Replaces with the customer number';
 $lng['admin']['webserver'] = 'Webserver';
 $lng['admin']['bindzonewarning'] = $lng['panel']['emptyfordefault'] . '<br /><strong class="text-danger">ATTENTION:</strong> If you use a zonefile you will have to manage all required records for all sub-zones manually as well.';
 
@@ -339,7 +341,7 @@ $lng['serversettings']['logfiles_directory']['description'] = 'Where should all 
 $lng['serversettings']['logfiles_script']['title'] = 'Custom script to pipe log-files to';
 $lng['serversettings']['logfiles_script']['description'] = 'You can specify a script here and use the placeholders <strong>{LOGFILE}, {DOMAIN} and {CUSTOMER}</strong> if needed. In case you want to use it you will need to activate the <strong>Pipe webserver logfiles</strong> option too. No prefixed pipe-character is needed.';
 $lng['serversettings']['logfiles_format']['title'] = 'Access-log format';
-$lng['serversettings']['logfiles_format']['description'] = 'Enter a custom log-format here according to your webservers specifications, leave empty for default';
+$lng['serversettings']['logfiles_format']['description'] = 'Enter a custom log-format here according to your webservers specifications, leave empty for default. Depending on your format the string must be quoted.<br/>If used with nginx, it will look like <i>log_format frx_custom {CONFIGURED_VALUE}</i>.<br/>If used with Apache, it will look like <i>LogFormat {CONFIGURED_VALUE} frx_custom</i>.<br/><strong>Attention</strong>: The code won\'t be checked for any errors. If it contains errors, webserver might not start again!';
 $lng['serversettings']['logfiles_type']['title'] = 'Access-log type';
 $lng['serversettings']['logfiles_type']['description'] = 'Choose between <strong>combined</strong> or <strong>vhost_combined</strong> here.';
 $lng['serversettings']['logfiles_piped']['title'] = 'Pipe webserver logfiles to specified script (see above)';
@@ -408,6 +410,7 @@ $lng['admin']['ipsandports']['add'] = 'Add IP/Port';
 $lng['admin']['ipsandports']['edit'] = 'Edit IP/Port';
 $lng['admin']['ipsandports']['ipandport'] = 'IP/Port';
 $lng['admin']['ipsandports']['ip'] = 'IP';
+$lng['admin']['ipsandports']['ipnote'] = '<div id="ipnote" class="red">Note: Although private ip addresses are allowed, some features like DNS might not behave correctly.<br>Only use private ip addresses if you are sure.</div>';
 $lng['admin']['ipsandports']['port'] = 'Port';
 
 // ADDED IN 1.2.13-rc3
@@ -1977,8 +1980,8 @@ $lng['admin']['domain_http2']['title'] = 'HTTP2 support';
 $lng['admin']['domain_http2']['description'] = 'See <a target="_blank" href="https://en.wikipedia.org/wiki/HTTP/2">Wikipedia</a> for a detailed explanation of HTTP2';
 $lng['admin']['testmail'] = 'SMTP test';
 $lng['success']['testmailsent'] = 'Test mail sent successfully';
-$lng['serversettings']['disable_le_selfcheck']['title'] = "Disable Let's Encrypt local self-check";
-$lng['serversettings']['disable_le_selfcheck']['description'] = "If activated, froxlor will <strong>not</strong> perform its self-check for token accessibility. Needed for NATed IP's or similar.";
+$lng['serversettings']['le_domain_dnscheck']['title'] = "Validate DNS of domains when using Let's Encrypt";
+$lng['serversettings']['le_domain_dnscheck']['description'] = "If activated, froxlor will validate whether the domain which requests a Let's Encrypt certificate resolves to at least one of the system ip addresses.";
 $lng['menue']['phpsettings']['fpmdaemons'] = 'PHP-FPM versions';
 $lng['admin']['phpsettings']['activephpconfigs'] = 'In use for php-config(s)';
 $lng['admin']['phpsettingsforsubdomains'] = 'Apply php-config to all subdomains:';
@@ -1987,7 +1990,7 @@ $lng['serversettings']['leapiversion']['title'] = "Choose Let's Encrypt ACME imp
 $lng['serversettings']['leapiversion']['description'] = "Currently only ACME v2 implementation for Let's Encrypt is supported.";
 $lng['admin']['phpsettings']['pass_authorizationheader'] = 'Add "-pass-header Authorization" / "CGIPassAuth On" to vhosts';
 $lng['serversettings']['ssl']['ssl_protocols']['title'] = 'Configure the TLS protocol version';
-$lng['serversettings']['ssl']['ssl_protocols']['description'] = 'This is a list of ssl protocols that you want (or don\'t want) to use when using SSL. <b>Notice:</b> Some older browsers may not support the newest protcol versions.<br /><br /><b>Default value is:</b><pre>TLSv1, TLSv1.2</pre>';
+$lng['serversettings']['ssl']['ssl_protocols']['description'] = 'This is a list of ssl protocols that you want (or don\'t want) to use when using SSL. <b>Notice:</b> Some older browsers may not support the newest protcol versions.<br /><br /><b>Default value is:</b><pre>TLSv1.2</pre>';
 $lng['serversettings']['phpfpm_settings']['limit_extensions']['title'] = 'Allowed extensions';
 $lng['serversettings']['phpfpm_settings']['limit_extensions']['description'] = 'Limits the extensions of the main script FPM will allow to parse. This can prevent configuration mistakes on the web server side. You should only limit FPM to .php extensions to prevent malicious users to use other extensions to execute php code. Default value: .php';
 $lng['phpfpm']['ini_flags'] = 'Enter possible <strong>php_flag</strong>s for php.ini. One entry per line';
@@ -2098,3 +2101,6 @@ $lng['admin']['domain_sessionticketsenabled']['description'] = 'Default <strong>
 $lng['serversettings']['phpfpm_settings']['restart_note'] = 'Attention: The config won\'t be checked for any errors. If it contains errors, PHP-FPM might not start again!';
 $lng['serversettings']['phpfpm_settings']['custom_config']['title'] = 'Custom configuration';
 $lng['serversettings']['phpfpm_settings']['custom_config']['description'] = 'Add custom configuration to each PHP-FPM version instance, for example <i>pm.status_path = /status</i> for monitoring. Variables below can be used here. ' . ' <strong>' . $lng['serversettings']['phpfpm_settings']['restart_note'] . '</strong>';
+
+$lng['serversettings']['awstats']['logformat']['title'] = 'LogFormat setting';
+$lng['serversettings']['awstats']['logformat']['description'] = 'If you use customized logformat for your webserver, you need change the awstats LogFormat too.<br/>Default is 1. For more information check documentation <a target="_blank" href="https://awstats.sourceforge.io/docs/awstats_config.html#LogFormat">here</a>.';

@@ -265,7 +265,6 @@ return array(
 						'desc' => \Froxlor\Frontend\UI::getLng('serversettings.ssl.ssl_protocols.description'),
 						'type' => 'checkbox',
 						'value' => array(
-							'TLSv1',
 							'TLSv1.2'
 						),
 						'values' => array(
@@ -384,7 +383,7 @@ return array(
 						'value' => array()
 					),
 					'sessiontickets' => array(
-						'visible' => ($ssl_ipsandports != '' ? true : false) && \Froxlor\Settings::Get('system.webserver') != 'lighttpd',
+						'visible' => ($ssl_ipsandports != '' ? true : false) && \Froxlor\Settings::Get('system.webserver') != 'lighttpd' && \Froxlor\Settings::Get('system.sessionticketsenabled' != '1'),
 						'label' => $lng['admin']['domain_sessiontickets'],
 						'type' => 'checkbox',
 						'values' => array(

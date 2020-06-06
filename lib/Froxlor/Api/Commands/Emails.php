@@ -62,9 +62,10 @@ class Emails extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEnt
 			}
 
 			// check domain and whether it's an email-enabled domain
+			// use internal call because the customer might have 'domains' in customer_hide_options
 			$domain_check = $this->apiCall('SubDomains.get', array(
 				'domainname' => $domain
-			));
+			), true);
 			if ($domain_check['isemaildomain'] == 0) {
 				\Froxlor\UI\Response::standard_error('maindomainnonexist', $domain, true);
 			}
@@ -106,10 +107,12 @@ class Emails extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEnt
 			);
 			$email_check = Database::pexecute_first($stmt, $params, true, true);
 
-			if (strtolower($email_check['email_full']) == strtolower($email_full)) {
-				\Froxlor\UI\Response::standard_error('emailexistalready', $email_full, true);
-			} elseif ($email_check['email'] == $email) {
-				\Froxlor\UI\Response::standard_error('youhavealreadyacatchallforthisdomain', '', true);
+			if ($email_check) {
+				if (strtolower($email_check['email_full']) == strtolower($email_full)) {
+					\Froxlor\UI\Response::standard_error('emailexistalready', $email_full, true);
+				} elseif ($email_check['email'] == $email) {
+					\Froxlor\UI\Response::standard_error('youhavealreadyacatchallforthisdomain', '', true);
+				}
 			}
 
 			$stmt = Database::prepare("
@@ -233,6 +236,19 @@ class Emails extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEnt
 			$iscatchall = '1';
 			$email_parts = explode('@', $result['email_full']);
 			$email = '@' . $email_parts[1];
+			// catchall check
+			$stmt = Database::prepare("
+				SELECT `email_full` FROM `" . TABLE_MAIL_VIRTUAL . "`
+				WHERE `email` = :email AND `customerid` = :cid AND `iscatchall` = '1'
+			");
+			$params = array(
+				"email" => $email,
+				"cid" => $customer['customerid']
+			);
+			$email_check = Database::pexecute_first($stmt, $params, true, true);
+			if ($email_check) {
+				\Froxlor\UI\Response::standard_error('youhavealreadyacatchallforthisdomain', '', true);
+			}
 		} else {
 			$iscatchall = '0';
 			$email = $result['email_full'];
@@ -273,7 +289,7 @@ class Emails extends \Froxlor\Api\ApiCommand implements \Froxlor\Api\ResourceEnt
 	 *        	optional specify offset for resultset
 	 * @param array $sql_orderby
 	 *        	optional array with index = fieldname and value = ASC|DESC to order the resultset by one or more fields
-	 *
+	 *        	
 	 * @access admin, customer
 	 * @throws \Exception
 	 * @return string json-encoded array count|list

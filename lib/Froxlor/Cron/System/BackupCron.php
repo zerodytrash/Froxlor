@@ -77,6 +77,7 @@ class BackupCron extends \Froxlor\Cron\FroxlorCron
 
 		$del_stmt = Database::prepare("DELETE FROM `" . TABLE_PANEL_TASKS . "` WHERE `id` = :id");
 
+		$cronlog = FroxlorLogger::getInstanceOf();
 		$all_jobs = $result_tasks_stmt->fetchAll();
 		foreach ($all_jobs as $row) {
 

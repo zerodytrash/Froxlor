@@ -177,7 +177,7 @@ class Apache extends HttpConfigBase
 
 				$mypath = $this->getMyPath($row_ipsandports);
 
-				$this->virtualhosts_data[$vhosts_filename] .= 'DocumentRoot "' . $mypath . '"' . "\n";
+				$this->virtualhosts_data[$vhosts_filename] .= 'DocumentRoot "' . rtrim($mypath, "/") . '"' . "\n";
 
 				if ($row_ipsandports['vhostcontainer_servername_statement'] == '1') {
 					$this->virtualhosts_data[$vhosts_filename] .= ' ServerName ' . Settings::Get('system.hostname') . "\n";
@@ -666,7 +666,7 @@ class Apache extends HttpConfigBase
 
 		if ($domain['deactivated'] == '1' && Settings::Get('system.deactivateddocroot') != '') {
 			$webroot_text .= '  # Using docroot for deactivated users...' . "\n";
-			$webroot_text .= '  DocumentRoot "' . \Froxlor\FileDir::makeCorrectDir(Settings::Get('system.deactivateddocroot')) . "\"\n";
+			$webroot_text .= '  DocumentRoot "' . rtrim(\Froxlor\FileDir::makeCorrectDir(Settings::Get('system.deactivateddocroot')), "/") . "\"\n";
 			$webroot_text .= '  <Directory "' . \Froxlor\FileDir::makeCorrectDir(Settings::Get('system.deactivateddocroot')) . '">' . "\n";
 			// >=apache-2.4 enabled?
 			if (Settings::Get('system.apache24') == '1') {
@@ -679,7 +679,7 @@ class Apache extends HttpConfigBase
 			$webroot_text .= '  </Directory>' . "\n";
 			$this->deactivated = true;
 		} else {
-			$webroot_text .= '  DocumentRoot "' . $domain['documentroot'] . "\"\n";
+			$webroot_text .= '  DocumentRoot "' . rtrim($domain['documentroot'], "/") . "\"\n";
 			$this->deactivated = false;
 		}
 
@@ -765,7 +765,7 @@ class Apache extends HttpConfigBase
 		$logtype = 'combined';
 		if (Settings::Get('system.logfiles_format') != '') {
 			$logtype = 'frx_custom';
-			$logfiles_text .= '  LogFormat "' . Settings::Get('system.logfiles_format') . '" ' . $logtype . "\n";
+			$logfiles_text .= '  LogFormat ' . Settings::Get('system.logfiles_format') . ' ' . $logtype . "\n";
 		}
 		if (Settings::Get('system.logfiles_type') == '2' && Settings::Get('system.logfiles_format') == '') {
 			$logtype = 'vhost_combined';
