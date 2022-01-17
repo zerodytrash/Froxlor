@@ -378,11 +378,14 @@ if ($action == '2fa_entercode') {
 		$lastscript = "";
 		if (isset($_REQUEST['script']) && $_REQUEST['script'] != "") {
 			$lastscript = $_REQUEST['script'];
+			$lastscript = str_replace("..", "", $lastscript);
+			$lastscript = htmlspecialchars($lastscript, ENT_QUOTES);
 
 			if (! file_exists(__DIR__ . "/" . $lastscript)) {
 				$lastscript = "";
 			}
 		}
+
 		$lastqrystr = "";
 		if (isset($_REQUEST['qrystr']) && $_REQUEST['qrystr'] != "") {
 			$lastqrystr = htmlspecialchars($_REQUEST['qrystr'], ENT_QUOTES);
