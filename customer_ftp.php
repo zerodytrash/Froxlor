@@ -228,6 +228,8 @@ if ($page == 'overview') {
 					}
 				}
 
+				$result = \Froxlor\PhpHelper::htmlentitiesArray($result);
+
 				$ftp_edit_data = include_once dirname(__FILE__) . '/lib/formfields/customer/ftp/formfield.ftp_edit.php';
 				$ftp_edit_form = \Froxlor\UI\HtmlForm::genHTMLForm($ftp_edit_data);
 

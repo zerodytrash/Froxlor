@@ -210,6 +210,8 @@ if ($page == 'overview') {
 				$sql_root = Database::getSqlData();
 				Database::needRoot(false);
 
+				$result = \Froxlor\PhpHelper::htmlentitiesArray($result);
+
 				$mysql_edit_data = include_once dirname(__FILE__) . '/lib/formfields/customer/mysql/formfield.mysql_edit.php';
 				$mysql_edit_form = \Froxlor\UI\HtmlForm::genHTMLForm($mysql_edit_data);
 
